@@ -1819,14 +1819,18 @@ class NCManageDatabase: NSObject {
                     metadata.resourceType = file.resourceType
                     metadata.serverUrl = serverUrl
                     metadata.size = file.size
-                    CCUtility.insertTypeFileIconName(metadata.fileNameView, metadata: metadata)
-                    
+                
                     realm.add(metadata, update: .all)
                 }
             }
         } catch let error {
             print("[LOG] Could not write to database: ", error)
             return
+        }
+        
+        // Create directory records
+        for file in files {
+            if file.directory { _ = self.addDirectory(encrypted: file.e2eEncrypted, favorite: file.favorite, ocId: file.ocId, permissions: file.permissions, serverUrl: CCUtility.stringAppendServerUrl(serverUrl, addFileName: file.fileName), account: account) }
         }
         
         self.setDateReadDirectory(serverUrl: serverUrl, account: account)
