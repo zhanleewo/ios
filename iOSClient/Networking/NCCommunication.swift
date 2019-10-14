@@ -229,14 +229,14 @@ class NCCommunication: SessionDelegate {
                                 fileNamePath = String(href[..<href.index(before: href.endIndex)])
                                 file.directory = true
                             }
+                            // path
+                            file.path = (fileNamePath as NSString).deletingLastPathComponent + "/"
+                            file.path = file.path.removingPercentEncoding ?? ""
+                            // fileName
                             if isNotFirstFileOfList {
-                                file.path = (fileNamePath as NSString).deletingLastPathComponent
-                                file.path = fileNamePath.removingPercentEncoding ?? ""
-                                
                                 file.fileName = (fileNamePath as NSString).lastPathComponent
                                 file.fileName = file.fileName.removingPercentEncoding ?? ""
                             } else {
-                                file.path = fileNamePath.removingPercentEncoding ?? ""
                                 file.fileName = ""
                             }
                         }
