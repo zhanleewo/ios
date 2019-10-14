@@ -142,7 +142,6 @@ class FileProviderEnumerator: NSObject, NSFileProviderEnumerator {
             */
             // ++++++++++++
             
-            //OCNetworking.sharedManager().readFile(withAccount: fileProviderData.sharedInstance.account, serverUrl: serverUrlForFileName, fileName: fileName, completion: { (account, metadata, message, errorCode) in
             NCCommunication.sharedInstance.readFileOrFolder(serverUrl: serverUrlForFileName, fileName: fileName, depth: "0", completionHandler: { (files, error) in
                 
                 if error == nil && files.count >= 1 {
