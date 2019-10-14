@@ -146,7 +146,7 @@ class NCCommunication: SessionDelegate {
         }
     }
     
-    @objc func readFileOrFolder(serverUrl: String, depth: String, completionHandler: @escaping (_ result: [NCFile], _ error: Error?) -> Void) {
+    @objc func readFileOrFolder(serverUrl: String, fileName: String?, depth: String, completionHandler: @escaping (_ result: [NCFile], _ error: Error?) -> Void) {
         
         var files = [NCFile]()
         var isNotFirstFileOfList: Bool = false
@@ -182,11 +182,19 @@ class NCCommunication: SessionDelegate {
         """
 
         // url
+        // url
+        var serverUrl = serverUrl
         var url: URLConvertible
         do {
+            if serverUrl.last != "/" {
+                serverUrl = serverUrl + "/"
+            }
+            if fileName != nil {
+                serverUrl = serverUrl + fileName!
+            }
             try url = serverUrl.asURL()
         } catch let error {
-            completionHandler(files, error)
+            completionHandler(files,error)
             return
         }
         
