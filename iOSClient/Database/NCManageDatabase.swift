@@ -1783,11 +1783,18 @@ class NCManageDatabase: NSObject {
 
     @objc func addMetadata(files: [NCFile], account: String, serverUrl: String, removeFirst: Bool) {
     
+        var isNotFirstFileOfList: Bool = false
         let realm = try! Realm()
         
         do {
             try realm.write {
                 for file in files {
+                    
+                    if removeFirst == true && isNotFirstFileOfList == false {
+                        isNotFirstFileOfList = true
+                        continue
+                    }
+                    
                     let metadata = tableMetadata()
                     
                     metadata.account = account
