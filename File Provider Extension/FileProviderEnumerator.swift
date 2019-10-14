@@ -150,7 +150,7 @@ class FileProviderEnumerator: NSObject, NSFileProviderEnumerator {
                     
                     if fileProviderData.sharedInstance.listServerUrlEtag[serverUrl] == nil || fileProviderData.sharedInstance.listServerUrlEtag[serverUrl] != file.etag || metadatasFromDB == nil {
                         
-                        NCCommunication.sharedInstance.readFileOrFolder(serverUrl: serverUrl, fileName: fileName, depth: "1", completionHandler: { (files, error) in
+                        NCCommunication.sharedInstance.readFileOrFolder(serverUrl: serverUrl, fileName: nil, depth: "1", completionHandler: { (files, error) in
                             
                             if error == nil && files.count >= 1 {
                                 

@@ -182,7 +182,6 @@ class NCCommunication: SessionDelegate {
         """
 
         // url
-        // url
         var serverUrl = serverUrl
         var url: URLConvertible
         do {
