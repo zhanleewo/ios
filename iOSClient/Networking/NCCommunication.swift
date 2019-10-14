@@ -191,6 +191,9 @@ class NCCommunication: SessionDelegate {
             if fileName != nil {
                 serverUrl = serverUrl + fileName!
             }
+            if depth = "1" && serverUrl.last != "/" { serverUrl = serverUrl + "/" }
+            serverUrl = serverUrl.addingPercentEncoding(withAllowedCharacters: CharacterSet(charactersIn: ";?@&=$+{}<>,!'* ").inverted)! //";?@&=$+{}<>,!'*"
+
             try url = serverUrl.asURL()
         } catch let error {
             completionHandler(files,error)
