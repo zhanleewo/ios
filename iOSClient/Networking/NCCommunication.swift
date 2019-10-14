@@ -146,7 +146,7 @@ class NCCommunication: SessionDelegate {
         }
     }
     
-    @objc func readFileOrFolder(serverUrl: String, fileName: String?, depth: String, completionHandler: @escaping (_ result: [NCFile], _ error: Error?) -> Void) {
+    @objc func readFileOrFolder(serverUrl: String, depth: String, completionHandler: @escaping (_ result: [NCFile], _ error: Error?) -> Void) {
         
         var files = [NCFile]()
         var isNotFirstFileOfList: Bool = false
@@ -182,18 +182,12 @@ class NCCommunication: SessionDelegate {
         """
 
         // url
-        var serverUrl = serverUrl
+        var serverUrl = String(serverUrl)
         var url: URLConvertible
         do {
-            if serverUrl.last != "/" {
-                serverUrl = serverUrl + "/"
-            }
-            if fileName != nil {
-                serverUrl = serverUrl + fileName!
-            }
-            if depth = "1" && serverUrl.last != "/" { serverUrl = serverUrl + "/" }
+            if depth == "1" && serverUrl.last != "/" { serverUrl = serverUrl + "/" }
+            if depth == "0" && serverUrl.last == "/" { serverUrl = String(serverUrl.removeLast()) }
             serverUrl = serverUrl.addingPercentEncoding(withAllowedCharacters: CharacterSet(charactersIn: ";?@&=$+{}<>,!'* ").inverted)! //";?@&=$+{}<>,!'*"
-
             try url = serverUrl.asURL()
         } catch let error {
             completionHandler(files,error)
@@ -230,9 +224,21 @@ class NCCommunication: SessionDelegate {
                     for element in elements {
                         let file = NCFile()
                         if let href = element["d:href"].text {
-                            file.path = href.removingPercentEncoding ?? ""
-                            if isNotFirstFileOfList { file.fileName = (file.path as NSString).lastPathComponent }
-                            if href.last == "/" { file.directory = true }
+                            var fileNamePath = href
+                            if href.last == "/" {
+                                fileNamePath = String(href[..<href.index(before: href.endIndex)])
+                                file.directory = true
+                            }
+                            if isNotFirstFileOfList {
+                                file.path = (fileNamePath as NSString).deletingLastPathComponent
+                                file.path = fileNamePath.removingPercentEncoding ?? ""
+                                
+                                file.fileName = (fileNamePath as NSString).lastPathComponent
+                                file.fileName = file.fileName.removingPercentEncoding ?? ""
+                            } else {
+                                file.path = fileNamePath.removingPercentEncoding ?? ""
+                                file.fileName = ""
+                            }
                         }
                         let propstat = element["d:propstat"][0]
                         

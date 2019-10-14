@@ -125,15 +125,6 @@ class FileProviderEnumerator: NSObject, NSFileProviderEnumerator {
             // Update the WorkingSet -> Favorite
             fileProviderData.sharedInstance.updateFavoriteForWorkingSet()
             
-            // Read
-            var fileName: String?
-            var serverUrlForFileName = fileProviderData.sharedInstance.homeServerUrl
-            
-            if serverUrl != fileProviderData.sharedInstance.homeServerUrl {
-                fileName = (serverUrl as NSString).lastPathComponent
-                serverUrlForFileName = (serverUrl as NSString).deletingLastPathComponent
-            }
-            
             // +++ TEST +++
             /*
             OCNetworking.sharedManager()?.search(withAccount: fileProviderData.sharedInstance.account, folder: serverUrl, fileName:"", dateLastModified: nil, numberOfItem: 2, completion: { (account, metadatas, message, errorCode) in
@@ -142,7 +133,7 @@ class FileProviderEnumerator: NSObject, NSFileProviderEnumerator {
             */
             // ++++++++++++
             
-            NCCommunication.sharedInstance.readFileOrFolder(serverUrl: serverUrlForFileName, fileName: fileName, depth: "0", completionHandler: { (files, error) in
+            NCCommunication.sharedInstance.readFileOrFolder(serverUrl: serverUrl, depth: "0", completionHandler: { (files, error) in
                 
                 if error == nil && files.count >= 1 {
                     
@@ -150,7 +141,7 @@ class FileProviderEnumerator: NSObject, NSFileProviderEnumerator {
                     
                     if fileProviderData.sharedInstance.listServerUrlEtag[serverUrl] == nil || fileProviderData.sharedInstance.listServerUrlEtag[serverUrl] != file.etag || metadatasFromDB == nil {
                         
-                        NCCommunication.sharedInstance.readFileOrFolder(serverUrl: serverUrl, fileName: nil, depth: "1", completionHandler: { (files, error) in
+                        NCCommunication.sharedInstance.readFileOrFolder(serverUrl: serverUrl, depth: "1", completionHandler: { (files, error) in
                             
                             if error == nil && files.count >= 1 {
                                 
