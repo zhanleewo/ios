@@ -1781,6 +1781,40 @@ class NCManageDatabase: NSObject {
         return Array(metadatas.map { tableMetadata.init(value:$0) })
     }
 
+    @objc func addFileToMetadata(_ files: [NCFile], account: String, serverUrl: String) {
+    
+        
+        let realm = try! Realm()
+        
+        do {
+            try realm.write {
+                for file in files {
+                    let metadata = tableMetadata()
+                    
+                    metadata.account = account
+                    metadata.commentsUnread = file.commentsUnread
+                    metadata.contentType = file.contentType
+                    metadata.date = file.date
+                    metadata.directory = file.directory
+                    metadata.e2eEncrypted = file.e2eEncrypted
+                    metadata.etag = file.etag
+                    metadata.favorite = file.favorite
+                    metadata.fileId = file.fileId
+                    metadata.fileName = file.fileName
+                    metadata.fileNameView = file.fileName
+                    metadata.hasPreview = file.hasPreview
+                    
+                    realm.add(metadata, update: .all)
+                }
+            }
+        } catch let error {
+            print("[LOG] Could not write to database: ", error)
+            return
+        }
+        
+        self.setDateReadDirectory(serverUrl: serverUrl, account: account)
+    }
+    
     @objc func deleteMetadata(predicate: NSPredicate) {
         
         var directoryToClearDate = [String:String]()

@@ -286,7 +286,7 @@ class NCCommunication: SessionDelegate {
                         
                         // nc:
                         if let encrypted = propstat["d:prop", "nc:encrypted"].text {
-                            file.encrypted = (encrypted as NSString).boolValue
+                            file.e2eEncrypted = (encrypted as NSString).boolValue
                         }
                         if let haspreview = propstat["d:prop", "nc:has-preview"].text {
                             file.hasPreview = (haspreview as NSString).boolValue
