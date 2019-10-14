@@ -1781,9 +1781,8 @@ class NCManageDatabase: NSObject {
         return Array(metadatas.map { tableMetadata.init(value:$0) })
     }
 
-    @objc func addFileToMetadata(_ files: [NCFile], account: String, serverUrl: String) {
+    @objc func addMetadata(files: [NCFile], account: String, serverUrl: String, removeFirst: Bool) {
     
-        
         let realm = try! Realm()
         
         do {
@@ -1803,6 +1802,16 @@ class NCManageDatabase: NSObject {
                     metadata.fileName = file.fileName
                     metadata.fileNameView = file.fileName
                     metadata.hasPreview = file.hasPreview
+                    metadata.mountType = file.mountType
+                    metadata.ocId = file.ocId
+                    metadata.ownerId = file.ownerId
+                    metadata.ownerDisplayName = file.ownerDisplayName
+                    metadata.permissions = file.permissions
+                    metadata.quotaUsedBytes = file.quotaUsedBytes
+                    metadata.quotaAvailableBytes = file.quotaAvailableBytes
+                    metadata.resourceType = file.resourceType
+                    metadata.serverUrl = serverUrl
+                    metadata.size = file.size
                     
                     realm.add(metadata, update: .all)
                 }

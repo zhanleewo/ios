@@ -168,7 +168,7 @@ class FileProviderEnumerator: NSObject, NSFileProviderEnumerator {
                                     
                                 let metadatasInDownload = NCManageDatabase.sharedInstance.getMetadatas(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@ AND (status == %d OR status == %d OR status == %d OR status == %d)", fileProviderData.sharedInstance.account, serverUrl, k_metadataStatusWaitDownload, k_metadataStatusInDownload, k_metadataStatusDownloading, k_metadataStatusDownloadError), sorted: nil, ascending: false)
                                 
-                                NCManageDatabase.sharedInstance.addFileToMetadata(files, account: fileProviderData.sharedInstance.account, serverUrl: serverUrl)
+                                NCManageDatabase.sharedInstance.addMetadata(files: files, account: fileProviderData.sharedInstance.account, serverUrl: serverUrl, removeFirst: true)
                                 
                                 if metadatasInDownload != nil {
                                     _ = NCManageDatabase.sharedInstance.addMetadatas(metadatasInDownload!)
