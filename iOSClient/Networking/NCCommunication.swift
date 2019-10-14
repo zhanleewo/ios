@@ -225,6 +225,7 @@ class NCCommunication: SessionDelegate {
                         let file = NCFile()
                         if let href = element["d:href"].text {
                             var fileNamePath = href
+                            // directory
                             if href.last == "/" {
                                 fileNamePath = String(href[..<href.index(before: href.endIndex)])
                                 file.directory = true
