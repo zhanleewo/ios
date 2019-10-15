@@ -113,7 +113,7 @@ class NCManageDatabase: NSObject {
             let config = Realm.Configuration(
                 fileURL: dirGroup?.appendingPathComponent("\(k_appDatabaseNextcloud)/\(k_databaseDefault)"),
                 schemaVersion: UInt64(k_databaseSchemaVersion),
-                objectTypes: [tableMetadata.self, tableLocalFile.self, tableDirectory.self, tableTag.self, tableAccount.self]
+                objectTypes: [tableMetadata.self, tableLocalFile.self, tableDirectory.self, tableTag.self, tableAccount.self, tableCapabilities.self]
             )
             Realm.Configuration.defaultConfiguration = config
             
