@@ -187,7 +187,7 @@ class NCCommunication: SessionDelegate {
         do {
             if depth == "1" && serverUrl.last != "/" { serverUrl = serverUrl + "/" }
             if depth == "0" && serverUrl.last == "/" { serverUrl = String(serverUrl.removeLast()) }
-            serverUrl = serverUrl.addingPercentEncoding(withAllowedCharacters: CharacterSet(charactersIn: ";?@&=$+{}<>,!'* ").inverted)! //";?@&=$+{}<>,!'*"
+            serverUrl = serverUrl.addingPercentEncoding(withAllowedCharacters: CharacterSet(charactersIn: " ").inverted)! //";?@&=$+{}<>,!'*"
             try url = serverUrl.asURL()
         } catch let error {
             completionHandler(files,error)

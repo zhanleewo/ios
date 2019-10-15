@@ -54,7 +54,6 @@ extension FileProviderExtension {
                     if error == nil && data != nil {
                         if let image = UIImage.init(data: data!) {
                             let url = URL.init(fileURLWithPath: CCUtility.getDirectoryProviderStorageIconOcId(metadata.ocId, fileNameView: metadata.fileNameView))
-                            
                             perThumbnailCompletionHandler(itemIdentifier, data, nil)
                         }
                     } else {
@@ -66,7 +65,7 @@ extension FileProviderExtension {
                         completionHandler(nil)
                     }
                 }
-
+               
                 /*
                 OCNetworking.sharedManager().downloadPreview(withAccount: metadata.account, metadata: metadata, withWidth: width, andHeight: height, completion: { (account, preview, message, errorCode) in
                    
