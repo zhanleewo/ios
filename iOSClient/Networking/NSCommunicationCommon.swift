@@ -22,6 +22,7 @@
 //
 
 import Foundation
+import Alamofire
 
 class NCCommunicationCommon: NSObject {
     @objc static let sharedInstance: NCCommunicationCommon = {
@@ -40,4 +41,18 @@ class NCCommunicationCommon: NSObject {
             return nil
         }
     }
-}
+    
+    func encodeUrlString(_ string: String) -> URLConvertible? {
+        let allowedCharacterSet = (CharacterSet(charactersIn: " ").inverted)
+        if let escapedString = string.addingPercentEncoding(withAllowedCharacters: allowedCharacterSet) {            
+            var url: URLConvertible
+            do {
+                try url = escapedString.asURL()
+                return url
+            } catch _ {
+                return nil
+            }
+        }
+        return nil
+    }
+ }

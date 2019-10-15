@@ -318,14 +318,10 @@ class NCCommunication: SessionDelegate {
         
         // url
         var serverUrl = String(serverUrl)
-        var url: URLConvertible
-        do {
-            if serverUrl.last != "/" { serverUrl = serverUrl + "/" }
-            serverUrl = serverUrl + "index.php/core/preview.png?file=" + fileNamePathSource + "&x=\(width)&y=\(height)&a=1&mode=cover"
-            serverUrl = serverUrl.addingPercentEncoding(withAllowedCharacters: CharacterSet(charactersIn: ";?@&=$+{}<>,!'* ").inverted)!
-            try url = serverUrl.asURL()
-        } catch let error {
-            completionHandler(nil, error)
+        if serverUrl.last != "/" { serverUrl = serverUrl + "/" }
+        serverUrl = serverUrl + "index.php/core/preview.png?file=" + fileNamePathSource + "&x=\(width)&y=\(height)&a=1&mode=cover"
+        guard let url = NCCommunicationCommon.sharedInstance.encodeUrlString(serverUrl) else {
+            completionHandler(nil, NSError(domain: "", code: 400, userInfo: nil))
             return
         }
         
@@ -344,7 +340,7 @@ class NCCommunication: SessionDelegate {
                 if let data = response.data {
                     completionHandler(data, nil)
                 } else {
-                    completionHandler(nil, NSError(domain: "", code: 404, userInfo: nil))
+                    completionHandler(nil, NSError(domain: "", code: 400, userInfo: nil))
                 }
             }
         }
