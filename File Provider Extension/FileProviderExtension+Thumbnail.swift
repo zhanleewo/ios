@@ -47,6 +47,23 @@ extension FileProviderExtension {
                 let width = NCUtility.sharedInstance.getScreenWidthForPreview()
                 let height = NCUtility.sharedInstance.getScreenHeightForPreview()
                 
+                let fileNamePathSource = CCUtility.returnFileNamePath(fromFileName: metadata.fileName, serverUrl: metadata.serverUrl, activeUrl: fileProviderData.sharedInstance.accountUrl)!
+                let serverUrl = fileProviderData.sharedInstance.accountUrl
+                    
+                NCCommunication.sharedInstance.downloadPreview(serverUrl: serverUrl, fileNamePathSource: fileNamePathSource, width: width, height: height) { (data, error) in
+                    if error == nil && data != nil {
+                        
+                    } else {
+                        perThumbnailCompletionHandler(itemIdentifier, nil, NSFileProviderError(.serverUnreachable))
+                    }
+                    
+                    counterProgress += 1
+                    if (counterProgress == progress.totalUnitCount) {
+                        completionHandler(nil)
+                    }
+                }
+                
+                /*
                 OCNetworking.sharedManager().downloadPreview(withAccount: metadata.account, metadata: metadata, withWidth: width, andHeight: height, completion: { (account, preview, message, errorCode) in
                    
                     if errorCode == 0 && account == metadata.account {
@@ -67,7 +84,7 @@ extension FileProviderExtension {
                         completionHandler(nil)
                     }
                 })
-                
+                */
             } else {
                 
                 counterProgress += 1
@@ -79,5 +96,5 @@ extension FileProviderExtension {
         
         return progress
     }
-
+    
 }

@@ -313,6 +313,41 @@ class NCCommunication: SessionDelegate {
         }
     }
     
+    //MARK: - API
+    @objc func downloadPreview(serverUrl: String, fileNamePathSource: String, width: CGFloat, height: CGFloat, completionHandler: @escaping (_ data: Data?, _ error: Error?) -> Void) {
+        
+        // url
+        var serverUrl = String(serverUrl)
+        var url: URLConvertible
+        do {
+            if serverUrl.last != "/" { serverUrl = serverUrl + "/" }
+            serverUrl = serverUrl + "index.php/core/preview.png?file=" + fileNamePathSource + "&x=\(width)&y=\(height)&a=1&mode=cover"
+            serverUrl = serverUrl.addingPercentEncoding(withAllowedCharacters: CharacterSet(charactersIn: ";?@&=$+{}<>,!'* ").inverted)!
+            try url = serverUrl.asURL()
+        } catch let error {
+            completionHandler(nil, error)
+            return
+        }
+        
+        // method
+        let method = HTTPMethod(rawValue: "GET")
+        
+        // headers
+        var headers: HTTPHeaders = [.authorization(username: self.username, password: self.password)]
+        if let userAgent = self.userAgent { headers.update(.userAgent(userAgent)) }
+
+        
+        AF.request(url, method: method, parameters:nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).response { (response) in
+            switch response.result {
+            case.failure(let error):
+                completionHandler(nil, error)
+            case .success( _):
+                completionHandler(response.data, nil)
+            }
+        }
+    }
+    
+    
     //MARK: - Download
     
     @objc func download(serverUrl: String, fileName: String, fileNamePathDestination: String, completionHandler: @escaping (_ error: Error?) -> Void) {
