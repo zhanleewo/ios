@@ -1886,7 +1886,24 @@ class NCManageDatabase: NSObject {
         metadata.size = file.size
      
         realm.add(metadata, update: .all)
-       
+        
+        // Directory
+        if file.directory {
+            let result = realm.objects(tableDirectory.self).filter("ocId == %@", file.ocId).first
+            if result == nil {
+                
+                let directory = tableDirectory()
+                
+                directory.account = account
+                directory.e2eEncrypted = file.e2eEncrypted
+                directory.favorite = file.favorite
+                directory.permissions = file.permissions
+                directory.serverUrl = CCUtility.stringAppendServerUrl(serverUrl, addFileName: file.fileName)
+                
+                realm.add(directory, update: .all)
+            }
+        }
+    
         do {
             try realm.commitWrite()
         } catch let error {
