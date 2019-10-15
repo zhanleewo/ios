@@ -30,7 +30,6 @@ class NCCommunicationCommon: NSObject {
         return instance
     }()
 
-    
     func convertDate(_ dateString: String, format: String) -> NSDate? {
         let dateFormatter = DateFormatter()
         dateFormatter.locale = Locale.init(identifier: "en_US_POSIX")
