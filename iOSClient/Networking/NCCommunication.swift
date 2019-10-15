@@ -183,14 +183,10 @@ class NCCommunication: SessionDelegate {
 
         // url
         var serverUrl = String(serverUrl)
-        var url: URLConvertible
-        do {
-            if depth == "1" && serverUrl.last != "/" { serverUrl = serverUrl + "/" }
-            if depth == "0" && serverUrl.last == "/" { serverUrl = String(serverUrl.removeLast()) }
-            serverUrl = serverUrl.addingPercentEncoding(withAllowedCharacters: CharacterSet(charactersIn: " ").inverted)! //";?@&=$+{}<>,!'*"
-            try url = serverUrl.asURL()
-        } catch let error {
-            completionHandler(files,error)
+        if depth == "1" && serverUrl.last != "/" { serverUrl = serverUrl + "/" }
+        if depth == "0" && serverUrl.last == "/" { serverUrl = String(serverUrl.removeLast()) }
+        guard let url = NCCommunicationCommon.sharedInstance.encodeUrlString(serverUrl) else {
+            completionHandler(files, NSError(domain: "", code: 400, userInfo: nil))
             return
         }
         
