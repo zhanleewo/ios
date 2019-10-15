@@ -48,14 +48,12 @@ extension FileProviderExtension {
                 let height = NCUtility.sharedInstance.getScreenHeightForPreview()
                 
                 let fileNamePathSource = CCUtility.returnFileNamePath(fromFileName: metadata.fileName, serverUrl: metadata.serverUrl, activeUrl: fileProviderData.sharedInstance.accountUrl)!
+                let fileNamePathLocalDestination = CCUtility.getDirectoryProviderStorageIconOcId(metadata.ocId, fileNameView: metadata.fileNameView)!
                 let serverUrl = fileProviderData.sharedInstance.accountUrl
                     
-                NCCommunication.sharedInstance.downloadPreview(serverUrl: serverUrl, fileNamePathSource: fileNamePathSource, width: width, height: height) { (data, error) in
+                NCCommunication.sharedInstance.downloadPreview(serverUrl: serverUrl, fileNamePathSource: fileNamePathSource, fileNamePathLocalDestination: fileNamePathLocalDestination ,width: width, height: height) { (data, error) in
                     if error == nil && data != nil {
-                        if let image = UIImage.init(data: data!) {
-                            let url = URL.init(fileURLWithPath: CCUtility.getDirectoryProviderStorageIconOcId(metadata.ocId, fileNameView: metadata.fileNameView))
-                            perThumbnailCompletionHandler(itemIdentifier, data, nil)
-                        }
+                        perThumbnailCompletionHandler(itemIdentifier, data, nil)
                     } else {
                         perThumbnailCompletionHandler(itemIdentifier, nil, NSFileProviderError(.serverUnreachable))
                     }
@@ -66,29 +64,6 @@ extension FileProviderExtension {
                     }
                 }
                
-                /*
-                OCNetworking.sharedManager().downloadPreview(withAccount: metadata.account, metadata: metadata, withWidth: width, andHeight: height, completion: { (account, preview, message, errorCode) in
-                   
-                    if errorCode == 0 && account == metadata.account {
-                        do {
-                            let url = URL.init(fileURLWithPath: CCUtility.getDirectoryProviderStorageIconOcId(metadata.ocId, fileNameView: metadata.fileNameView))
-                            let data = try Data.init(contentsOf: url)
-                            perThumbnailCompletionHandler(itemIdentifier, data, nil)
-                        } catch let error {
-                            print("error: \(error)")
-                            perThumbnailCompletionHandler(itemIdentifier, nil, NSFileProviderError(.noSuchItem))
-                        }
-                    } else {
-                        perThumbnailCompletionHandler(itemIdentifier, nil, NSFileProviderError(.serverUnreachable))
-                    }
-                    
-                    counterProgress += 1
-                    if (counterProgress == progress.totalUnitCount) {
-                        completionHandler(nil)
-                    }
-                })
-                */
-                
             } else {
                 
                 counterProgress += 1

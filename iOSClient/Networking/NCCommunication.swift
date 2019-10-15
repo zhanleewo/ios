@@ -310,7 +310,7 @@ class NCCommunication: SessionDelegate {
     }
     
     //MARK: - API
-    @objc func downloadPreview(serverUrl: String, fileNamePathSource: String, width: CGFloat, height: CGFloat, completionHandler: @escaping (_ data: Data?, _ error: Error?) -> Void) {
+    @objc func downloadPreview(serverUrl: String, fileNamePathSource: String, fileNamePathLocalDestination: String, width: CGFloat, height: CGFloat, completionHandler: @escaping (_ data: Data?, _ error: Error?) -> Void) {
         
         // url
         var serverUrl = String(serverUrl)
@@ -334,7 +334,13 @@ class NCCommunication: SessionDelegate {
                 completionHandler(nil, error)
             case .success( _):
                 if let data = response.data {
-                    completionHandler(data, nil)
+                    do {
+                        let url = URL.init(fileURLWithPath: fileNamePathLocalDestination)
+                        try  data.write(to: url, options: .atomic)
+                        completionHandler(data, nil)
+                    } catch let error {
+                        completionHandler(nil, error)
+                    }
                 } else {
                     completionHandler(nil, NSError(domain: "", code: 400, userInfo: nil))
                 }
