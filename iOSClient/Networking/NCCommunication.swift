@@ -186,8 +186,7 @@ class NCCommunication: SessionDelegate {
         if depth == "1" && serverUrl.last != "/" { serverUrl = serverUrl + "/" }
         if depth == "0" && serverUrl.last == "/" { serverUrl = String(serverUrl.removeLast()) }
         guard let url = NCCommunicationCommon.sharedInstance.encodeUrlString(serverUrl) else {
-            completionHandler(files, NSError(domain: NSURLErrorUnsupportedURL, code:
-                , userInfo: nil))
+            completionHandler(files, NSError(domain: NSCocoaErrorDomain, code: NSURLErrorUnsupportedURL, userInfo: nil))
             return
         }
         
@@ -306,7 +305,7 @@ class NCCommunication: SessionDelegate {
                     }
                     completionHandler(files, nil)
                 } else {
-                    completionHandler(files, NSError(domain: NSCocoaErrorDomain, code: NSURLErrorCannotDecodeContentData, userInfo: nil))
+                    completionHandler(files, NSError(domain: NSCocoaErrorDomain, code: NSURLErrorBadServerResponse, userInfo: nil))
                 }
             }
         }
