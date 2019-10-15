@@ -66,7 +66,7 @@ extension FileProviderExtension {
                         completionHandler(nil)
                     }
                 }
-                
+
                 /*
                 OCNetworking.sharedManager().downloadPreview(withAccount: metadata.account, metadata: metadata, withWidth: width, andHeight: height, completion: { (account, preview, message, errorCode) in
                    
@@ -89,6 +89,7 @@ extension FileProviderExtension {
                     }
                 })
                 */
+                
             } else {
                 
                 counterProgress += 1
