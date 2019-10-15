@@ -52,7 +52,11 @@ extension FileProviderExtension {
                     
                 NCCommunication.sharedInstance.downloadPreview(serverUrl: serverUrl, fileNamePathSource: fileNamePathSource, width: width, height: height) { (data, error) in
                     if error == nil && data != nil {
-                        
+                        if let image = UIImage.init(data: data!) {
+                            let url = URL.init(fileURLWithPath: CCUtility.getDirectoryProviderStorageIconOcId(metadata.ocId, fileNameView: metadata.fileNameView))
+                            
+                            perThumbnailCompletionHandler(itemIdentifier, data, nil)
+                        }
                     } else {
                         perThumbnailCompletionHandler(itemIdentifier, nil, NSFileProviderError(.serverUnreachable))
                     }

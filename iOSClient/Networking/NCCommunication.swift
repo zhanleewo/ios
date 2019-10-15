@@ -342,7 +342,11 @@ class NCCommunication: SessionDelegate {
             case.failure(let error):
                 completionHandler(nil, error)
             case .success( _):
-                completionHandler(response.data, nil)
+                if let data = response.data {
+                    completionHandler(data, nil)
+                } else {
+                    completionHandler(nil, NSError(domain: "", code: 404, userInfo: nil))
+                }
             }
         }
     }
