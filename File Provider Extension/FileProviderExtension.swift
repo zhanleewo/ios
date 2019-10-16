@@ -215,6 +215,7 @@ class FileProviderExtension: NSFileProviderExtension {
             return
         }
         
+        /*
         let task = OCNetworking.sharedManager().download(withAccount: metadata.account, fileNameServerUrl: metadata.serverUrl + "/" + metadata.fileName, fileNameLocalPath: url.path, encode: true, communication: OCNetworking.sharedManager()?.sharedOCCommunicationExtension(), completion: { (account, lenght, etag, date, message, errorCode) in
             
             // remove Task
@@ -253,6 +254,7 @@ class FileProviderExtension: NSFileProviderExtension {
             outstandingSessionTasks[url] = task
             NSFileProviderManager.default.register(task!, forItemWithIdentifier: NSFileProviderItemIdentifier(identifier.rawValue)) { (error) in }
         }
+        */
     }
     
     override func itemChanged(at url: URL) {
@@ -267,6 +269,7 @@ class FileProviderExtension: NSFileProviderExtension {
         let fileNameServerUrl = metadata.serverUrl + "/" + fileName
         let fileNameLocalPath = url.path
         
+        /*
         OCNetworking.sharedManager()?.upload(withAccount: fileProviderData.sharedInstance.account, fileNameServerUrl: fileNameServerUrl, fileNameLocalPath: fileNameLocalPath, encode: true, communication: OCNetworking.sharedManager()?.sharedOCCommunicationExtension(), progress: { (progress) in
         }, completion: { (account, ocId, etag, date, message, errorCode) in
             
@@ -276,6 +279,7 @@ class FileProviderExtension: NSFileProviderExtension {
                 CCUtility.removeFile(atPath: CCUtility.getDirectoryProviderStorageIconOcId(itemIdentifier.rawValue, fileNameView: fileName))
             }
         })
+        */
     }
     
     /*

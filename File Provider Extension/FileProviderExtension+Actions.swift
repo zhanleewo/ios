@@ -79,6 +79,7 @@ extension FileProviderExtension {
             return
         }
         
+        /*
         OCNetworking.sharedManager().deleteFileOrFolder(withAccount: fileProviderData.sharedInstance.account, path: metadata.serverUrl + "/" + metadata.fileName, completion: { (account, message, errorCode) in
             if errorCode == 0 || errorCode == kOCErrorServerPathNotFound {
                 let fileNamePath = CCUtility.getDirectoryProviderStorageOcId(itemIdentifier.rawValue)!
@@ -102,6 +103,7 @@ extension FileProviderExtension {
                 completionHandler( NSFileProviderError(.serverUnreachable))
             }
         })
+        */
     }
     
     override func reparentItem(withIdentifier itemIdentifier: NSFileProviderItemIdentifier, toParentItemWithIdentifier parentItemIdentifier: NSFileProviderItemIdentifier, newName: String?, completionHandler: @escaping (NSFileProviderItem?, Error?) -> Void) {
@@ -127,6 +129,7 @@ extension FileProviderExtension {
         let serverUrlTo = tableDirectoryTo.serverUrl
         let fileNameTo = serverUrlTo + "/" + itemFrom.filename
         
+        /*
         OCNetworking.sharedManager().moveFileOrFolder(withAccount:  metadataFrom.account, fileName: fileNameFrom, fileNameTo: fileNameTo, completion: { (account, message, errorCode) in
             
             if errorCode == 0 && account == metadataFrom.account {
@@ -150,6 +153,7 @@ extension FileProviderExtension {
                 completionHandler(nil, NSFileProviderError(.serverUnreachable))
             }
         })
+        */
     }
     
     override func renameItem(withIdentifier itemIdentifier: NSFileProviderItemIdentifier, toName itemName: String, completionHandler: @escaping (NSFileProviderItem?, Error?) -> Void) {
@@ -168,6 +172,7 @@ extension FileProviderExtension {
         let fileNamePathFrom = metadata.serverUrl + "/" + fileNameFrom
         let fileNamePathTo = metadata.serverUrl + "/" + itemName
         
+        /*
         OCNetworking.sharedManager().moveFileOrFolder(withAccount: metadata.account, fileName: fileNamePathFrom, fileNameTo: fileNamePathTo, completion: { (account, message, errorCode) in
             
             if errorCode == 0 && account == metadata.account {
@@ -205,6 +210,7 @@ extension FileProviderExtension {
                 completionHandler(nil, NSFileProviderError(.serverUnreachable))
             }
         })
+        */
     }
     
     override func setFavoriteRank(_ favoriteRank: NSNumber?, forItemIdentifier itemIdentifier: NSFileProviderItemIdentifier, completionHandler: @escaping (NSFileProviderItem?, Error?) -> Void) {
@@ -233,6 +239,7 @@ extension FileProviderExtension {
         if (favorite == true && metadata.favorite == false) || (favorite == false && metadata.favorite == true) {
             let fileNamePath = CCUtility.returnFileNamePath(fromFileName: metadata.fileName, serverUrl: metadata.serverUrl, activeUrl: fileProviderData.sharedInstance.accountUrl)
             
+            /*
             OCNetworking.sharedManager().settingFavorite(withAccount: metadata.account, fileName: fileNamePath, favorite: favorite, completion: { (account, message, errorCode) in
                 if errorCode == 0 && account == metadata.account {
                     // Change DB
@@ -259,6 +266,7 @@ extension FileProviderExtension {
                     completionHandler(item, NSFileProviderError(.serverUnreachable))
                 }
             })
+            */
         }
     }
     
@@ -346,6 +354,7 @@ extension FileProviderExtension {
                 
                 fileURL.stopAccessingSecurityScopedResource()
                 
+                /*
                 OCNetworking.sharedManager()?.upload(withAccount: fileProviderData.sharedInstance.account, fileNameServerUrl: fileNameServerUrl, fileNameLocalPath: fileTemporaryDirectory, encode: true, communication: OCNetworking.sharedManager()?.sharedOCCommunicationExtension(), progress: { (progress) in
                     
                 }, completion: { (account, ocId, etag, date, message, errorCode) in
@@ -379,6 +388,7 @@ extension FileProviderExtension {
                         completionHandler(nil, NSFileProviderError(.serverUnreachable))
                     }                   
                 })
+                */
             }
         }
     }
