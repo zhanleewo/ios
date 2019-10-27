@@ -93,9 +93,6 @@
 #define k_login_Add_Forced                              1
 #define k_login_Add_SignUp                              2
 
-// Picker select image
-#define k_pickerControllerMax                           1000.0
-
 // define Nextcloud IOS
 #define k_share_link_middle_part_url_after_version_8    @"index.php/s/"
 
