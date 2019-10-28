@@ -382,4 +382,79 @@ class FileProviderExtension: NSFileProviderExtension {
             outstandingSessionTasks.removeValue(forKey: url)
         }
     }
+    
+    override func importDocument(at fileURL: URL, toParentItemIdentifier parentItemIdentifier: NSFileProviderItemIdentifier, completionHandler: @escaping (NSFileProviderItem?, Error?) -> Void) {
+                
+        DispatchQueue.main.async {
+            
+            autoreleasepool {
+            
+                var size = 0 as Double
+                var error: NSError?
+                
+                guard let tableDirectory = fileProviderUtility.sharedInstance.getTableDirectoryFromParentItemIdentifier(parentItemIdentifier, account: fileProviderData.sharedInstance.account, homeServerUrl: fileProviderData.sharedInstance.homeServerUrl) else {
+                    completionHandler(nil, NSFileProviderError(.noSuchItem))
+                    return
+                }
+                
+                if fileURL.startAccessingSecurityScopedResource() == false {
+                    completionHandler(nil, NSFileProviderError(.noSuchItem))
+                    return
+                }
+                
+                // typefile directory ? (NOT PERMITTED)
+                do {
+                    let attributes = try fileProviderUtility.sharedInstance.fileManager.attributesOfItem(atPath: fileURL.path)
+                    size = attributes[FileAttributeKey.size] as! Double
+                    let typeFile = attributes[FileAttributeKey.type] as! FileAttributeType
+                    if typeFile == FileAttributeType.typeDirectory {
+                        completionHandler(nil, NSFileProviderError(.noSuchItem))
+                        return
+                    }
+                } catch {
+                    completionHandler(nil, NSFileProviderError(.noSuchItem))
+                    return
+                }
+        
+                let fileName = NCUtility.sharedInstance.createFileName(fileURL.lastPathComponent, serverUrl: tableDirectory.serverUrl, account: fileProviderData.sharedInstance.account)
+                let fileNameServerUrl = tableDirectory.serverUrl + "/" + fileName
+                let fileTemporaryDirectory = NSTemporaryDirectory() + fileName
+                
+                self.fileCoordinator.coordinate(readingItemAt: fileURL, options: .withoutChanges, error: &error) { (url) in
+                    _ = fileProviderUtility.sharedInstance.copyFile(url.path, toPath: fileTemporaryDirectory)
+                }
+                
+                fileURL.stopAccessingSecurityScopedResource()
+                
+                _ = NCCommunication.sharedInstance.upload(serverUrlFileName: fileNameServerUrl, fileNamePathSource: fileTemporaryDirectory, wwan: false, account: fileProviderData.sharedInstance.account, progressHandler: { (progress) in
+                }) { (account, ocId, etag, date, error) in
+                    if error == nil {
+                        _ = fileProviderUtility.sharedInstance.moveFile(fileTemporaryDirectory, toPath: CCUtility.getDirectoryProviderStorageOcId(ocId, fileNameView: fileName))
+                                               
+                        let metadata = tableMetadata()
+                        metadata.account = account
+                        metadata.date = date! as NSDate
+                        metadata.directory = false
+                        metadata.etag = etag!
+                        metadata.ocId = ocId!
+                        metadata.fileName = fileName
+                        metadata.fileNameView = fileName
+                        metadata.serverUrl = tableDirectory.serverUrl
+                        metadata.size = size
+                       
+                        guard let metadataDB = NCManageDatabase.sharedInstance.addMetadata(metadata) else {
+                            completionHandler(nil, NSFileProviderError(.noSuchItem))
+                            return
+                        }
+                        NCManageDatabase.sharedInstance.addLocalFile(metadata: metadataDB)
+                       
+                        let item = FileProviderItem(metadata: metadataDB, parentItemIdentifier: parentItemIdentifier)
+                        completionHandler(item, nil)
+                    } else {
+                        completionHandler(nil, NSFileProviderError(.serverUnreachable))
+                    }
+                }
+            }
+        }
+    }
 }
