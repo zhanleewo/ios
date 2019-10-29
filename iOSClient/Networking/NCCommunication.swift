@@ -65,7 +65,7 @@ import SwiftyJSON
     }()
     
     @objc public lazy var sessionManagerTransferExtension: URLSession = {
-        let configuration = URLSessionConfiguration.background(withIdentifier: NCCommunicationCommon.sharedInstance.session_description_extension)
+        let configuration = URLSessionConfiguration.background(withIdentifier: NCCommunicationCommon.sharedInstance.session_extension)
         configuration.allowsCellularAccess = true
         configuration.sessionSendsLaunchEvents = true
         configuration.isDiscretionary = false
@@ -73,7 +73,7 @@ import SwiftyJSON
         configuration.requestCachePolicy = NSURLRequest.CachePolicy.reloadIgnoringLocalCacheData
         configuration.sharedContainerIdentifier = capabilitiesGroup
         let session = URLSession(configuration: configuration, delegate: self, delegateQueue: OperationQueue.main)
-        session.sessionDescription = NCCommunicationCommon.sharedInstance.session_description_extension
+        session.sessionDescription = NCCommunicationCommon.sharedInstance.session_extension
         return session
     }()
     
@@ -541,17 +541,7 @@ import SwiftyJSON
     }
     //MARK: - File transfer
     
-    @objc public func download(serverUrlFileName: String, fileNamePathLocalDestination: String, wwan: Bool, account: String, progressHandler: @escaping (_ progress: Progress) -> Void , completionHandler: @escaping (_ account: String, _ etag: String?, _ date: NSDate?, _ lenght: Double, _ error: Error?) -> Void) -> URLSessionTask? {
-        
-        // session
-        let sessionManager: Alamofire.Session
-        if wwan {
-            sessionManager = sessionManagerTransferWWan
-            sessionManager.session.sessionDescription = NCCommunicationCommon.sharedInstance.session_description_download_wwan
-        } else {
-            sessionManager = sessionManagerTransfer
-            sessionManager.session.sessionDescription = NCCommunicationCommon.sharedInstance.session_description_download
-        }
+    @objc public func download(serverUrlFileName: String, fileNamePathLocalDestination: String, account: String, progressHandler: @escaping (_ progress: Progress) -> Void , completionHandler: @escaping (_ account: String, _ etag: String?, _ date: NSDate?, _ lenght: Double, _ error: Error?) -> Void) -> URLSessionTask? {
         
         // url
         guard let url = NCCommunicationCommon.sharedInstance.encodeUrlString(serverUrlFileName) else {
@@ -572,7 +562,9 @@ import SwiftyJSON
         var headers: HTTPHeaders = [.authorization(username: self.username, password: self.password)]
         if let userAgent = self.userAgent { headers.update(.userAgent(userAgent)) }
         
-        let request = sessionManager.download(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil, to: destination)
+        // session
+        sessionManagerTransfer.session.sessionDescription = NCCommunicationCommon.sharedInstance.session_description_download
+        let request = sessionManagerTransfer.download(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil, to: destination)
         .downloadProgress { progress in
             progressHandler(progress)
         }
@@ -596,17 +588,7 @@ import SwiftyJSON
         return request.task
     }
     
-    @objc public func upload(serverUrlFileName: String, fileNamePathSource: String, wwan: Bool, account: String, progressHandler: @escaping (_ progress: Progress) -> Void ,completionHandler: @escaping (_ account: String, _ ocId: String?, _ etag: String?, _ date: NSDate?, _ error: Error?) -> Void) -> URLSessionTask? {
-        
-        // session
-        let sessionManager: Alamofire.Session
-        if wwan {
-            sessionManager = sessionManagerTransferWWan
-            sessionManager.session.sessionDescription = NCCommunicationCommon.sharedInstance.session_description_upload_wwan
-        } else {
-            sessionManager = sessionManagerTransfer
-            sessionManager.session.sessionDescription = NCCommunicationCommon.sharedInstance.session_description_upload
-        }
+    @objc public func upload(serverUrlFileName: String, fileNamePathSource: String, account: String, progressHandler: @escaping (_ progress: Progress) -> Void ,completionHandler: @escaping (_ account: String, _ ocId: String?, _ etag: String?, _ date: NSDate?, _ error: Error?) -> Void) -> URLSessionTask? {
         
         // url
         guard let url = NCCommunicationCommon.sharedInstance.encodeUrlString(serverUrlFileName) else {
@@ -619,7 +601,9 @@ import SwiftyJSON
         var headers: HTTPHeaders = [.authorization(username: self.username, password: self.password)]
         if let userAgent = self.userAgent { headers.update(.userAgent(userAgent)) }
         
-        let request = sessionManager.upload(fileNamePathSourceUrl, to: url, method: .put, headers: headers, interceptor: nil, fileManager: .default)
+        // session
+        sessionManagerTransfer.session.sessionDescription = NCCommunicationCommon.sharedInstance.session_description_upload
+        let request = sessionManagerTransfer.upload(fileNamePathSourceUrl, to: url, method: .put, headers: headers, interceptor: nil, fileManager: .default)
         .uploadProgress { progress in
             progressHandler(progress)
         }
