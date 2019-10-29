@@ -40,6 +40,7 @@ import SwiftyJSON
     var username = ""
     var password = ""
     var userAgent: String?
+    var capabilitiesGroup: String?
     @objc public var delegate: NCCommunicationDelegate?
     
     // Session Manager
@@ -63,14 +64,28 @@ import SwiftyJSON
         return Alamofire.Session(configuration: configuration, delegate: self, rootQueue:  DispatchQueue(label: "com.nextcloud.sessionManagerTransferWWan.rootQueue"), startRequestsImmediately: true, requestQueue: nil, serializationQueue: nil, interceptor: nil, serverTrustManager: nil, redirectHandler: nil, cachedResponseHandler: nil, eventMonitors: self.makeEvents())
     }()
     
+    public lazy var sessionManagerTransferExtension: URLSession = {
+        let configuration = URLSessionConfiguration.background(withIdentifier: NCCommunicationCommon.sharedInstance.session_description_upload_extension)
+        configuration.allowsCellularAccess = true
+        configuration.sessionSendsLaunchEvents = true
+        configuration.isDiscretionary = false
+        configuration.httpMaximumConnectionsPerHost = 1
+        configuration.requestCachePolicy = NSURLRequest.CachePolicy.reloadIgnoringLocalCacheData
+        configuration.sharedContainerIdentifier = capabilitiesGroup
+        let session = URLSession(configuration: configuration, delegate: self, delegateQueue: OperationQueue.main)
+        session.sessionDescription = NCCommunicationCommon.sharedInstance.session_description_upload_extension
+        return session
+    }()
+    
     //MARK: - Initializer / Setup
 
     init() { }
     
-    @objc public func setup(username: String, password: String, userAgent: String?) {
-           self.username = username
-           self.password = password
-           self.userAgent = userAgent
+    @objc public func setup(username: String, password: String, userAgent: String?, capabilitiesGroup: String?) {
+        self.username = username
+        self.password = password
+        self.userAgent = userAgent
+        self.capabilitiesGroup = capabilitiesGroup
     }
 
     //MARK: - monitor
@@ -628,8 +643,26 @@ import SwiftyJSON
         return request.task
     }
     
-    @objc public func uploadBackground(serverUrlFileName: String, fileNamePathSource: String) {
+    @objc public func uploadBackground(serverUrlFileName: String, fileNamePathSource: String, session: URLSession) -> URLSessionUploadTask? {
         
+        guard let url = NCCommunicationCommon.sharedInstance.encodeUrlString(serverUrlFileName) as? URL else {
+            return nil
+        }
+        var request = URLRequest(url: url)
+        let loginString = "\(username):\(password)"
+        guard let loginData = loginString.data(using: String.Encoding.utf8) else {
+            return nil
+        }
+        let base64LoginString = loginData.base64EncodedString()
+        
+        request.httpMethod = "PUT"
+        request.setValue(userAgent, forHTTPHeaderField: "User-Agent")
+        request.setValue("Basic \(base64LoginString)", forHTTPHeaderField: "Authorization")
+
+        let task = session.uploadTask(with: request, fromFile: URL.init(fileURLWithPath: fileNamePathSource))
+        
+        task.resume()
+        return task
     }
     
     //MARK: - SessionDelegate
