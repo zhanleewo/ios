@@ -431,6 +431,9 @@
 		F7AE00F5230D5F9E007ACF8A /* NCLoginWeb.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7AE00F4230D5F9E007ACF8A /* NCLoginWeb.swift */; };
 		F7AE00F8230E81CB007ACF8A /* NCBrowserWeb.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7AE00F7230E81CB007ACF8A /* NCBrowserWeb.swift */; };
 		F7AE00FA230E81EB007ACF8A /* NCBrowserWeb.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F7AE00F9230E81EB007ACF8A /* NCBrowserWeb.storyboard */; };
+		F7AE0F372368A50700997EE0 /* NCCommunicationBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7AE0F362368A50700997EE0 /* NCCommunicationBackground.swift */; };
+		F7AE0F382368A50700997EE0 /* NCCommunicationBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7AE0F362368A50700997EE0 /* NCCommunicationBackground.swift */; };
+		F7AE0F392368A50700997EE0 /* NCCommunicationBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7AE0F362368A50700997EE0 /* NCCommunicationBackground.swift */; };
 		F7B0C0CD1EE7E7750033AC24 /* CCSynchronize.m in Sources */ = {isa = PBXBuildFile; fileRef = F7B0C0CC1EE7E7750033AC24 /* CCSynchronize.m */; };
 		F7B0C1751EE839A30033AC24 /* NCAutoUpload.m in Sources */ = {isa = PBXBuildFile; fileRef = F7B0C1741EE839A30033AC24 /* NCAutoUpload.m */; };
 		F7B174C822FAC0A8000B7579 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = F7B174C722FAC0A8000B7579 /* AppDelegate.m */; };
@@ -1196,6 +1199,7 @@
 		F7AE00F4230D5F9E007ACF8A /* NCLoginWeb.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCLoginWeb.swift; sourceTree = "<group>"; };
 		F7AE00F7230E81CB007ACF8A /* NCBrowserWeb.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCBrowserWeb.swift; sourceTree = "<group>"; };
 		F7AE00F9230E81EB007ACF8A /* NCBrowserWeb.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = NCBrowserWeb.storyboard; sourceTree = "<group>"; };
+		F7AE0F362368A50700997EE0 /* NCCommunicationBackground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCCommunicationBackground.swift; sourceTree = "<group>"; };
 		F7B0C0CB1EE7E7750033AC24 /* CCSynchronize.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CCSynchronize.h; sourceTree = "<group>"; };
 		F7B0C0CC1EE7E7750033AC24 /* CCSynchronize.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CCSynchronize.m; sourceTree = "<group>"; };
 		F7B0C1731EE839A30033AC24 /* NCAutoUpload.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NCAutoUpload.h; sourceTree = "<group>"; };
@@ -1913,6 +1917,7 @@
 				F755BD9A20594AC7008C5FBB /* NCService.swift */,
 				F736267823604A8A0083CF36 /* NCNetworking.swift */,
 				F736B54D234DCE43008A5C9F /* NCCommunication.swift */,
+				F7AE0F362368A50700997EE0 /* NCCommunicationBackground.swift */,
 				F724B1CB2351BFBD00A5753B /* NCCommunicationModel.swift */,
 				F7E8561A235202DF009A3330 /* NCCommunicationCommon.swift */,
 				F732BA031D76CE1500E9878B /* CCNetworking.h */,
@@ -3410,6 +3415,7 @@
 				F73CC0791E813DFF006E3047 /* BKShiftingView.m in Sources */,
 				F71459D21D12E3B700CAFEEC /* CCUtility.m in Sources */,
 				F71459D31D12E3B700CAFEEC /* CCBKPasscode.m in Sources */,
+				F7AE0F382368A50700997EE0 /* NCCommunicationBackground.swift in Sources */,
 				F7F8D71C1ED6183000E711F3 /* CCCellShareExt.m in Sources */,
 				F732BA0B1D76DBA500E9878B /* CCNetworking.m in Sources */,
 				F70022CF1EC4C9100080073F /* OCShareUser.m in Sources */,
@@ -3483,6 +3489,7 @@
 				F7434B5B20E241D100417916 /* NCEndToEndMetadata.swift in Sources */,
 				F736B550234DCE43008A5C9F /* NCCommunication.swift in Sources */,
 				F7B6ACDD22FC2D15008AB646 /* NCComments.m in Sources */,
+				F7AE0F392368A50700997EE0 /* NCCommunicationBackground.swift in Sources */,
 				F7434B5D20E241E800417916 /* CCUtility.m in Sources */,
 				F736267B23604A8A0083CF36 /* NCNetworking.swift in Sources */,
 				F7434B5220E2409900417916 /* OCXMLShareByLinkParser.m in Sources */,
@@ -3614,6 +3621,7 @@
 				F77B0E301D118A16002130FE /* CCHud.m in Sources */,
 				F76673ED22C901F6007ED366 /* FileProviderDomain.swift in Sources */,
 				F7D423891F0596C6009C9782 /* ReaderViewController.m in Sources */,
+				F7AE0F372368A50700997EE0 /* NCCommunicationBackground.swift in Sources */,
 				F70022E91EC4C9100080073F /* OCXMLShareByLinkParser.m in Sources */,
 				F77B0E311D118A16002130FE /* CCExifGeo.m in Sources */,
 				F73B4F0E1F470D9100BBEE4B /* nsMBCSGroupProber.cpp in Sources */,
