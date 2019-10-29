@@ -28,7 +28,8 @@ import SwiftyXMLParser
 import SwiftyJSON
 
 @objc public protocol NCCommunicationDelegate {
-    @objc func authenticationChallenge(_ challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void)
+    @objc optional func authenticationChallenge(_ challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void)
+    @objc optional func uploadProgress(_ progress: Double, sessionDescription: String?)
 }
 
 @objc public class NCCommunication: SessionDelegate {
@@ -643,11 +644,18 @@ import SwiftyJSON
     //MARK: - SessionDelegate
 
     public override func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
-        
     }
     
     public override func urlSession(_ session: URLSession, task: URLSessionTask, didSendBodyData bytesSent: Int64, totalBytesSent: Int64, totalBytesExpectedToSend: Int64) {
-        
+        guard totalBytesExpectedToSend != NSURLSessionTransferSizeUnknown else {
+            return
+        }
+        if session.sessionDescription == NCCommunicationCommon.sharedInstance.session_extension {
+            let progress = Double(Double(totalBytesSent)/Double(totalBytesExpectedToSend))
+            DispatchQueue.main.async {
+                self.delegate?.uploadProgress?(progress, sessionDescription: session.description)
+            }
+        }
     }
     
     override public func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
@@ -659,7 +667,7 @@ import SwiftyJSON
         if delegate == nil {
             completionHandler(URLSession.AuthChallengeDisposition.performDefaultHandling, nil)
         } else {
-            delegate?.authenticationChallenge(challenge, completionHandler: { (authChallengeDisposition, credential) in
+            delegate?.authenticationChallenge?(challenge, completionHandler: { (authChallengeDisposition, credential) in
                 completionHandler(authChallengeDisposition, credential)
             })
         }
