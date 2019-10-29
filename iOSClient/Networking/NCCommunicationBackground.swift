@@ -24,20 +24,12 @@
 
 import Foundation
 
-@objc public protocol NCCommunicationBackgroundSessionDelegate {
-    @objc optional func downloadProgress(_ progress: Double, fileName: String, ServerUrl: String, session: URLSession, task: URLSessionTask)
-    @objc optional func uploadProgress(_ progress: Double, fileName: String, ServerUrl: String, session: URLSession, task: URLSessionTask)
-    @objc optional func uploadComplete(fileName: String, serverUrl: String, ocId: String?, etag: String?, date: NSDate? ,session: URLSession, task: URLSessionTask, error: Error?)
-}
-
 @objc public class NCCommunicationBackground: NSObject, URLSessionTaskDelegate, URLSessionDelegate, URLSessionDownloadDelegate {
     @objc public static let sharedInstance: NCCommunicationBackground = {
         let instance = NCCommunicationBackground()
         return instance
     }()
-    
-    @objc public var sessionDelegate: NCCommunicationBackgroundSessionDelegate?
-    
+        
     @objc public lazy var sessionManagerTransfer: URLSession = {
         let configuration = URLSessionConfiguration.background(withIdentifier: NCCommunicationCommon.sharedInstance.session_background)
         configuration.allowsCellularAccess = true
@@ -100,7 +92,7 @@ import Foundation
         let progress = Double(Double(totalBytesWritten)/Double(totalBytesExpectedToWrite))
 
         DispatchQueue.main.async {
-            self.sessionDelegate?.downloadProgress?(progress, fileName: fileName, ServerUrl: serverUrl, session: session, task: downloadTask)
+            NCCommunicationCommon.sharedInstance.downloadProgress(progress, fileName: fileName, ServerUrl: serverUrl, session: session, task: downloadTask)
         }
     }
     
@@ -115,7 +107,7 @@ import Foundation
         let progress = Double(Double(totalBytesSent)/Double(totalBytesExpectedToSend))
 
         DispatchQueue.main.async {
-            self.sessionDelegate?.uploadProgress?(progress, fileName: fileName, ServerUrl: serverUrl, session: session, task: task)
+            NCCommunicationCommon.sharedInstance.uploadProgress(progress, fileName: fileName, ServerUrl: serverUrl, session: session, task: task)
         }
     }
     
@@ -127,18 +119,20 @@ import Foundation
             fileName = (url! as NSString).lastPathComponent
             serverUrl = url!.replacingOccurrences(of: "/"+fileName, with: "")
         }
-        if let header = (task.response as? HTTPURLResponse)?.allHeaderFields {
-            etag = header["OC-ETag"] as? String
-            if etag != nil { etag = etag!.replacingOccurrences(of: "\"", with: "") }
-            ocId = header["OC-FileId"] as? String
-            if let dateString = header["Date"] as? String {
-                dateUpload = NCCommunicationCommon.sharedInstance.convertDate(dateString, format: "EEE, dd MMM y HH:mm:ss zzz")
-            }
-        }
         
         DispatchQueue.main.async {
             if task is URLSessionUploadTask {
-                self.sessionDelegate?.uploadComplete?(fileName: fileName, serverUrl: serverUrl, ocId: ocId, etag: etag, date: dateUpload, session: session, task: task, error: error)
+                
+                if let header = (task.response as? HTTPURLResponse)?.allHeaderFields {
+                    etag = header["OC-ETag"] as? String
+                    if etag != nil { etag = etag!.replacingOccurrences(of: "\"", with: "") }
+                    ocId = header["OC-FileId"] as? String
+                    if let dateString = header["Date"] as? String {
+                        dateUpload = NCCommunicationCommon.sharedInstance.convertDate(dateString, format: "EEE, dd MMM y HH:mm:ss zzz")
+                    }
+                }
+                
+                NCCommunicationCommon.sharedInstance.uploadComplete(fileName: fileName, serverUrl: serverUrl, ocId: ocId, etag: etag, date: dateUpload, session: session, task: task, error: error)
             }
         }
     }
