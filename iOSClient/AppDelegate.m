@@ -53,6 +53,9 @@ PKPushRegistry *pushRegistry;
 {
     [CCUtility createDirectoryStandard];
     
+    // Networking
+    [[NCCommunicationCommon sharedInstance] setupWithUserAgent:[CCUtility getUserAgent] authenticationChallengeDelegate:[NCNetworking sharedInstance]];
+    
     // Verify upgrade
     if ([self upgrade]) {
         // Set account, if no exists clear all

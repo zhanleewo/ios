@@ -37,11 +37,11 @@ class NCCommunicationCommon: NSObject, NCCommunicationBackgroundSessionDelegate 
     
     var username = ""
     var password = ""
-    @objc public var userAgent: String?
+    var userAgent: String?
     var capabilitiesGroup: String?
     
     // Protocol
-    @objc public var authenticationChallengeDelegate: NCCommunicationCommonDelegate?
+    var authenticationChallengeDelegate: NCCommunicationCommonDelegate?
     
     // Session
     @objc let session_maximumConnectionsPerHost = 5
@@ -56,6 +56,11 @@ class NCCommunicationCommon: NSObject, NCCommunicationBackgroundSessionDelegate 
         self.password = password
         self.userAgent = userAgent
         self.capabilitiesGroup = capabilitiesGroup
+        self.authenticationChallengeDelegate = authenticationChallengeDelegate
+    }
+    
+    @objc public func setup(userAgent: String?, authenticationChallengeDelegate: NCCommunicationCommonDelegate?) {
+        self.userAgent = userAgent
         self.authenticationChallengeDelegate = authenticationChallengeDelegate
     }
     

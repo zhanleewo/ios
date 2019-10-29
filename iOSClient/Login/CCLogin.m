@@ -54,9 +54,6 @@
 {
     [super viewDidLoad];
     
-    // Networking Authentication Challenge Delegate for Login
-    [NCCommunicationCommon sharedInstance].authenticationChallengeDelegate = [NCNetworking sharedInstance];
-    
     Ivar ivar =  class_getInstanceVariable([UITextField class], "_placeholderLabel");
 
     // Background color
