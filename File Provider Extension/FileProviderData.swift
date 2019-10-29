@@ -77,7 +77,7 @@ class fileProviderData: NSObject {
             accountUrl = tableAccounts.url
             homeServerUrl = CCUtility.getHomeServerUrlActiveUrl(tableAccounts.url)
             
-            NCCommunicationCommon.sharedInstance.setup(username: accountUserID, password: accountPassword, userAgent: CCUtility.getUserAgent(), capabilitiesGroup: NCBrandOptions.sharedInstance.capabilitiesGroups, authenticationChallengeDelegate: NCNetworking.sharedInstance)
+            NCCommunicationCommon.sharedInstance.setup(username: accountUserID, password: accountPassword, userAgent: CCUtility.getUserAgent(), capabilitiesGroup: NCBrandOptions.sharedInstance.capabilitiesGroups, delegate: NCNetworking.sharedInstance)
             
             return true
         }
@@ -98,7 +98,7 @@ class fileProviderData: NSObject {
                 accountUrl = tableAccount.url
                 homeServerUrl = CCUtility.getHomeServerUrlActiveUrl(tableAccount.url)
                 
-                NCCommunicationCommon.sharedInstance.setup(username: accountUserID, password: accountPassword, userAgent: CCUtility.getUserAgent(), capabilitiesGroup: NCBrandOptions.sharedInstance.capabilitiesGroups, authenticationChallengeDelegate: NCNetworking.sharedInstance)
+                NCCommunicationCommon.sharedInstance.setup(username: accountUserID, password: accountPassword, userAgent: CCUtility.getUserAgent(), capabilitiesGroup: NCBrandOptions.sharedInstance.capabilitiesGroups, delegate: NCNetworking.sharedInstance)
 
 
                 foundAccount = true
@@ -126,7 +126,7 @@ class fileProviderData: NSObject {
                 accountUrl = tableAccount.url
                 homeServerUrl = CCUtility.getHomeServerUrlActiveUrl(tableAccount.url)
                 
-                NCCommunicationCommon.sharedInstance.setup(username: accountUserID, password: accountPassword, userAgent: CCUtility.getUserAgent(), capabilitiesGroup: NCBrandOptions.sharedInstance.capabilitiesGroups, authenticationChallengeDelegate: NCNetworking.sharedInstance)
+                NCCommunicationCommon.sharedInstance.setup(username: accountUserID, password: accountPassword, userAgent: CCUtility.getUserAgent(), capabilitiesGroup: NCBrandOptions.sharedInstance.capabilitiesGroups, delegate: NCNetworking.sharedInstance)
 
                 foundAccount = true
             }

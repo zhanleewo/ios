@@ -58,7 +58,7 @@
     } else {
         
         // Networking
-        [[NCCommunicationCommon sharedInstance] setupWithUsername:tableAccount.userID password:[CCUtility getPassword:tableAccount.account] userAgent:[CCUtility getUserAgent] capabilitiesGroup:[NCBrandOptions sharedInstance].capabilitiesGroups authenticationChallengeDelegate:[NCNetworking sharedInstance]];
+        [[NCCommunicationCommon sharedInstance] setupWithUsername:tableAccount.userID password:[CCUtility getPassword:tableAccount.account] userAgent:[CCUtility getUserAgent] capabilitiesGroup:[NCBrandOptions sharedInstance].capabilitiesGroups delegate:[NCNetworking sharedInstance]];
        
         _activeAccount = tableAccount.account;
         

@@ -25,10 +25,10 @@ import Foundation
 import Alamofire
 
 @objc public protocol NCCommunicationCommonDelegate {
-    @objc func authenticationChallenge(_ challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void)
+    @objc optional func authenticationChallenge(_ challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void)
 }
 
-class NCCommunicationCommon: NSObject, NCCommunicationBackgroundSessionDelegate {
+class NCCommunicationCommon: NSObject {
    
     @objc static let sharedInstance: NCCommunicationCommon = {
         let instance = NCCommunicationCommon()
@@ -41,7 +41,7 @@ class NCCommunicationCommon: NSObject, NCCommunicationBackgroundSessionDelegate 
     var capabilitiesGroup: String?
     
     // Protocol
-    var authenticationChallengeDelegate: NCCommunicationCommonDelegate?
+    var delegate: NCCommunicationCommonDelegate?
     
     // Session
     @objc let session_maximumConnectionsPerHost = 5
@@ -51,26 +51,26 @@ class NCCommunicationCommon: NSObject, NCCommunicationBackgroundSessionDelegate 
 
     //MARK: - Setup
     
-    @objc public func setup(username: String, password: String, userAgent: String?, capabilitiesGroup: String?, authenticationChallengeDelegate: NCCommunicationCommonDelegate?) {
+    @objc public func setup(username: String, password: String, userAgent: String?, capabilitiesGroup: String?, delegate: NCCommunicationCommonDelegate?) {
         self.username = username
         self.password = password
         self.userAgent = userAgent
         self.capabilitiesGroup = capabilitiesGroup
-        self.authenticationChallengeDelegate = authenticationChallengeDelegate
+        self.delegate = delegate
     }
     
-    @objc public func setup(userAgent: String?, authenticationChallengeDelegate: NCCommunicationCommonDelegate?) {
+    @objc public func setup(userAgent: String?, delegate: NCCommunicationCommonDelegate?) {
         self.userAgent = userAgent
-        self.authenticationChallengeDelegate = authenticationChallengeDelegate
+        self.delegate = delegate
     }
     
     //MARK: - Authentication Challenge Delegate
     
     @objc public func authenticationChallenge(_ challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
-        if authenticationChallengeDelegate == nil {
+        if delegate == nil {
             completionHandler(URLSession.AuthChallengeDisposition.performDefaultHandling, nil)
         } else {
-            authenticationChallengeDelegate?.authenticationChallenge(challenge, completionHandler: { (authChallengeDisposition, credential) in
+            delegate?.authenticationChallenge?(challenge, completionHandler: { (authChallengeDisposition, credential) in
                 completionHandler(authChallengeDisposition, credential)
             })
         }
