@@ -59,7 +59,7 @@
         
         // Networking
         [NCCommunication sharedInstance].delegate = [NCNetworking sharedInstance];
-        [[NCCommunication sharedInstance] setupWithUsername:tableAccount.userID password:[CCUtility getPassword:tableAccount.account]  userAgent:[CCUtility getUserAgent] capabilitiesGroup:[NCBrandOptions sharedInstance].capabilitiesGroups];
+        [[NCCommunication sharedInstance] setupWithUsername:tableAccount.userID password:[CCUtility getPassword:tableAccount.account]  userAgent:[CCUtility getUserAgent]];
         
         _activeAccount = tableAccount.account;
         
@@ -212,10 +212,7 @@
         NSString *fileNameServer = [NSString stringWithFormat:@"%@/%@", self.serverUrl, fileNameForUpload];
         NSString *fileNameLocal = [NSTemporaryDirectory() stringByAppendingString:fileName];
         
-        (void)[[NCCommunication sharedInstance] uploadBackgroundWithServerUrlFileName:fileNameServer fileNamePathSource:fileNameLocal session:nil];
-        
-        /*
-        (void)[[NCCommunication sharedInstance] uploadWithServerUrlFileName:fileNameServer fileNamePathSource:fileNameLocal account:self.activeAccount progressHandler:^(NSProgress * progress) {
+        (void)[[NCCommunication sharedInstance] uploadWithServerUrlFileName:fileNameServer fileNamePathSource:fileNameLocal wwan:false account:self.activeAccount progressHandler:^(NSProgress * progress) {
             [self.hud progress:progress.fractionCompleted];
         } completionHandler:^(NSString *account, NSString *ocId, NSString *etag, NSDate *date, NSError *error) {
             [self.hud hideHud];
@@ -254,7 +251,7 @@
                 [self presentViewController:alert animated:YES completion:nil];
             }
         }];
-        */
+        
     } else {
         
         [self closeShareViewController];

@@ -28,9 +28,7 @@ import SwiftyXMLParser
 import SwiftyJSON
 
 @objc public protocol NCCommunicationDelegate {
-    @objc optional func authenticationChallenge(_ challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void)
-    @objc optional func uploadProgress(_ progress: Double, fileName: String, ServerUrl: String, session: URLSession, task: URLSessionTask)
-    @objc optional func uploadComplete(fileName: String, serverUrl: String, session: URLSession, task: URLSessionTask, error: Error?)
+    @objc func authenticationChallenge(_ challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void)
 }
 
 @objc public class NCCommunication: SessionDelegate {
@@ -42,40 +40,37 @@ import SwiftyJSON
     var username = ""
     var password = ""
     var userAgent: String?
-    var capabilitiesGroup: String?
     @objc public var delegate: NCCommunicationDelegate?
     
     // Session Manager
     
-    private lazy var sessionManager: Alamofire.Session = {
+    private lazy var sessionManagerData: Alamofire.Session = {
+        let configuration = URLSessionConfiguration.af.default
+        return Alamofire.Session(configuration: configuration, delegate: self, rootQueue:  DispatchQueue(label: "com.nextcloud.sessionManagerData.rootQueue"), startRequestsImmediately: true, requestQueue: nil, serializationQueue: nil, interceptor: nil, serverTrustManager: nil, redirectHandler: nil, cachedResponseHandler: nil, eventMonitors: self.makeEvents())
+    }()
+   
+    private lazy var sessionManagerTransfer: Alamofire.Session = {
         let configuration = URLSessionConfiguration.af.default
         configuration.allowsCellularAccess = true
         configuration.httpMaximumConnectionsPerHost = NCCommunicationCommon.sharedInstance.session_maximumConnectionsPerHost
         return Alamofire.Session(configuration: configuration, delegate: self, rootQueue:  DispatchQueue(label: "com.nextcloud.sessionManagerTransfer.rootQueue"), startRequestsImmediately: true, requestQueue: nil, serializationQueue: nil, interceptor: nil, serverTrustManager: nil, redirectHandler: nil, cachedResponseHandler: nil, eventMonitors: self.makeEvents())
     }()
     
-    @objc public lazy var sessionManagerExtension: URLSession = {
-        let configuration = URLSessionConfiguration.background(withIdentifier: NCCommunicationCommon.sharedInstance.session_extension)
-        configuration.allowsCellularAccess = true
-        configuration.sessionSendsLaunchEvents = true
-        configuration.isDiscretionary = false
-        configuration.httpMaximumConnectionsPerHost = 1
-        configuration.requestCachePolicy = NSURLRequest.CachePolicy.reloadIgnoringLocalCacheData
-        configuration.sharedContainerIdentifier = capabilitiesGroup
-        let session = URLSession(configuration: configuration, delegate: self, delegateQueue: OperationQueue.main)
-        session.sessionDescription = NCCommunicationCommon.sharedInstance.session_extension
-        return session
+    private lazy var sessionManagerTransferWWan: Alamofire.Session = {
+        let configuration = URLSessionConfiguration.af.default
+        configuration.allowsCellularAccess = false
+        configuration.httpMaximumConnectionsPerHost = NCCommunicationCommon.sharedInstance.session_maximumConnectionsPerHost
+        return Alamofire.Session(configuration: configuration, delegate: self, rootQueue:  DispatchQueue(label: "com.nextcloud.sessionManagerTransferWWan.rootQueue"), startRequestsImmediately: true, requestQueue: nil, serializationQueue: nil, interceptor: nil, serverTrustManager: nil, redirectHandler: nil, cachedResponseHandler: nil, eventMonitors: self.makeEvents())
     }()
     
     //MARK: - Initializer / Setup
 
     init() { }
     
-    @objc public func setup(username: String, password: String, userAgent: String?, capabilitiesGroup: String?) {
-        self.username = username
-        self.password = password
-        self.userAgent = userAgent
-        self.capabilitiesGroup = capabilitiesGroup
+    @objc public func setup(username: String, password: String, userAgent: String?) {
+           self.username = username
+           self.password = password
+           self.userAgent = userAgent
     }
 
     //MARK: - monitor
@@ -115,7 +110,7 @@ import SwiftyJSON
         var headers: HTTPHeaders = [.authorization(username: self.username, password: self.password)]
         if let userAgent = self.userAgent { headers.update(.userAgent(userAgent)) }
         
-        sessionManager.request(url, method: method, parameters:nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).response { (response) in
+        sessionManagerData.request(url, method: method, parameters:nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).response { (response) in
             switch response.result {
             case.failure(let error):
                 completionHandler(account, nil, nil, error)
@@ -145,7 +140,7 @@ import SwiftyJSON
         var headers: HTTPHeaders = [.authorization(username: self.username, password: self.password)]
         if let userAgent = self.userAgent { headers.update(.userAgent(userAgent)) }
         
-        sessionManager.request(url, method: method, parameters:nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).response { (response) in
+        sessionManagerData.request(url, method: method, parameters:nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).response { (response) in
             switch response.result {
             case.failure(let error):
                 completionHandler(account, error)
@@ -172,7 +167,7 @@ import SwiftyJSON
         headers.update(name: "Destination", value: serverUrlFileNameDestination.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "")
         headers.update(name: "Overwrite", value: "T")
         
-        sessionManager.request(url, method: method, parameters:nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).response { (response) in
+        sessionManagerData.request(url, method: method, parameters:nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).response { (response) in
             switch response.result {
             case.failure(let error):
                 completionHandler(account, error)
@@ -245,7 +240,7 @@ import SwiftyJSON
             return
         }
         
-        sessionManager.request(urlRequest).validate(statusCode: 200..<300).responseData { (response) in
+        sessionManagerData.request(urlRequest).validate(statusCode: 200..<300).responseData { (response) in
             switch response.result {
             case.failure(let error):
                 completionHandler(account, files, error)
@@ -388,7 +383,7 @@ import SwiftyJSON
             return
         }
         
-        sessionManager.request(urlRequest).validate(statusCode: 200..<300).responseData { (response) in
+        sessionManagerData.request(urlRequest).validate(statusCode: 200..<300).responseData { (response) in
             switch response.result {
             case.failure(let error):
                 completionHandler(account, error)
@@ -417,7 +412,7 @@ import SwiftyJSON
         var headers: HTTPHeaders = [.authorization(username: self.username, password: self.password)]
         if let userAgent = self.userAgent { headers.update(.userAgent(userAgent)) }
 
-        sessionManager.request(url, method: method, parameters:nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).response { (response) in
+        sessionManagerData.request(url, method: method, parameters:nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).response { (response) in
             switch response.result {
             case.failure(let error):
                 completionHandler(account, nil, error)
@@ -457,7 +452,7 @@ import SwiftyJSON
         var headers: HTTPHeaders = [.authorization(username: self.username, password: self.password)]
         if let userAgent = self.userAgent { headers.update(.userAgent(userAgent)) }
         
-        sessionManager.request(url, method: method, parameters:nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseJSON { (response) in
+        sessionManagerData.request(url, method: method, parameters:nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseJSON { (response) in
             debugPrint(response)
             switch response.result {
             case.failure(let error):
@@ -499,7 +494,7 @@ import SwiftyJSON
         if let userAgent = self.userAgent { headers.update(.userAgent(userAgent)) }
         headers.update(name: "OCS-APIRequest", value: "true")
 
-        sessionManager.request(url, method: method, parameters:nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseJSON { (response) in
+        sessionManagerData.request(url, method: method, parameters:nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseJSON { (response) in
             switch response.result {
             case.failure(let error):
                 let error = NCCommunicationCommon.sharedInstance.getError(error: error, httResponse: response.response)
@@ -531,7 +526,17 @@ import SwiftyJSON
     }
     //MARK: - File transfer
     
-    @objc public func download(serverUrlFileName: String, fileNamePathLocalDestination: String, account: String, progressHandler: @escaping (_ progress: Progress) -> Void , completionHandler: @escaping (_ account: String, _ etag: String?, _ date: NSDate?, _ lenght: Double, _ error: Error?) -> Void) -> URLSessionTask? {
+    @objc public func download(serverUrlFileName: String, fileNamePathLocalDestination: String, wwan: Bool, account: String, progressHandler: @escaping (_ progress: Progress) -> Void , completionHandler: @escaping (_ account: String, _ etag: String?, _ date: NSDate?, _ lenght: Double, _ error: Error?) -> Void) -> URLSessionTask? {
+        
+        // session
+        let sessionManager: Alamofire.Session
+        if wwan {
+            sessionManager = sessionManagerTransferWWan
+            sessionManager.session.sessionDescription = NCCommunicationCommon.sharedInstance.session_description_download_wwan
+        } else {
+            sessionManager = sessionManagerTransfer
+            sessionManager.session.sessionDescription = NCCommunicationCommon.sharedInstance.session_description_download
+        }
         
         // url
         guard let url = NCCommunicationCommon.sharedInstance.encodeUrlString(serverUrlFileName) else {
@@ -552,8 +557,6 @@ import SwiftyJSON
         var headers: HTTPHeaders = [.authorization(username: self.username, password: self.password)]
         if let userAgent = self.userAgent { headers.update(.userAgent(userAgent)) }
         
-        // session
-        sessionManager.session.sessionDescription = NCCommunicationCommon.sharedInstance.session_description_download
         let request = sessionManager.download(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil, to: destination)
         .downloadProgress { progress in
             progressHandler(progress)
@@ -578,7 +581,17 @@ import SwiftyJSON
         return request.task
     }
     
-    @objc public func upload(serverUrlFileName: String, fileNamePathSource: String, account: String, progressHandler: @escaping (_ progress: Progress) -> Void ,completionHandler: @escaping (_ account: String, _ ocId: String?, _ etag: String?, _ date: NSDate?, _ error: Error?) -> Void) -> URLSessionTask? {
+    @objc public func upload(serverUrlFileName: String, fileNamePathSource: String, wwan: Bool, account: String, progressHandler: @escaping (_ progress: Progress) -> Void ,completionHandler: @escaping (_ account: String, _ ocId: String?, _ etag: String?, _ date: NSDate?, _ error: Error?) -> Void) -> URLSessionTask? {
+        
+        // session
+        let sessionManager: Alamofire.Session
+        if wwan {
+            sessionManager = sessionManagerTransferWWan
+            sessionManager.session.sessionDescription = NCCommunicationCommon.sharedInstance.session_description_upload_wwan
+        } else {
+            sessionManager = sessionManagerTransfer
+            sessionManager.session.sessionDescription = NCCommunicationCommon.sharedInstance.session_description_upload
+        }
         
         // url
         guard let url = NCCommunicationCommon.sharedInstance.encodeUrlString(serverUrlFileName) else {
@@ -591,8 +604,6 @@ import SwiftyJSON
         var headers: HTTPHeaders = [.authorization(username: self.username, password: self.password)]
         if let userAgent = self.userAgent { headers.update(.userAgent(userAgent)) }
         
-        // session
-        sessionManager.session.sessionDescription = NCCommunicationCommon.sharedInstance.session_description_upload
         let request = sessionManager.upload(fileNamePathSourceUrl, to: url, method: .put, headers: headers, interceptor: nil, fileManager: .default)
         .uploadProgress { progress in
             progressHandler(progress)
@@ -617,70 +628,14 @@ import SwiftyJSON
         return request.task
     }
     
-    @objc public func uploadBackground(serverUrlFileName: String, fileNamePathSource: String, session: URLSession?) -> URLSessionUploadTask? {
-        
-        guard let url = NCCommunicationCommon.sharedInstance.encodeUrlString(serverUrlFileName) as? URL else {
-            return nil
-        }
-        var request = URLRequest(url: url)
-        let loginString = "\(username):\(password)"
-        guard let loginData = loginString.data(using: String.Encoding.utf8) else {
-            return nil
-        }
-        let base64LoginString = loginData.base64EncodedString()
-        
-        request.httpMethod = "PUT"
-        request.setValue(userAgent, forHTTPHeaderField: "User-Agent")
-        request.setValue("Basic \(base64LoginString)", forHTTPHeaderField: "Authorization")
-
-        // session
-        var session = session
-        if session == nil { session = sessionManagerExtension}
-        let task = session!.uploadTask(with: request, fromFile: URL.init(fileURLWithPath: fileNamePathSource))
-        
-        task.resume()
-        return task
-    }
-    
     //MARK: - SessionDelegate
 
-    public override func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) { }
-    
-    public override func urlSession(_ session: URLSession, task: URLSessionTask, didSendBodyData bytesSent: Int64, totalBytesSent: Int64, totalBytesExpectedToSend: Int64) {
-        
-        guard totalBytesExpectedToSend != NSURLSessionTransferSizeUnknown else { return }
-        guard let url = task.currentRequest?.url?.absoluteString.removingPercentEncoding else { return }
-        let fileName = (url as NSString).lastPathComponent
-        let serverUrl = url.replacingOccurrences(of: "/"+fileName, with: "")
-        let progress = Double(Double(totalBytesSent)/Double(totalBytesExpectedToSend))
-
-        DispatchQueue.main.async {
-            self.delegate?.uploadProgress?(progress, fileName: fileName, ServerUrl: serverUrl, session: session, task: task)
-        }
-    }
-    
-    override public func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
-        
-        var fileName: String = "", serverUrl: String = ""
-        let url = task.currentRequest?.url?.absoluteString.removingPercentEncoding
-        if url != nil {
-            fileName = (url! as NSString).lastPathComponent
-            serverUrl = url!.replacingOccurrences(of: "/"+fileName, with: "")
-        }
-        
-        DispatchQueue.main.async {
-            if task is URLSessionUploadTask {
-                self.delegate?.uploadComplete?(fileName: fileName, serverUrl: serverUrl, session: session, task: task, error: error)
-            }
-        }
-    }
-    
     public func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
                 
         if delegate == nil {
             completionHandler(URLSession.AuthChallengeDisposition.performDefaultHandling, nil)
         } else {
-            delegate?.authenticationChallenge?(challenge, completionHandler: { (authChallengeDisposition, credential) in
+            delegate?.authenticationChallenge(challenge, completionHandler: { (authChallengeDisposition, credential) in
                 completionHandler(authChallengeDisposition, credential)
             })
         }
