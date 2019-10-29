@@ -30,12 +30,26 @@ class NCCommunicationCommon: NSObject {
         return instance
     }()
     
+    //
+    var username = ""
+    var password = ""
+    var userAgent: String?
+    var capabilitiesGroup: String?
+    
     // Session
     @objc let session_maximumConnectionsPerHost = 5
     @objc let session_description_download: String = "com.nextcloud.download.session"
     @objc let session_description_upload: String = "com.nextcloud.upload.session"
     @objc let session_extension: String = "com.nextcloud.session.extension"
 
+    // Setup
+    @objc public func setup(username: String, password: String, userAgent: String?, capabilitiesGroup: String?) {
+        self.username = username
+        self.password = password
+        self.userAgent = userAgent
+        self.capabilitiesGroup = capabilitiesGroup
+    }
+    
     func convertDate(_ dateString: String, format: String) -> NSDate? {
         let dateFormatter = DateFormatter()
         dateFormatter.locale = Locale.init(identifier: "en_US_POSIX")

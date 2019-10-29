@@ -40,10 +40,6 @@ import Foundation
         return instance
     }()
     
-    var username = ""
-    var password = ""
-    var userAgent: String?
-    var capabilitiesGroup: String?
     @objc public var authenticationChallengeDelegate: NCCommunicationBackgroundAuthenticationChallengeDelegate?
     @objc public var sessionDelegate: NCCommunicationBackgroundSessionDelegate?
     
@@ -54,21 +50,12 @@ import Foundation
         configuration.isDiscretionary = false
         configuration.httpMaximumConnectionsPerHost = 1
         configuration.requestCachePolicy = NSURLRequest.CachePolicy.reloadIgnoringLocalCacheData
-        configuration.sharedContainerIdentifier = capabilitiesGroup
+        configuration.sharedContainerIdentifier = NCCommunicationCommon.sharedInstance.capabilitiesGroup
         let session = URLSession(configuration: configuration, delegate: self, delegateQueue: OperationQueue.main)
         session.sessionDescription = NCCommunicationCommon.sharedInstance.session_extension
         return session
     }()
     
-    //MARK: - Initializer / Setup
-    
-    @objc public func setup(username: String, password: String, userAgent: String?, capabilitiesGroup: String?) {
-        self.username = username
-        self.password = password
-        self.userAgent = userAgent
-        self.capabilitiesGroup = capabilitiesGroup
-    }
-
     //MARK: - Upload
     
     @objc public func upload(serverUrlFileName: String, fileNamePathSource: String, session: URLSession?) -> URLSessionUploadTask? {
@@ -77,14 +64,14 @@ import Foundation
             return nil
         }
         var request = URLRequest(url: url)
-        let loginString = "\(username):\(password)"
+        let loginString = "\(NCCommunicationCommon.sharedInstance.username):\(NCCommunicationCommon.sharedInstance.password)"
         guard let loginData = loginString.data(using: String.Encoding.utf8) else {
             return nil
         }
         let base64LoginString = loginData.base64EncodedString()
         
         request.httpMethod = "PUT"
-        request.setValue(userAgent, forHTTPHeaderField: "User-Agent")
+        request.setValue( NCCommunicationCommon.sharedInstance.userAgent, forHTTPHeaderField: "User-Agent")
         request.setValue("Basic \(base64LoginString)", forHTTPHeaderField: "Authorization")
 
         // session
