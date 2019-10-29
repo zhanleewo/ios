@@ -38,15 +38,14 @@ import Foundation
     
     @objc public var sessionDelegate: NCCommunicationBackgroundSessionDelegate?
     
-    @objc public lazy var sessionManager: URLSession = {
-        let configuration = URLSessionConfiguration.background(withIdentifier: NCCommunicationCommon.sharedInstance.session_description_uploadbackground)
+    @objc public lazy var sessionManagerTransfer: URLSession = {
+        let configuration = URLSessionConfiguration.background(withIdentifier: NCCommunicationCommon.sharedInstance.session_background)
         configuration.allowsCellularAccess = true
         configuration.sessionSendsLaunchEvents = true
         configuration.isDiscretionary = false
         configuration.httpMaximumConnectionsPerHost = 1
         configuration.requestCachePolicy = NSURLRequest.CachePolicy.reloadIgnoringLocalCacheData
         let session = URLSession(configuration: configuration, delegate: self, delegateQueue: OperationQueue.main)
-        session.sessionDescription = NCCommunicationCommon.sharedInstance.session_description_uploadbackground
         return session
     }()
     
@@ -59,7 +58,6 @@ import Foundation
         configuration.requestCachePolicy = NSURLRequest.CachePolicy.reloadIgnoringLocalCacheData
         configuration.sharedContainerIdentifier = NCCommunicationCommon.sharedInstance.capabilitiesGroup
         let session = URLSession(configuration: configuration, delegate: self, delegateQueue: OperationQueue.main)
-        session.sessionDescription = NCCommunicationCommon.sharedInstance.session_extension
         return session
     }()
     
@@ -78,9 +76,11 @@ import Foundation
         let base64LoginString = loginData.base64EncodedString()
         
         request.httpMethod = "PUT"
-        request.setValue( NCCommunicationCommon.sharedInstance.userAgent, forHTTPHeaderField: "User-Agent")
+        request.setValue(NCCommunicationCommon.sharedInstance.userAgent, forHTTPHeaderField: "User-Agent")
         request.setValue("Basic \(base64LoginString)", forHTTPHeaderField: "Authorization")
       
+        // session
+        session.sessionDescription = NCCommunicationCommon.sharedInstance.session_description_upload
         let task = session.uploadTask(with: request, fromFile: URL.init(fileURLWithPath: fileNamePathSource))
         
         task.resume()

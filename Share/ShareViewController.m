@@ -211,10 +211,6 @@
         NSString *fileNameServer = [NSString stringWithFormat:@"%@/%@", self.serverUrl, fileNameForUpload];
         NSString *fileNameLocal = [NSTemporaryDirectory() stringByAppendingString:fileName];
         
-        (void)[[NCCommunicationBackground sharedInstance] uploadWithServerUrlFileName:fileNameServer fileNamePathSource:fileNameLocal session:[NCCommunicationBackground sharedInstance].sessionManagerExtension];
-        
-        return;
-        
         (void)[[NCCommunication sharedInstance] uploadWithServerUrlFileName:fileNameServer fileNamePathSource:fileNameLocal wwan:false account:self.activeAccount progressHandler:^(NSProgress * progress) {
             [self.hud progress:progress.fractionCompleted];
         } completionHandler:^(NSString *account, NSString *ocId, NSString *etag, NSDate *date, NSError *error) {
