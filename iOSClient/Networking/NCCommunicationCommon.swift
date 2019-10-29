@@ -37,7 +37,7 @@ class NCCommunicationCommon: NSObject, NCCommunicationBackgroundSessionDelegate 
     
     var username = ""
     var password = ""
-    var userAgent: String?
+    @objc public var userAgent: String?
     var capabilitiesGroup: String?
     
     // Protocol
