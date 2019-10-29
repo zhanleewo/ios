@@ -36,7 +36,7 @@ class NCCommunicationCommon: NSObject {
     @objc let session_description_download_wwan: String = "com.nextcloud.download.sessionwwan"
     @objc let session_description_upload: String = "com.nextcloud.upload.session"
     @objc let session_description_upload_wwan: String = "com.nextcloud.upload.sessionwwan"
-    @objc let session_description_upload_extension: String = "com.nextcloud.upload.session.extension"
+    @objc let session_description_extension: String = "com.nextcloud.session.extension"
 
     func convertDate(_ dateString: String, format: String) -> NSDate? {
         let dateFormatter = DateFormatter()
