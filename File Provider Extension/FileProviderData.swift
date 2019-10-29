@@ -64,10 +64,7 @@ class fileProviderData: NSObject {
         if CCUtility.getDisableFilesApp() || NCBrandOptions.sharedInstance.disable_openin_file {
             return false
         }
-        
-        // Networking
-        NCCommunicationCommon.sharedInstance.authenticationChallengeDelegate = NCNetworking.sharedInstance
-        
+                
         // NO DOMAIN -> Set default account
         if domain == nil {
             

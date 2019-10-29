@@ -35,7 +35,6 @@ class NCCommunicationCommon: NSObject, NCCommunicationBackgroundSessionDelegate 
         return instance
     }()
     
-    // 
     var username = ""
     var password = ""
     var userAgent: String?
@@ -50,13 +49,17 @@ class NCCommunicationCommon: NSObject, NCCommunicationBackgroundSessionDelegate 
     @objc let session_description_upload: String = "com.nextcloud.upload.session"
     @objc let session_extension: String = "com.nextcloud.session.extension"
 
-    // Setup
+    //MARK: - Setup
+    
     @objc public func setup(username: String, password: String, userAgent: String?, capabilitiesGroup: String?, authenticationChallengeDelegate: NCCommunicationCommonDelegate?) {
         self.username = username
         self.password = password
         self.userAgent = userAgent
         self.capabilitiesGroup = capabilitiesGroup
+        self.authenticationChallengeDelegate = authenticationChallengeDelegate
     }
+    
+    //MARK: - Authentication Challenge Delegate
     
     @objc public func authenticationChallenge(_ challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
         if authenticationChallengeDelegate == nil {
@@ -68,7 +71,7 @@ class NCCommunicationCommon: NSObject, NCCommunicationBackgroundSessionDelegate 
         }
     }
     
-    //
+    //MARK: - Common
     
     func convertDate(_ dateString: String, format: String) -> NSDate? {
         let dateFormatter = DateFormatter()
