@@ -101,7 +101,7 @@ class fileProviderData: NSObject {
                 accountUrl = tableAccount.url
                 homeServerUrl = CCUtility.getHomeServerUrlActiveUrl(tableAccount.url)
                 
-                 NCCommunication.sharedInstance.setup(username: accountUserID, password: accountPassword, userAgent: CCUtility.getUserAgent())
+                NCCommunication.sharedInstance.setup(username: accountUserID, password: accountPassword, userAgent: CCUtility.getUserAgent())
 
                 foundAccount = true
             }

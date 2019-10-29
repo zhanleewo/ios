@@ -56,21 +56,14 @@ import SwiftyJSON
         return Alamofire.Session(configuration: configuration, delegate: self, rootQueue:  DispatchQueue(label: "com.nextcloud.sessionManagerTransfer.rootQueue"), startRequestsImmediately: true, requestQueue: nil, serializationQueue: nil, interceptor: nil, serverTrustManager: nil, redirectHandler: nil, cachedResponseHandler: nil, eventMonitors: self.makeEvents())
     }()
     
-    private lazy var sessionManagerTransferWWan: Alamofire.Session = {
-        let configuration = URLSessionConfiguration.af.default
-        configuration.allowsCellularAccess = false
-        configuration.httpMaximumConnectionsPerHost = NCCommunicationCommon.sharedInstance.session_maximumConnectionsPerHost
-        return Alamofire.Session(configuration: configuration, delegate: self, rootQueue:  DispatchQueue(label: "com.nextcloud.sessionManagerTransferWWan.rootQueue"), startRequestsImmediately: true, requestQueue: nil, serializationQueue: nil, interceptor: nil, serverTrustManager: nil, redirectHandler: nil, cachedResponseHandler: nil, eventMonitors: self.makeEvents())
-    }()
-    
     //MARK: - Initializer / Setup
 
     init() { }
     
     @objc public func setup(username: String, password: String, userAgent: String?) {
-           self.username = username
-           self.password = password
-           self.userAgent = userAgent
+        self.username = username
+        self.password = password
+        self.userAgent = userAgent
     }
 
     //MARK: - monitor
@@ -528,16 +521,6 @@ import SwiftyJSON
     
     @objc public func download(serverUrlFileName: String, fileNamePathLocalDestination: String, wwan: Bool, account: String, progressHandler: @escaping (_ progress: Progress) -> Void , completionHandler: @escaping (_ account: String, _ etag: String?, _ date: NSDate?, _ lenght: Double, _ error: Error?) -> Void) -> URLSessionTask? {
         
-        // session
-        let sessionManager: Alamofire.Session
-        if wwan {
-            sessionManager = sessionManagerTransferWWan
-            sessionManager.session.sessionDescription = NCCommunicationCommon.sharedInstance.session_description_download_wwan
-        } else {
-            sessionManager = sessionManagerTransfer
-            sessionManager.session.sessionDescription = NCCommunicationCommon.sharedInstance.session_description_download
-        }
-        
         // url
         guard let url = NCCommunicationCommon.sharedInstance.encodeUrlString(serverUrlFileName) else {
             completionHandler(account, nil, nil, 0, NCCommunicationCommon.sharedInstance.getError(code: NSURLErrorUnsupportedURL, description: "Invalid server url"))
@@ -557,7 +540,9 @@ import SwiftyJSON
         var headers: HTTPHeaders = [.authorization(username: self.username, password: self.password)]
         if let userAgent = self.userAgent { headers.update(.userAgent(userAgent)) }
         
-        let request = sessionManager.download(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil, to: destination)
+        // session
+        sessionManagerTransfer.session.sessionDescription = NCCommunicationCommon.sharedInstance.session_description_download
+        let request = sessionManagerTransfer.download(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil, to: destination)
         .downloadProgress { progress in
             progressHandler(progress)
         }
@@ -583,16 +568,6 @@ import SwiftyJSON
     
     @objc public func upload(serverUrlFileName: String, fileNamePathSource: String, wwan: Bool, account: String, progressHandler: @escaping (_ progress: Progress) -> Void ,completionHandler: @escaping (_ account: String, _ ocId: String?, _ etag: String?, _ date: NSDate?, _ error: Error?) -> Void) -> URLSessionTask? {
         
-        // session
-        let sessionManager: Alamofire.Session
-        if wwan {
-            sessionManager = sessionManagerTransferWWan
-            sessionManager.session.sessionDescription = NCCommunicationCommon.sharedInstance.session_description_upload_wwan
-        } else {
-            sessionManager = sessionManagerTransfer
-            sessionManager.session.sessionDescription = NCCommunicationCommon.sharedInstance.session_description_upload
-        }
-        
         // url
         guard let url = NCCommunicationCommon.sharedInstance.encodeUrlString(serverUrlFileName) else {
             completionHandler(account, nil, nil, nil, NCCommunicationCommon.sharedInstance.getError(code: NSURLErrorUnsupportedURL, description: "Invalid server url"))
@@ -604,7 +579,9 @@ import SwiftyJSON
         var headers: HTTPHeaders = [.authorization(username: self.username, password: self.password)]
         if let userAgent = self.userAgent { headers.update(.userAgent(userAgent)) }
         
-        let request = sessionManager.upload(fileNamePathSourceUrl, to: url, method: .put, headers: headers, interceptor: nil, fileManager: .default)
+        // session
+        sessionManagerTransfer.session.sessionDescription = NCCommunicationCommon.sharedInstance.session_description_upload
+        let request = sessionManagerTransfer.upload(fileNamePathSourceUrl, to: url, method: .put, headers: headers, interceptor: nil, fileManager: .default)
         .uploadProgress { progress in
             progressHandler(progress)
         }
