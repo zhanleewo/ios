@@ -112,11 +112,19 @@ import Foundation
     
     public func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
         
-        var fileName: String = "", serverUrl: String = ""
+        var fileName: String = "", serverUrl: String = "", etag: String?, ocId: String?, dateUpload: NSDate?
         let url = task.currentRequest?.url?.absoluteString.removingPercentEncoding
         if url != nil {
             fileName = (url! as NSString).lastPathComponent
             serverUrl = url!.replacingOccurrences(of: "/"+fileName, with: "")
+        }
+        if let header = (task.response as? HTTPURLResponse)?.allHeaderFields {
+            etag = header["OC-ETag"] as? String
+            if etag != nil { etag = etag!.replacingOccurrences(of: "\"", with: "") }
+            ocId = header["OC-FileId"] as? String
+            if let dateString = header["Date"] as? String {
+                dateUpload = NCCommunicationCommon.sharedInstance.convertDate(dateString, format: "EEE, dd MMM y HH:mm:ss zzz")
+            }
         }
         
         DispatchQueue.main.async {
