@@ -60,6 +60,17 @@ import Foundation
         return session
     }()
     
+    //MARK: - Initializer / Setup
+    
+    @objc public func setup(username: String, password: String, userAgent: String?, capabilitiesGroup: String?) {
+        self.username = username
+        self.password = password
+        self.userAgent = userAgent
+        self.capabilitiesGroup = capabilitiesGroup
+    }
+
+    //MARK: - Upload
+    
     @objc public func upload(serverUrlFileName: String, fileNamePathSource: String, session: URLSession?) -> URLSessionUploadTask? {
         
         guard let url = NCCommunicationCommon.sharedInstance.encodeUrlString(serverUrlFileName) as? URL else {
