@@ -24,11 +24,14 @@
 
 import Foundation
 
-@objc public protocol NCCommunicationBackgroundDelegate {
-    @objc optional func authenticationChallenge(_ challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void)
+@objc public protocol NCCommunicationBackgroundSessionDelegate {
     @objc optional func downloadProgress(_ progress: Double, fileName: String, ServerUrl: String, session: URLSession, task: URLSessionTask)
     @objc optional func uploadProgress(_ progress: Double, fileName: String, ServerUrl: String, session: URLSession, task: URLSessionTask)
     @objc optional func uploadComplete(fileName: String, serverUrl: String, session: URLSession, task: URLSessionTask, error: Error?)
+}
+
+@objc public protocol NCCommunicationBackgroundAuthenticationChallengeDelegate {
+    @objc optional func authenticationChallenge(_ challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void)
 }
 
 @objc public class NCCommunicationBackground: NSObject, URLSessionTaskDelegate, URLSessionDelegate, URLSessionDownloadDelegate {
@@ -41,7 +44,8 @@ import Foundation
     var password = ""
     var userAgent: String?
     var capabilitiesGroup: String?
-    @objc public var delegate: NCCommunicationBackgroundDelegate?
+    @objc public var authenticationChallengeDelegate: NCCommunicationBackgroundAuthenticationChallengeDelegate?
+    @objc public var sessionDelegate: NCCommunicationBackgroundSessionDelegate?
     
     @objc public lazy var sessionManagerExtension: URLSession = {
         let configuration = URLSessionConfiguration.background(withIdentifier: NCCommunicationCommon.sharedInstance.session_extension)
@@ -94,7 +98,7 @@ import Foundation
         let progress = Double(Double(totalBytesWritten)/Double(totalBytesExpectedToWrite))
 
         DispatchQueue.main.async {
-            self.delegate?.downloadProgress?(progress, fileName: fileName, ServerUrl: serverUrl, session: session, task: downloadTask)
+            self.sessionDelegate?.downloadProgress?(progress, fileName: fileName, ServerUrl: serverUrl, session: session, task: downloadTask)
         }
     }
     
@@ -109,7 +113,7 @@ import Foundation
         let progress = Double(Double(totalBytesSent)/Double(totalBytesExpectedToSend))
 
         DispatchQueue.main.async {
-            self.delegate?.uploadProgress?(progress, fileName: fileName, ServerUrl: serverUrl, session: session, task: task)
+            self.sessionDelegate?.uploadProgress?(progress, fileName: fileName, ServerUrl: serverUrl, session: session, task: task)
         }
     }
     
@@ -124,17 +128,17 @@ import Foundation
         
         DispatchQueue.main.async {
             if task is URLSessionUploadTask {
-                self.delegate?.uploadComplete?(fileName: fileName, serverUrl: serverUrl, session: session, task: task, error: error)
+                self.sessionDelegate?.uploadComplete?(fileName: fileName, serverUrl: serverUrl, session: session, task: task, error: error)
             }
         }
     }
     
     public func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
                 
-        if delegate == nil {
+        if authenticationChallengeDelegate == nil {
             completionHandler(URLSession.AuthChallengeDisposition.performDefaultHandling, nil)
         } else {
-            delegate?.authenticationChallenge?(challenge, completionHandler: { (authChallengeDisposition, credential) in
+            authenticationChallengeDelegate?.authenticationChallenge?(challenge, completionHandler: { (authChallengeDisposition, credential) in
                 completionHandler(authChallengeDisposition, credential)
             })
         }

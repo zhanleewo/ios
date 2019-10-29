@@ -55,7 +55,7 @@
         activeUrl = tableAccount.url;
         
         // Networking
-        [NCCommunication sharedInstance].delegate = [NCNetworking sharedInstance];
+        [NCCommunication sharedInstance].authenticationChallengeDelegate = [NCNetworking sharedInstance];
         [[NCCommunication sharedInstance] setupWithUsername:tableAccount.userID password:[CCUtility getPassword:tableAccount.account] userAgent:[CCUtility getUserAgent]];
        
     } else {

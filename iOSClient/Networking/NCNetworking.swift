@@ -24,7 +24,7 @@
 import Foundation
 import OpenSSL
 
-@objc class NCNetworking: NSObject, NCCommunicationDelegate {
+@objc class NCNetworking: NSObject, NCCommunicationAuthenticationChallengeDelegate {
     @objc public static let sharedInstance: NCNetworking = {
         let instance = NCNetworking()
         return instance

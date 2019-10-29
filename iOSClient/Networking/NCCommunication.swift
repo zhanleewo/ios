@@ -27,7 +27,7 @@ import Alamofire
 import SwiftyXMLParser
 import SwiftyJSON
 
-@objc public protocol NCCommunicationDelegate {
+@objc public protocol NCCommunicationAuthenticationChallengeDelegate {
     @objc func authenticationChallenge(_ challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void)
 }
 
@@ -40,7 +40,7 @@ import SwiftyJSON
     var username = ""
     var password = ""
     var userAgent: String?
-    @objc public var delegate: NCCommunicationDelegate?
+    @objc public var authenticationChallengeDelegate: NCCommunicationAuthenticationChallengeDelegate?
     
     // Session Manager
     
@@ -609,10 +609,10 @@ import SwiftyJSON
 
     public func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
                 
-        if delegate == nil {
+        if authenticationChallengeDelegate == nil {
             completionHandler(URLSession.AuthChallengeDisposition.performDefaultHandling, nil)
         } else {
-            delegate?.authenticationChallenge(challenge, completionHandler: { (authChallengeDisposition, credential) in
+            authenticationChallengeDelegate?.authenticationChallenge(challenge, completionHandler: { (authChallengeDisposition, credential) in
                 completionHandler(authChallengeDisposition, credential)
             })
         }
