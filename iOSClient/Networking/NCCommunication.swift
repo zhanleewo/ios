@@ -89,8 +89,8 @@ import SwiftyJSON
             case.failure(let error):
                 completionHandler(account, nil, nil, error)
             case .success( _):
-                let ocId = response.response?.allHeaderFields["OC-FileId"] as! String?
-                if let dateString = response.response?.allHeaderFields["Date"] as! String? {
+                let ocId = response.response?.allHeaderFields["OC-FileId"] as? String
+                if let dateString = response.response?.allHeaderFields["Date"] as? String {
                     if let date = NCCommunicationCommon.sharedInstance.convertDate(dateString, format: "EEE, dd MMM y HH:mm:ss zzz") {
                         completionHandler(account, ocId, date, nil)
                     } else { completionHandler(account, nil, nil, NCCommunicationCommon.sharedInstance.getError(code: NSURLErrorBadServerResponse, description: "Response error decode date format")) }
@@ -533,12 +533,12 @@ import SwiftyJSON
             case.failure(let error):
                 completionHandler(account, nil, nil, 0, error)
             case .success( _):
-                let lenght = response.response?.allHeaderFields["lenght"] as! Double
-                var etag = response.response?.allHeaderFields["OC-ETag"] as! String?
+                let lenght = response.response?.allHeaderFields["lenght"] as? Double
+                var etag = response.response?.allHeaderFields["OC-ETag"] as? String
                 if etag != nil { etag = etag!.replacingOccurrences(of: "\"", with: "") }
-                if let dateString = response.response?.allHeaderFields["Date"] as! String? {
+                if let dateString = response.response?.allHeaderFields["Date"] as? String {
                     if let date = NCCommunicationCommon.sharedInstance.convertDate(dateString, format: "EEE, dd MMM y HH:mm:ss zzz") {
-                        completionHandler(account, etag, date, lenght, nil)
+                        completionHandler(account, etag, date, lenght!, nil)
                     } else { completionHandler(account, nil, nil, 0, NCCommunicationCommon.sharedInstance.getError(code: NSURLErrorBadServerResponse, description: "Response error decode date format")) }
                 } else { completionHandler(account, nil, nil, 0, NCCommunicationCommon.sharedInstance.getError(code: NSURLErrorBadServerResponse, description: "Response error decode date format")) }
             }
@@ -572,10 +572,10 @@ import SwiftyJSON
             case.failure(let error):
                 completionHandler(account, nil, nil, nil, error)
             case .success( _):
-                let ocId = response.response?.allHeaderFields["OC-FileId"] as! String?
-                var etag = response.response?.allHeaderFields["OC-ETag"] as! String?
+                let ocId = response.response?.allHeaderFields["OC-FileId"] as? String
+                var etag = response.response?.allHeaderFields["OC-ETag"] as? String
                 if etag != nil { etag = etag!.replacingOccurrences(of: "\"", with: "") }
-                if let dateString = response.response?.allHeaderFields["Date"] as! String? {
+                if let dateString = response.response?.allHeaderFields["Date"] as? String {
                     if let date = NCCommunicationCommon.sharedInstance.convertDate(dateString, format: "EEE, dd MMM y HH:mm:ss zzz") {
                         completionHandler(account, ocId, etag, date, nil)
                     } else { completionHandler(account, nil, nil, nil, NCCommunicationCommon.sharedInstance.getError(code: NSURLErrorBadServerResponse, description: "Response error decode date format")) }
