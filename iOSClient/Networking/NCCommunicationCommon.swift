@@ -64,7 +64,7 @@ class NCCommunicationCommon: NSObject {
         self.delegate = delegate
     }
     
-    //MARK: - Authentication Challenge Delegate
+    //MARK: -  Delegate session
     
     @objc public func authenticationChallenge(_ challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
         if delegate == nil {
