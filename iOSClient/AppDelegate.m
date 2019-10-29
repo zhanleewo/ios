@@ -53,8 +53,8 @@ PKPushRegistry *pushRegistry;
 {
     [CCUtility createDirectoryStandard];
     
-    // Networking
-    [NCCommunication sharedInstance].authenticationChallengeDelegate = [NCNetworking sharedInstance];
+    // Networking Authentication Challenge Delegate
+    [NCCommunicationCommon sharedInstance].authenticationChallengeDelegate = [NCNetworking sharedInstance];
     
     // Verify upgrade
     if ([self upgrade]) {
@@ -401,7 +401,7 @@ PKPushRegistry *pushRegistry;
     // Setting Account to Networking
     [CCNetworking sharedNetworking].delegate = [NCNetworkingMain sharedInstance];
     
-    [[NCCommunication sharedInstance] setupWithUsername:activeUserID password:activePassword userAgent:[CCUtility getUserAgent]];
+    [[NCCommunicationCommon sharedInstance] setupWithUsername:activeUserID password:activePassword userAgent:[CCUtility getUserAgent] capabilitiesGroup:[NCBrandOptions sharedInstance].capabilitiesGroups authenticationChallengeDelegate:[NCNetworking sharedInstance]];    
 }
 
 - (void)deleteAccount:(NSString *)account wipe:(BOOL)wipe

@@ -27,20 +27,11 @@ import Alamofire
 import SwiftyXMLParser
 import SwiftyJSON
 
-@objc public protocol NCCommunicationAuthenticationChallengeDelegate {
-    @objc func authenticationChallenge(_ challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void)
-}
-
 @objc public class NCCommunication: SessionDelegate {
     @objc public static let sharedInstance: NCCommunication = {
         let instance = NCCommunication()
         return instance
     }()
-    
-    var username = ""
-    var password = ""
-    var userAgent: String?
-    @objc public var authenticationChallengeDelegate: NCCommunicationAuthenticationChallengeDelegate?
     
     // Session Manager
     
@@ -56,16 +47,6 @@ import SwiftyJSON
         return Alamofire.Session(configuration: configuration, delegate: self, rootQueue:  DispatchQueue(label: "com.nextcloud.sessionManagerTransfer.rootQueue"), startRequestsImmediately: true, requestQueue: nil, serializationQueue: nil, interceptor: nil, serverTrustManager: nil, redirectHandler: nil, cachedResponseHandler: nil, eventMonitors: self.makeEvents())
     }()
     
-    //MARK: - Initializer / Setup
-
-    init() { }
-    
-    @objc public func setup(username: String, password: String, userAgent: String?) {
-        self.username = username
-        self.password = password
-        self.userAgent = userAgent
-    }
-
     //MARK: - monitor
     
     private func makeEvents() -> [EventMonitor] {
@@ -100,8 +81,8 @@ import SwiftyJSON
         let method = HTTPMethod(rawValue: "MKCOL")
         
         // headers
-        var headers: HTTPHeaders = [.authorization(username: self.username, password: self.password)]
-        if let userAgent = self.userAgent { headers.update(.userAgent(userAgent)) }
+        var headers: HTTPHeaders = [.authorization(username: NCCommunicationCommon.sharedInstance.username, password: NCCommunicationCommon.sharedInstance.password)]
+        if let userAgent = NCCommunicationCommon.sharedInstance.userAgent { headers.update(.userAgent(userAgent)) }
         
         sessionManagerData.request(url, method: method, parameters:nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).response { (response) in
             switch response.result {
@@ -130,8 +111,8 @@ import SwiftyJSON
         let method = HTTPMethod(rawValue: "DELETE")
         
         // headers
-        var headers: HTTPHeaders = [.authorization(username: self.username, password: self.password)]
-        if let userAgent = self.userAgent { headers.update(.userAgent(userAgent)) }
+        var headers: HTTPHeaders = [.authorization(username: NCCommunicationCommon.sharedInstance.username, password: NCCommunicationCommon.sharedInstance.password)]
+        if let userAgent = NCCommunicationCommon.sharedInstance.userAgent { headers.update(.userAgent(userAgent)) }
         
         sessionManagerData.request(url, method: method, parameters:nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).response { (response) in
             switch response.result {
@@ -155,8 +136,8 @@ import SwiftyJSON
         let method = HTTPMethod(rawValue: "MOVE")
         
         // headers
-        var headers: HTTPHeaders = [.authorization(username: self.username, password: self.password)]
-        if let userAgent = self.userAgent { headers.update(.userAgent(userAgent)) }
+        var headers: HTTPHeaders = [.authorization(username: NCCommunicationCommon.sharedInstance.username, password: NCCommunicationCommon.sharedInstance.password)]
+        if let userAgent = NCCommunicationCommon.sharedInstance.userAgent { headers.update(.userAgent(userAgent)) }
         headers.update(name: "Destination", value: serverUrlFileNameDestination.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "")
         headers.update(name: "Overwrite", value: "T")
         
@@ -218,8 +199,8 @@ import SwiftyJSON
         let method = HTTPMethod(rawValue: "PROPFIND")
         
         // headers
-        var headers: HTTPHeaders = [.authorization(username: self.username, password: self.password)]
-        if let userAgent = self.userAgent { headers.update(.userAgent(userAgent)) }
+        var headers: HTTPHeaders = [.authorization(username: NCCommunicationCommon.sharedInstance.username, password: NCCommunicationCommon.sharedInstance.password)]
+        if let userAgent = NCCommunicationCommon.sharedInstance.userAgent { headers.update(.userAgent(userAgent)) }
         headers.update(.contentType("application/xml"))
         headers.update(name: "Depth", value: depth)
 
@@ -351,7 +332,7 @@ import SwiftyJSON
         let body = NSString.init(format: dataFile as NSString, (favorite ? 1 : 0)) as String
         
         // url
-        let serverUrlFileName = urlString + "/remote.php/dav/files/" + username + "/" + fileName
+        let serverUrlFileName = urlString + "/remote.php/dav/files/" + NCCommunicationCommon.sharedInstance.username + "/" + fileName
  
         guard let url = NCCommunicationCommon.sharedInstance.encodeUrlString(serverUrlFileName) else {
             completionHandler(account, NCCommunicationCommon.sharedInstance.getError(code: NSURLErrorUnsupportedURL, description: "Invalid server url"))
@@ -362,8 +343,8 @@ import SwiftyJSON
         let method = HTTPMethod(rawValue: "PROPPATCH")
         
         // headers
-        var headers: HTTPHeaders = [.authorization(username: self.username, password: self.password)]
-        if let userAgent = self.userAgent { headers.update(.userAgent(userAgent)) }
+        var headers: HTTPHeaders = [.authorization(username: NCCommunicationCommon.sharedInstance.username, password: NCCommunicationCommon.sharedInstance.password)]
+        if let userAgent = NCCommunicationCommon.sharedInstance.userAgent { headers.update(.userAgent(userAgent)) }
         headers.update(.contentType("application/xml"))
         
         // request
@@ -402,8 +383,8 @@ import SwiftyJSON
         let method = HTTPMethod(rawValue: "GET")
         
         // headers
-        var headers: HTTPHeaders = [.authorization(username: self.username, password: self.password)]
-        if let userAgent = self.userAgent { headers.update(.userAgent(userAgent)) }
+        var headers: HTTPHeaders = [.authorization(username: NCCommunicationCommon.sharedInstance.username, password: NCCommunicationCommon.sharedInstance.password)]
+        if let userAgent = NCCommunicationCommon.sharedInstance.userAgent { headers.update(.userAgent(userAgent)) }
 
         sessionManagerData.request(url, method: method, parameters:nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).response { (response) in
             switch response.result {
@@ -442,8 +423,8 @@ import SwiftyJSON
         let method = HTTPMethod(rawValue: "GET")
         
         // headers
-        var headers: HTTPHeaders = [.authorization(username: self.username, password: self.password)]
-        if let userAgent = self.userAgent { headers.update(.userAgent(userAgent)) }
+        var headers: HTTPHeaders = [.authorization(username: NCCommunicationCommon.sharedInstance.username, password: NCCommunicationCommon.sharedInstance.password)]
+        if let userAgent = NCCommunicationCommon.sharedInstance.userAgent { headers.update(.userAgent(userAgent)) }
         
         sessionManagerData.request(url, method: method, parameters:nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseJSON { (response) in
             debugPrint(response)
@@ -483,8 +464,8 @@ import SwiftyJSON
         let method = HTTPMethod(rawValue: "GET")
         
         // headers
-        var headers: HTTPHeaders = [.authorization(username: self.username, password: self.password)]
-        if let userAgent = self.userAgent { headers.update(.userAgent(userAgent)) }
+        var headers: HTTPHeaders = [.authorization(username: NCCommunicationCommon.sharedInstance.username, password: NCCommunicationCommon.sharedInstance.password)]
+        if let userAgent = NCCommunicationCommon.sharedInstance.userAgent { headers.update(.userAgent(userAgent)) }
         headers.update(name: "OCS-APIRequest", value: "true")
 
         sessionManagerData.request(url, method: method, parameters:nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseJSON { (response) in
@@ -537,8 +518,8 @@ import SwiftyJSON
         }
         
         // headers
-        var headers: HTTPHeaders = [.authorization(username: self.username, password: self.password)]
-        if let userAgent = self.userAgent { headers.update(.userAgent(userAgent)) }
+        var headers: HTTPHeaders = [.authorization(username: NCCommunicationCommon.sharedInstance.username, password: NCCommunicationCommon.sharedInstance.password)]
+        if let userAgent = NCCommunicationCommon.sharedInstance.userAgent { headers.update(.userAgent(userAgent)) }
         
         // session
         sessionManagerTransfer.session.sessionDescription = NCCommunicationCommon.sharedInstance.session_description_download
@@ -576,8 +557,8 @@ import SwiftyJSON
         let fileNamePathSourceUrl = URL.init(fileURLWithPath: fileNamePathSource)
         
         // headers
-        var headers: HTTPHeaders = [.authorization(username: self.username, password: self.password)]
-        if let userAgent = self.userAgent { headers.update(.userAgent(userAgent)) }
+        var headers: HTTPHeaders = [.authorization(username: NCCommunicationCommon.sharedInstance.username, password: NCCommunicationCommon.sharedInstance.password)]
+        if let userAgent = NCCommunicationCommon.sharedInstance.userAgent { headers.update(.userAgent(userAgent)) }
         
         // session
         sessionManagerTransfer.session.sessionDescription = NCCommunicationCommon.sharedInstance.session_description_upload
@@ -608,14 +589,9 @@ import SwiftyJSON
     //MARK: - SessionDelegate
 
     public func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
-                
-        if authenticationChallengeDelegate == nil {
-            completionHandler(URLSession.AuthChallengeDisposition.performDefaultHandling, nil)
-        } else {
-            authenticationChallengeDelegate?.authenticationChallenge(challenge, completionHandler: { (authChallengeDisposition, credential) in
-                completionHandler(authChallengeDisposition, credential)
-            })
-        }
+        NCCommunicationCommon.sharedInstance.authenticationChallenge(challenge, completionHandler: { (authChallengeDisposition, credential) in
+            completionHandler(authChallengeDisposition, credential)
+        })
     }
 }
 

@@ -58,9 +58,8 @@
     } else {
         
         // Networking
-        [NCCommunication sharedInstance].authenticationChallengeDelegate = [NCNetworking sharedInstance];
-        [[NCCommunication sharedInstance] setupWithUsername:tableAccount.userID password:[CCUtility getPassword:tableAccount.account]  userAgent:[CCUtility getUserAgent]];
-        
+        [[NCCommunicationCommon sharedInstance] setupWithUsername:tableAccount.userID password:[CCUtility getPassword:tableAccount.account] userAgent:[CCUtility getUserAgent] capabilitiesGroup:[NCBrandOptions sharedInstance].capabilitiesGroups authenticationChallengeDelegate:[NCNetworking sharedInstance]];
+       
         _activeAccount = tableAccount.account;
         
         if ([_activeAccount isEqualToString:[CCUtility getActiveAccountExt]]) {

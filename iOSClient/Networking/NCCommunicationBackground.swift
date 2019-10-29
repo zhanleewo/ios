@@ -30,17 +30,12 @@ import Foundation
     @objc optional func uploadComplete(fileName: String, serverUrl: String, session: URLSession, task: URLSessionTask, error: Error?)
 }
 
-@objc public protocol NCCommunicationBackgroundAuthenticationChallengeDelegate {
-    @objc optional func authenticationChallenge(_ challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void)
-}
-
 @objc public class NCCommunicationBackground: NSObject, URLSessionTaskDelegate, URLSessionDelegate, URLSessionDownloadDelegate {
     @objc public static let sharedInstance: NCCommunicationBackground = {
         let instance = NCCommunicationBackground()
         return instance
     }()
     
-    @objc public var authenticationChallengeDelegate: NCCommunicationBackgroundAuthenticationChallengeDelegate?
     @objc public var sessionDelegate: NCCommunicationBackgroundSessionDelegate?
     
     @objc public lazy var sessionManagerExtension: URLSession = {
@@ -132,14 +127,8 @@ import Foundation
     }
     
     public func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
-                
-        if authenticationChallengeDelegate == nil {
-            completionHandler(URLSession.AuthChallengeDisposition.performDefaultHandling, nil)
-        } else {
-            authenticationChallengeDelegate?.authenticationChallenge?(challenge, completionHandler: { (authChallengeDisposition, credential) in
-                completionHandler(authChallengeDisposition, credential)
-            })
-        }
+        NCCommunicationCommon.sharedInstance.authenticationChallenge(challenge, completionHandler: { (authChallengeDisposition, credential) in
+            completionHandler(authChallengeDisposition, credential)
+        })
     }
-    
 }

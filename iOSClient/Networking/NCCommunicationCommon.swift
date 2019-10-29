@@ -24,17 +24,25 @@
 import Foundation
 import Alamofire
 
-class NCCommunicationCommon: NSObject {
+@objc public protocol NCCommunicationCommonDelegate {
+    @objc func authenticationChallenge(_ challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void)
+}
+
+class NCCommunicationCommon: NSObject, NCCommunicationBackgroundSessionDelegate {
+   
     @objc static let sharedInstance: NCCommunicationCommon = {
         let instance = NCCommunicationCommon()
         return instance
     }()
     
-    //
+    // 
     var username = ""
     var password = ""
     var userAgent: String?
     var capabilitiesGroup: String?
+    
+    // Protocol
+    @objc public var authenticationChallengeDelegate: NCCommunicationCommonDelegate?
     
     // Session
     @objc let session_maximumConnectionsPerHost = 5
@@ -43,12 +51,24 @@ class NCCommunicationCommon: NSObject {
     @objc let session_extension: String = "com.nextcloud.session.extension"
 
     // Setup
-    @objc public func setup(username: String, password: String, userAgent: String?, capabilitiesGroup: String?) {
+    @objc public func setup(username: String, password: String, userAgent: String?, capabilitiesGroup: String?, authenticationChallengeDelegate: NCCommunicationCommonDelegate?) {
         self.username = username
         self.password = password
         self.userAgent = userAgent
         self.capabilitiesGroup = capabilitiesGroup
     }
+    
+    @objc public func authenticationChallenge(_ challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
+        if authenticationChallengeDelegate == nil {
+            completionHandler(URLSession.AuthChallengeDisposition.performDefaultHandling, nil)
+        } else {
+            authenticationChallengeDelegate?.authenticationChallenge(challenge, completionHandler: { (authChallengeDisposition, credential) in
+                completionHandler(authChallengeDisposition, credential)
+            })
+        }
+    }
+    
+    //
     
     func convertDate(_ dateString: String, format: String) -> NSDate? {
         let dateFormatter = DateFormatter()
