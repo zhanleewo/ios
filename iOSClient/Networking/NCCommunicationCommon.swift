@@ -47,6 +47,7 @@ class NCCommunicationCommon: NSObject {
     @objc let session_maximumConnectionsPerHost = 5
     @objc let session_description_download: String = "com.nextcloud.download.session"
     @objc let session_description_upload: String = "com.nextcloud.upload.session"
+    @objc let session_description_uploadbackground: String = "com.nextcloud.uploadbackground.session"
     @objc let session_extension: String = "com.nextcloud.session.extension"
 
     //MARK: - Setup

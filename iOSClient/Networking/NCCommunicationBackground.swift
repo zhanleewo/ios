@@ -38,6 +38,18 @@ import Foundation
     
     @objc public var sessionDelegate: NCCommunicationBackgroundSessionDelegate?
     
+    @objc public lazy var sessionManager: URLSession = {
+        let configuration = URLSessionConfiguration.background(withIdentifier: NCCommunicationCommon.sharedInstance.session_description_uploadbackground)
+        configuration.allowsCellularAccess = true
+        configuration.sessionSendsLaunchEvents = true
+        configuration.isDiscretionary = false
+        configuration.httpMaximumConnectionsPerHost = 1
+        configuration.requestCachePolicy = NSURLRequest.CachePolicy.reloadIgnoringLocalCacheData
+        let session = URLSession(configuration: configuration, delegate: self, delegateQueue: OperationQueue.main)
+        session.sessionDescription = NCCommunicationCommon.sharedInstance.session_description_uploadbackground
+        return session
+    }()
+    
     @objc public lazy var sessionManagerExtension: URLSession = {
         let configuration = URLSessionConfiguration.background(withIdentifier: NCCommunicationCommon.sharedInstance.session_extension)
         configuration.allowsCellularAccess = true
@@ -53,7 +65,7 @@ import Foundation
     
     //MARK: - Upload
     
-    @objc public func upload(serverUrlFileName: String, fileNamePathSource: String, session: URLSession?) -> URLSessionUploadTask? {
+    @objc public func upload(serverUrlFileName: String, fileNamePathSource: String, session: URLSession) -> URLSessionUploadTask? {
         
         guard let url = NCCommunicationCommon.sharedInstance.encodeUrlString(serverUrlFileName) as? URL else {
             return nil
@@ -68,11 +80,8 @@ import Foundation
         request.httpMethod = "PUT"
         request.setValue( NCCommunicationCommon.sharedInstance.userAgent, forHTTPHeaderField: "User-Agent")
         request.setValue("Basic \(base64LoginString)", forHTTPHeaderField: "Authorization")
-
-        // session
-        var session = session
-        if session == nil { session = sessionManagerExtension}
-        let task = session!.uploadTask(with: request, fromFile: URL.init(fileURLWithPath: fileNamePathSource))
+      
+        let task = session.uploadTask(with: request, fromFile: URL.init(fileURLWithPath: fileNamePathSource))
         
         task.resume()
         return task
