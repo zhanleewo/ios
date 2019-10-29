@@ -628,6 +628,10 @@ import SwiftyJSON
         return request.task
     }
     
+    @objc public func uploadBackground(serverUrlFileName: String, fileNamePathSource: String) {
+        
+    }
+    
     //MARK: - SessionDelegate
 
     public func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {

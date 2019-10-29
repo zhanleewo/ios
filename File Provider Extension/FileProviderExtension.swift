@@ -456,8 +456,8 @@ class FileProviderExtension: NSFileProviderExtension {
                 }
                 
                 //
-                CCNetworking.shared().delegate = self
-                CCNetworking.shared().uploadFile(metadataForUpload, taskStatus: Int(k_taskStatusResume))
+                //CCNetworking.shared().delegate = self
+                //CCNetworking.shared().uploadFile(metadataForUpload, taskStatus: Int(k_taskStatusResume))
                 //
                 
                 let item = FileProviderItem(metadata: metadataForUpload, parentItemIdentifier: parentItemIdentifier)
