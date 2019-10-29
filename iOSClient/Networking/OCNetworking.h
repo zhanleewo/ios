@@ -34,7 +34,6 @@
 #pragma mark ===== OCCommunication =====
 
 - (OCCommunication *)sharedOCCommunication;
-- (OCCommunication *)sharedOCCommunicationExtension;
 
 #pragma mark ===== Server =====
 
