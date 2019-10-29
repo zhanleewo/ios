@@ -59,8 +59,9 @@ class NCCommunicationCommon: NSObject {
         self.delegate = delegate
     }
     
-    @objc public func setup(userAgent: String?, delegate: NCCommunicationCommonDelegate?) {
+    @objc public func setup(userAgent: String?, capabilitiesGroup: String?, delegate: NCCommunicationCommonDelegate?) {
         self.userAgent = userAgent
+        self.capabilitiesGroup = capabilitiesGroup
         self.delegate = delegate
     }
     

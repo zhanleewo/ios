@@ -54,7 +54,7 @@ PKPushRegistry *pushRegistry;
     [CCUtility createDirectoryStandard];
     
     // Networking
-    [[NCCommunicationCommon sharedInstance] setupWithUserAgent:[CCUtility getUserAgent] delegate:[NCNetworking sharedInstance]];
+    [[NCCommunicationCommon sharedInstance] setupWithUserAgent:[CCUtility getUserAgent] capabilitiesGroup:[NCBrandOptions sharedInstance].capabilitiesGroups delegate:[NCNetworking sharedInstance]];
     
     // Verify upgrade
     if ([self upgrade]) {
