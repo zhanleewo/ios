@@ -65,6 +65,9 @@ class fileProviderData: NSObject {
             return false
         }
         
+        // Networking
+        NCCommunicationCommon.sharedInstance.authenticationChallengeDelegate = NCNetworking.sharedInstance
+        
         // NO DOMAIN -> Set default account
         if domain == nil {
             
