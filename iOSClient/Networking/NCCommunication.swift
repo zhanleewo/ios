@@ -29,7 +29,8 @@ import SwiftyJSON
 
 @objc public protocol NCCommunicationDelegate {
     @objc optional func authenticationChallenge(_ challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void)
-    @objc optional func uploadProgress(_ progress: Double, sessionDescription: String?)
+    @objc optional func uploadProgress(_ progress: Double, fileName: String, ServerUrl: String, session: URLSession, task: URLSessionTask)
+    @objc optional func uploadComplete(fileName: String, serverUrl: String, session: URLSession, task: URLSessionTask, error: Error?)
 }
 
 @objc public class NCCommunication: SessionDelegate {
@@ -643,23 +644,35 @@ import SwiftyJSON
     
     //MARK: - SessionDelegate
 
-    public override func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
-    }
+    public override func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) { }
     
     public override func urlSession(_ session: URLSession, task: URLSessionTask, didSendBodyData bytesSent: Int64, totalBytesSent: Int64, totalBytesExpectedToSend: Int64) {
-        guard totalBytesExpectedToSend != NSURLSessionTransferSizeUnknown else {
-            return
-        }
-        if session.sessionDescription == NCCommunicationCommon.sharedInstance.session_extension {
-            let progress = Double(Double(totalBytesSent)/Double(totalBytesExpectedToSend))
-            DispatchQueue.main.async {
-                self.delegate?.uploadProgress?(progress, sessionDescription: session.description)
-            }
+        
+        guard totalBytesExpectedToSend != NSURLSessionTransferSizeUnknown else { return }
+        guard let url = task.currentRequest?.url?.absoluteString.removingPercentEncoding else { return }
+        let fileName = (url as NSString).lastPathComponent
+        let serverUrl = url.replacingOccurrences(of: "/"+fileName, with: "")
+        let progress = Double(Double(totalBytesSent)/Double(totalBytesExpectedToSend))
+
+        DispatchQueue.main.async {
+            self.delegate?.uploadProgress?(progress, fileName: fileName, ServerUrl: serverUrl, session: session, task: task)
         }
     }
     
     override public func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
         
+        var fileName: String = "", serverUrl: String = ""
+        let url = task.currentRequest?.url?.absoluteString.removingPercentEncoding
+        if url != nil {
+            fileName = (url! as NSString).lastPathComponent
+            serverUrl = url!.replacingOccurrences(of: "/"+fileName, with: "")
+        }
+        
+        DispatchQueue.main.async {
+            if task is URLSessionUploadTask {
+                self.delegate?.uploadComplete?(fileName: fileName, serverUrl: serverUrl, session: session, task: task, error: error)
+            }
+        }
     }
     
     public func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
