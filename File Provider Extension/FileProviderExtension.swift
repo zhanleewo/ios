@@ -48,7 +48,7 @@ import FileProvider
  
    -------------------------------------------------------------------------------------------------------------------------------------------- */
 
-class FileProviderExtension: NSFileProviderExtension {
+class FileProviderExtension: NSFileProviderExtension, NCNetworkingDelegate {
     
     var outstandingSessionTasks = [URL: URLSessionTask]()
     
@@ -77,11 +77,11 @@ class FileProviderExtension: NSFileProviderExtension {
             if containerItemIdentifier == NSFileProviderItemIdentifier.rootContainer && self.domain?.identifier.rawValue == nil {
                 throw NSError(domain: NSFileProviderErrorDomain, code: NSFileProviderError.notAuthenticated.rawValue, userInfo:[:])
             } else if self.domain?.identifier.rawValue != nil {
-                if fileProviderData.sharedInstance.setupActiveAccount(domain: self.domain?.identifier.rawValue) == false {
+                if fileProviderData.sharedInstance.setupActiveAccount(domain: self.domain?.identifier.rawValue, providerExtension: self) == false {
                     throw NSError(domain: NSFileProviderErrorDomain, code: NSFileProviderError.notAuthenticated.rawValue, userInfo:[:])
                 }
             } else {
-                if fileProviderData.sharedInstance.setupActiveAccount(itemIdentifier: containerItemIdentifier) == false {
+                if fileProviderData.sharedInstance.setupActiveAccount(itemIdentifier: containerItemIdentifier, providerExtension: self) == false {
                     throw NSError(domain: NSFileProviderErrorDomain, code: NSFileProviderError.notAuthenticated.rawValue, userInfo:[:])
                 }
             }

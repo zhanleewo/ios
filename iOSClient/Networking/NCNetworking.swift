@@ -24,11 +24,21 @@
 import Foundation
 import OpenSSL
 
+@objc public protocol NCNetworkingDelegate {
+    @objc optional func downloadProgress(_ progress: Double, fileName: String, ServerUrl: String, session: URLSession, task: URLSessionTask)
+    @objc optional func uploadProgress(_ progress: Double, fileName: String, ServerUrl: String, session: URLSession, task: URLSessionTask)
+    @objc optional func uploadComplete(fileName: String, serverUrl: String, ocId: String?, etag: String?, date: NSDate? ,session: URLSession, task: URLSessionTask, error: Error?)
+}
+
+
 @objc class NCNetworking: NSObject, NCCommunicationCommonDelegate {
     @objc public static let sharedInstance: NCNetworking = {
         let instance = NCNetworking()
         return instance
     }()
+    
+    // Protocol
+    var delegate: NCNetworkingDelegate?
     
     //MARK: - Communication Delegate
        
@@ -41,12 +51,16 @@ import OpenSSL
     }
     
     func downloadProgress(_ progress: Double, fileName: String, ServerUrl: String, session: URLSession, task: URLSessionTask) {
+        delegate?.downloadProgress?(progress, fileName: fileName, ServerUrl: ServerUrl, session: session, task: task)
     }
     
     func uploadProgress(_ progress: Double, fileName: String, ServerUrl: String, session: URLSession, task: URLSessionTask) {
+        delegate?.uploadProgress?(progress, fileName: fileName, ServerUrl: ServerUrl, session: session, task: task)
     }
     
     func uploadComplete(fileName: String, serverUrl: String, ocId: String?, etag: String?, date: NSDate?, session: URLSession, task: URLSessionTask, error: Error?) {
+        
+        delegate?.uploadComplete?(fileName: fileName, serverUrl: serverUrl, ocId: ocId, etag: etag, date: date, session: session, task: task, error: error)
     }
     
     //MARK: - Pinning check

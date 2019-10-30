@@ -57,7 +57,7 @@ class fileProviderData: NSObject {
     
     // MARK: - 
     
-    func setupActiveAccount(domain: String?) -> Bool {
+    func setupActiveAccount(domain: String?, providerExtension: NSFileProviderExtension) -> Bool {
         
         var foundAccount: Bool = false
         
@@ -78,6 +78,7 @@ class fileProviderData: NSObject {
             homeServerUrl = CCUtility.getHomeServerUrlActiveUrl(tableAccounts.url)
             
             NCCommunicationCommon.sharedInstance.setup(username: accountUserID, password: accountPassword, userAgent: CCUtility.getUserAgent(), capabilitiesGroup: NCBrandOptions.sharedInstance.capabilitiesGroups, delegate: NCNetworking.sharedInstance)
+            NCNetworking.sharedInstance.delegate = providerExtension as? NCNetworkingDelegate
             
             return true
         }
@@ -99,7 +100,7 @@ class fileProviderData: NSObject {
                 homeServerUrl = CCUtility.getHomeServerUrlActiveUrl(tableAccount.url)
                 
                 NCCommunicationCommon.sharedInstance.setup(username: accountUserID, password: accountPassword, userAgent: CCUtility.getUserAgent(), capabilitiesGroup: NCBrandOptions.sharedInstance.capabilitiesGroups, delegate: NCNetworking.sharedInstance)
-
+                NCNetworking.sharedInstance.delegate = providerExtension as? NCNetworkingDelegate
 
                 foundAccount = true
             }
@@ -108,7 +109,7 @@ class fileProviderData: NSObject {
         return foundAccount
     }
     
-    func setupActiveAccount(itemIdentifier: NSFileProviderItemIdentifier) -> Bool {
+    func setupActiveAccount(itemIdentifier: NSFileProviderItemIdentifier, providerExtension: NSFileProviderExtension) -> Bool {
         
         var foundAccount: Bool = false
 
@@ -127,7 +128,8 @@ class fileProviderData: NSObject {
                 homeServerUrl = CCUtility.getHomeServerUrlActiveUrl(tableAccount.url)
                 
                 NCCommunicationCommon.sharedInstance.setup(username: accountUserID, password: accountPassword, userAgent: CCUtility.getUserAgent(), capabilitiesGroup: NCBrandOptions.sharedInstance.capabilitiesGroups, delegate: NCNetworking.sharedInstance)
-
+                NCNetworking.sharedInstance.delegate = providerExtension as? NCNetworkingDelegate
+                
                 foundAccount = true
             }
         }
