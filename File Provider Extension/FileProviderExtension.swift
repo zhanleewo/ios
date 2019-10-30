@@ -440,15 +440,7 @@ class FileProviderExtension: NSFileProviderExtension, NCNetworkingDelegate {
                 metadata.serverUrl = tableDirectory.serverUrl
                 metadata.size = size
                 metadata.status = Int(k_metadataStatusHide)
-               
                 CCUtility.insertTypeFileIconName(fileName, metadata: metadata)
-
-                if (size > 0) {
-                    
-                    metadata.session = k_upload_session_extension
-                    metadata.sessionSelector = selectorUploadFile
-                    metadata.status = Int(k_metadataStatusWaitUpload)
-                }
                 
                 guard let metadataForUpload = NCManageDatabase.sharedInstance.addMetadata(metadata) else {
                     completionHandler(nil, NSFileProviderError(.noSuchItem))
@@ -458,7 +450,7 @@ class FileProviderExtension: NSFileProviderExtension, NCNetworkingDelegate {
                 let serverUrlFileName = tableDirectory.serverUrl + "/" + fileName
                 let fileNamePathSource = CCUtility.getDirectoryProviderStorageOcId(ocId, fileNameView: fileName)!
                 
-                let task = NCCommunicationBackground.sharedInstance.upload(serverUrlFileName: serverUrlFileName, fileNamePathSource: fileNamePathSource, account: fileProviderData.sharedInstance.account, session: NCCommunicationBackground.sharedInstance.sessionManagerExtension)
+                _ = NCCommunicationBackground.sharedInstance.upload(serverUrlFileName: serverUrlFileName, fileNamePathSource: fileNamePathSource, account: fileProviderData.sharedInstance.account, session: NCCommunicationBackground.sharedInstance.sessionManagerExtension)
                 
                 let item = FileProviderItem(metadata: metadataForUpload, parentItemIdentifier: parentItemIdentifier)
                 completionHandler(item, nil)
@@ -484,12 +476,8 @@ class FileProviderExtension: NSFileProviderExtension, NCNetworkingDelegate {
                 if let etag = etag { metadata.etag = etag }
                 if let ocId = ocId { metadata.ocId = ocId }
                 if let date = date { metadata.date = date }
+                metadata.status = Int(k_metadataStatusNormal)
                       
-                metadata.session = ""
-                metadata.sessionError = ""
-                metadata.sessionSelector = ""
-                metadata.sessionTaskIdentifier = 0
-                
                 guard let metadataUpdated = NCManageDatabase.sharedInstance.addMetadata(metadata) else { return }
                 let item = FileProviderItem(metadata: metadataUpdated, parentItemIdentifier: parentItemIdentifier)
 
