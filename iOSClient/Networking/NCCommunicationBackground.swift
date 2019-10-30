@@ -31,7 +31,7 @@ import Foundation
     }()
         
     @objc public lazy var sessionManagerTransfer: URLSession = {
-        let configuration = URLSessionConfiguration.background(withIdentifier: NCCommunicationCommon.sharedInstance.session_background)
+        let configuration = URLSessionConfiguration.background(withIdentifier: NCCommunicationCommon.sharedInstance.session_identifier_background)
         configuration.allowsCellularAccess = true
         configuration.sessionSendsLaunchEvents = true
         configuration.isDiscretionary = false
@@ -42,7 +42,7 @@ import Foundation
     }()
     
     @objc public lazy var sessionManagerExtension: URLSession = {
-        let configuration = URLSessionConfiguration.background(withIdentifier: NCCommunicationCommon.sharedInstance.session_extension)
+        let configuration = URLSessionConfiguration.background(withIdentifier: NCCommunicationCommon.sharedInstance.session_identifier_extension)
         configuration.allowsCellularAccess = true
         configuration.sessionSendsLaunchEvents = true
         configuration.isDiscretionary = false
@@ -55,7 +55,7 @@ import Foundation
     
     //MARK: - Upload
     
-    @objc public func upload(serverUrlFileName: String, fileNamePathSource: String, session: URLSession) -> URLSessionUploadTask? {
+    @objc public func upload(serverUrlFileName: String, fileNamePathSource: String, account: String, session: URLSession) -> URLSessionUploadTask? {
         
         guard let url = NCCommunicationCommon.sharedInstance.encodeUrlString(serverUrlFileName) as? URL else {
             return nil
@@ -72,7 +72,7 @@ import Foundation
         request.setValue("Basic \(base64LoginString)", forHTTPHeaderField: "Authorization")
       
         // session
-        session.sessionDescription = NCCommunicationCommon.sharedInstance.session_description_upload
+        session.sessionDescription = account
         let task = session.uploadTask(with: request, fromFile: URL.init(fileURLWithPath: fileNamePathSource))
         
         task.resume()
@@ -122,7 +122,6 @@ import Foundation
         
         DispatchQueue.main.async {
             if task is URLSessionUploadTask {
-                
                 if let header = (task.response as? HTTPURLResponse)?.allHeaderFields {
                     etag = header["OC-ETag"] as? String
                     if etag != nil { etag = etag!.replacingOccurrences(of: "\"", with: "") }
