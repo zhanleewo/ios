@@ -455,10 +455,10 @@ class FileProviderExtension: NSFileProviderExtension, NCNetworkingDelegate {
                     return
                 }
                 
-                //
-                //CCNetworking.shared().delegate = self
-                //CCNetworking.shared().uploadFile(metadataForUpload, taskStatus: Int(k_taskStatusResume))
-                //
+                let serverUrlFileName = tableDirectory.serverUrl + "/" + fileName
+                let fileNamePathSource = CCUtility.getDirectoryProviderStorageOcId(ocId, fileNameView: fileName)!
+                
+                let task = NCCommunicationBackground.sharedInstance.upload(serverUrlFileName: serverUrlFileName, fileNamePathSource: fileNamePathSource, account: fileProviderData.sharedInstance.account, session: NCCommunicationBackground.sharedInstance.sessionManagerExtension)
                 
                 let item = FileProviderItem(metadata: metadataForUpload, parentItemIdentifier: parentItemIdentifier)
                 completionHandler(item, nil)
@@ -466,19 +466,7 @@ class FileProviderExtension: NSFileProviderExtension, NCNetworkingDelegate {
         }
     }
     
-    
-    func uploadFileSuccessFailure(_ fileName: String!, ocId: String!, assetLocalIdentifier: String!, serverUrl: String!, selector: String!, errorMessage: String!, errorCode: Int) {
+    func uploadComplete(fileName: String, serverUrl: String, ocId: String?, etag: String?, date: NSDate?, session: URLSession, task: URLSessionTask, error: Error?) {
         
-        guard let metadata = NCManageDatabase.sharedInstance.getMetadata(predicate: NSPredicate(format: "ocId == %@", ocId)) else {
-            return
-        }
-        guard let parentItemIdentifier = fileProviderUtility.sharedInstance.getParentItemIdentifier(metadata: metadata, homeServerUrl: fileProviderData.sharedInstance.homeServerUrl) else {
-            return
-        }
-        if errorCode == 0 {
-            
-        } else {
-            
-        }
     }
 }
