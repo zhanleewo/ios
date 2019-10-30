@@ -429,7 +429,6 @@ class FileProviderExtension: NSFileProviderExtension, NCNetworkingDelegate {
                 
                 // ---------------------------------------------------------------------------------
                 
-                // Metadata TEMP
                 metadata.account = fileProviderData.sharedInstance.account
                 metadata.date = NSDate()
                 metadata.directory = false
