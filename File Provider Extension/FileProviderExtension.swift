@@ -468,5 +468,26 @@ class FileProviderExtension: NSFileProviderExtension, NCNetworkingDelegate {
     
     func uploadComplete(fileName: String, serverUrl: String, ocId: String?, etag: String?, date: NSDate?, session: URLSession, task: URLSessionTask, error: Error?) {
         
+        var account = session.sessionDescription
+        if account == nil { account = fileProviderData.sharedInstance.account }
+              
+        if error == nil {
+            
+            if let metadata = NCManageDatabase.sharedInstance.getMetadata(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@ AND fileName == %@", account!, serverUrl, fileName)) {
+                      
+                let ocIdTemp = metadata.ocId
+                      
+                if let etag = etag { metadata.etag = etag }
+                if let ocId = ocId { metadata.ocId = ocId }
+                if let date = date { metadata.date = date }
+                      
+                metadata.session = ""
+                metadata.sessionError = ""
+                metadata.sessionSelector = ""
+                metadata.sessionTaskIdentifier = 0
+                      
+                _ = NCManageDatabase.sharedInstance.addMetadata(metadata)
+            }
+        }
     }
 }
