@@ -25,13 +25,12 @@ import Foundation
 import SVGKit
 
 class NCService: NSObject {
-    
-    let appDelegate = UIApplication.shared.delegate as! AppDelegate
-
     @objc static let sharedInstance: NCService = {
         let instance = NCService()
         return instance
     }()
+    
+    let appDelegate = UIApplication.shared.delegate as! AppDelegate
     
     //MARK: -
     //MARK: Start Services API NC
