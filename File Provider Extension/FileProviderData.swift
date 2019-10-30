@@ -68,17 +68,17 @@ class fileProviderData: NSObject {
         // NO DOMAIN -> Set default account
         if domain == nil {
             
-            guard let tableAccounts = NCManageDatabase.sharedInstance.getAccountActive() else { return false }
+            guard let tableAccount = NCManageDatabase.sharedInstance.getAccountActive() else { return false }
             
-            account = tableAccounts.account
-            accountUser = tableAccounts.user
-            accountUserID = tableAccounts.userID
-            accountPassword = CCUtility.getPassword(tableAccounts.account)
-            accountUrl = tableAccounts.url
-            homeServerUrl = CCUtility.getHomeServerUrlActiveUrl(tableAccounts.url)
+            account = tableAccount.account
+            accountUser = tableAccount.user
+            accountUserID = tableAccount.userID
+            accountPassword = CCUtility.getPassword(tableAccount.account)
+            accountUrl = tableAccount.url
+            homeServerUrl = CCUtility.getHomeServerUrlActiveUrl(tableAccount.url)
             
             NCCommunicationCommon.sharedInstance.setup(username: accountUserID, password: accountPassword, userAgent: CCUtility.getUserAgent(), capabilitiesGroup: NCBrandOptions.sharedInstance.capabilitiesGroups, delegate: NCNetworking.sharedInstance)
-            NCNetworking.sharedInstance.delegate = providerExtension as? NCNetworkingDelegate
+            NCNetworking.sharedInstance.setup(account: tableAccount.account, delegate: providerExtension as? NCNetworkingDelegate)
             
             return true
         }
@@ -100,7 +100,7 @@ class fileProviderData: NSObject {
                 homeServerUrl = CCUtility.getHomeServerUrlActiveUrl(tableAccount.url)
                 
                 NCCommunicationCommon.sharedInstance.setup(username: accountUserID, password: accountPassword, userAgent: CCUtility.getUserAgent(), capabilitiesGroup: NCBrandOptions.sharedInstance.capabilitiesGroups, delegate: NCNetworking.sharedInstance)
-                NCNetworking.sharedInstance.delegate = providerExtension as? NCNetworkingDelegate
+                NCNetworking.sharedInstance.setup(account: tableAccount.account, delegate: providerExtension as? NCNetworkingDelegate)
 
                 foundAccount = true
             }
@@ -128,7 +128,7 @@ class fileProviderData: NSObject {
                 homeServerUrl = CCUtility.getHomeServerUrlActiveUrl(tableAccount.url)
                 
                 NCCommunicationCommon.sharedInstance.setup(username: accountUserID, password: accountPassword, userAgent: CCUtility.getUserAgent(), capabilitiesGroup: NCBrandOptions.sharedInstance.capabilitiesGroups, delegate: NCNetworking.sharedInstance)
-                NCNetworking.sharedInstance.delegate = providerExtension as? NCNetworkingDelegate
+                NCNetworking.sharedInstance.setup(account: tableAccount.account, delegate: providerExtension as? NCNetworkingDelegate)
                 
                 foundAccount = true
             }

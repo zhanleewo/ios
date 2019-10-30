@@ -37,8 +37,17 @@ import OpenSSL
         return instance
     }()
     
+    var account = ""
+    
     // Protocol
     var delegate: NCNetworkingDelegate?
+    
+    //MARK: - Setup
+    
+    @objc public func setup(account: String, delegate: NCNetworkingDelegate?) {
+        self.account = account
+        self.delegate = delegate
+    }
     
     //MARK: - Communication Delegate
        
@@ -59,6 +68,11 @@ import OpenSSL
     }
     
     func uploadComplete(fileName: String, serverUrl: String, ocId: String?, etag: String?, date: NSDate?, session: URLSession, task: URLSessionTask, error: Error?) {
+        
+        var account = session.sessionDescription
+        if account == nil {
+            account = self.account
+        }
         
         delegate?.uploadComplete?(fileName: fileName, serverUrl: serverUrl, ocId: ocId, etag: etag, date: date, session: session, task: task, error: error)
     }
