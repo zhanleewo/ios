@@ -469,7 +469,11 @@ class FileProviderExtension: NSFileProviderExtension, NCNetworkingDelegate {
                 guard let parentItemIdentifier = fileProviderUtility.sharedInstance.getParentItemIdentifier(metadata: metadata, homeServerUrl: fileProviderData.sharedInstance.homeServerUrl) else {
                     return
                 }
-                let removeItem = FileProviderItem(metadata: metadata, parentItemIdentifier: parentItemIdentifier)
+                var item = FileProviderItem(metadata: metadata, parentItemIdentifier: parentItemIdentifier)
+                fileProviderData.sharedInstance.fileProviderSignalDeleteContainerItemIdentifier[item.itemIdentifier] = item.itemIdentifier
+                fileProviderData.sharedInstance.fileProviderSignalDeleteWorkingSetItemIdentifier[item.itemIdentifier] = item.itemIdentifier
+                fileProviderData.sharedInstance.signalEnumerator(for: [parentItemIdentifier, .workingSet])
+
                 let ocIdTemp = metadata.ocId
                       
                 if let etag = etag { metadata.etag = etag }
@@ -478,7 +482,7 @@ class FileProviderExtension: NSFileProviderExtension, NCNetworkingDelegate {
                 metadata.status = Int(k_metadataStatusNormal)
                       
                 guard let metadataUpdated = NCManageDatabase.sharedInstance.addMetadata(metadata) else { return }
-                let item = FileProviderItem(metadata: metadataUpdated, parentItemIdentifier: parentItemIdentifier)
+                item = FileProviderItem(metadata: metadataUpdated, parentItemIdentifier: parentItemIdentifier)
 
                 // File system
                 let atPath = CCUtility.getDirectoryProviderStorageOcId(ocIdTemp)
@@ -486,11 +490,8 @@ class FileProviderExtension: NSFileProviderExtension, NCNetworkingDelegate {
                 CCUtility.copyFile(atPath: atPath, toPath: toPath)
                 
                 // Signal
-                fileProviderData.sharedInstance.fileProviderSignalDeleteContainerItemIdentifier[removeItem.itemIdentifier] = removeItem.itemIdentifier
-                fileProviderData.sharedInstance.fileProviderSignalDeleteWorkingSetItemIdentifier[removeItem.itemIdentifier] = removeItem.itemIdentifier
                 fileProviderData.sharedInstance.fileProviderSignalUpdateContainerItem[item.itemIdentifier] = item
                 fileProviderData.sharedInstance.fileProviderSignalUpdateWorkingSetItem[item.itemIdentifier] = item
-
                 fileProviderData.sharedInstance.signalEnumerator(for: [parentItemIdentifier, .workingSet])
             }
         }
