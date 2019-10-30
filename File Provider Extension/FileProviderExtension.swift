@@ -475,6 +475,14 @@ class FileProviderExtension: NSFileProviderExtension, NCNetworkingDelegate {
             
             if let metadata = NCManageDatabase.sharedInstance.getMetadata(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@ AND fileName == %@", account!, serverUrl, fileName)) {
                       
+                guard let parentItemIdentifier = fileProviderUtility.sharedInstance.getParentItemIdentifier(metadata: metadata, homeServerUrl: fileProviderData.sharedInstance.homeServerUrl) else {
+                    return
+                }
+                let removeItem = FileProviderItem(metadata: metadata, parentItemIdentifier: parentItemIdentifier)
+                
+                fileProviderData.sharedInstance.fileProviderSignalDeleteContainerItemIdentifier[removeItem.itemIdentifier] = removeItem.itemIdentifier
+                fileProviderData.sharedInstance.fileProviderSignalDeleteWorkingSetItemIdentifier[removeItem.itemIdentifier] = removeItem.itemIdentifier
+                
                 let ocIdTemp = metadata.ocId
                       
                 if let etag = etag { metadata.etag = etag }
@@ -486,7 +494,14 @@ class FileProviderExtension: NSFileProviderExtension, NCNetworkingDelegate {
                 metadata.sessionSelector = ""
                 metadata.sessionTaskIdentifier = 0
                       
-                _ = NCManageDatabase.sharedInstance.addMetadata(metadata)
+                guard let metadataUpdated = NCManageDatabase.sharedInstance.addMetadata(metadata) else { return }
+                
+                let item = FileProviderItem(metadata: metadataUpdated, parentItemIdentifier: parentItemIdentifier)
+                
+                fileProviderData.sharedInstance.fileProviderSignalUpdateContainerItem[item.itemIdentifier] = item
+                fileProviderData.sharedInstance.fileProviderSignalUpdateWorkingSetItem[item.itemIdentifier] = item
+
+                fileProviderData.sharedInstance.signalEnumerator(for: [parentItemIdentifier, .workingSet])
             }
         }
     }
