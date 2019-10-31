@@ -72,7 +72,15 @@ class FileProviderExtension: NSFileProviderExtension, NCNetworkingDelegate {
         
         var maybeEnumerator: NSFileProviderEnumerator? = nil
         
-        // Check account
+        // Check account single
+        if (containerItemIdentifier != NSFileProviderItemIdentifier.workingSet) {
+            if fileProviderData.sharedInstance.setupActiveAccount(domain: nil, providerExtension: self) == false {
+                throw NSError(domain: NSFileProviderErrorDomain, code: NSFileProviderError.notAuthenticated.rawValue, userInfo:[:])
+            }
+        }
+        
+        // Check account domain
+        /*
         if (containerItemIdentifier != NSFileProviderItemIdentifier.workingSet) {
             if containerItemIdentifier == NSFileProviderItemIdentifier.rootContainer && self.domain?.identifier.rawValue == nil {
                 throw NSError(domain: NSFileProviderErrorDomain, code: NSFileProviderError.notAuthenticated.rawValue, userInfo:[:])
@@ -86,6 +94,7 @@ class FileProviderExtension: NSFileProviderExtension, NCNetworkingDelegate {
                 }
             }
         }
+        */
 
         if (containerItemIdentifier == NSFileProviderItemIdentifier.rootContainer) {
             maybeEnumerator = FileProviderEnumerator(enumeratedItemIdentifier: containerItemIdentifier)
@@ -483,8 +492,7 @@ class FileProviderExtension: NSFileProviderExtension, NCNetworkingDelegate {
                 // Signal delete
                 fileProviderData.sharedInstance.fileProviderSignalDeleteContainerItemIdentifier[item.itemIdentifier] = item.itemIdentifier
                 fileProviderData.sharedInstance.fileProviderSignalDeleteWorkingSetItemIdentifier[item.itemIdentifier] = item.itemIdentifier
-                fileProviderData.sharedInstance.signalEnumerator(for: [parentItemIdentifier, .workingSet])
-                
+
                 // File system
                 let atPath = CCUtility.getDirectoryProviderStorageOcId(ocIdTemp)
                 let toPath = CCUtility.getDirectoryProviderStorageOcId(ocId)
@@ -494,6 +502,7 @@ class FileProviderExtension: NSFileProviderExtension, NCNetworkingDelegate {
                 item = FileProviderItem(metadata: metadataUpdated, parentItemIdentifier: parentItemIdentifier)
                 fileProviderData.sharedInstance.fileProviderSignalUpdateContainerItem[item.itemIdentifier] = item
                 fileProviderData.sharedInstance.fileProviderSignalUpdateWorkingSetItem[item.itemIdentifier] = item
+                
                 fileProviderData.sharedInstance.signalEnumerator(for: [parentItemIdentifier, .workingSet])
             }
         }
