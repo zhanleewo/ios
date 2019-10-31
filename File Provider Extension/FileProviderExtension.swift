@@ -418,10 +418,10 @@ class FileProviderExtension: NSFileProviderExtension, NCNetworkingDelegate {
                 }
         
                 let fileName = NCUtility.sharedInstance.createFileName(fileURL.lastPathComponent, serverUrl: tableDirectory.serverUrl, account: fileProviderData.sharedInstance.account)
-                let ocId = CCUtility.createMetadataID(fromAccount: fileProviderData.sharedInstance.account, serverUrl: tableDirectory.serverUrl, fileNameView: fileName, directory: false)!
+                let ocIdTemp = CCUtility.createMetadataID(fromAccount: fileProviderData.sharedInstance.account, serverUrl: tableDirectory.serverUrl, fileNameView: fileName, directory: false)!
                 
                 self.fileCoordinator.coordinate(readingItemAt: fileURL, options: .withoutChanges, error: &error) { (url) in
-                    _ = fileProviderUtility.sharedInstance.moveFile(url.path, toPath: CCUtility.getDirectoryProviderStorageOcId(ocId, fileNameView: fileName))
+                    _ = fileProviderUtility.sharedInstance.moveFile(url.path, toPath: CCUtility.getDirectoryProviderStorageOcId(ocIdTemp, fileNameView: fileName))
                 }
                 
                 
@@ -435,7 +435,7 @@ class FileProviderExtension: NSFileProviderExtension, NCNetworkingDelegate {
                 metadata.etag = ""
                 metadata.fileName = fileName
                 metadata.fileNameView = fileName
-                metadata.ocId = ocId
+                metadata.ocId = ocIdTemp
                 metadata.serverUrl = tableDirectory.serverUrl
                 metadata.size = size
                 metadata.status = Int(k_metadataStatusHide)
@@ -447,9 +447,9 @@ class FileProviderExtension: NSFileProviderExtension, NCNetworkingDelegate {
                 }
                 
                 let serverUrlFileName = tableDirectory.serverUrl + "/" + fileName
-                let fileNamePathSource = CCUtility.getDirectoryProviderStorageOcId(ocId, fileNameView: fileName)!
+                let fileNamePathSource = CCUtility.getDirectoryProviderStorageOcId(ocIdTemp, fileNameView: fileName)!
                 
-                _ = NCCommunicationBackground.sharedInstance.upload(serverUrlFileName: serverUrlFileName, fileNamePathSource: fileNamePathSource, account: fileProviderData.sharedInstance.account, session: NCCommunicationBackground.sharedInstance.sessionManagerExtension)
+                _ = NCCommunicationBackground.sharedInstance.upload(serverUrlFileName: serverUrlFileName, fileNamePathSource: fileNamePathSource, sessionDescription: ocIdTemp, session: NCCommunicationBackground.sharedInstance.sessionManagerExtension)
                 
                 let item = FileProviderItem(metadata: metadataForUpload, parentItemIdentifier: parentItemIdentifier)
                 completionHandler(item, nil)
@@ -458,13 +458,12 @@ class FileProviderExtension: NSFileProviderExtension, NCNetworkingDelegate {
     }
     
     func uploadComplete(fileName: String, serverUrl: String, ocId: String?, etag: String?, date: NSDate?, session: URLSession, task: URLSessionTask, error: Error?) {
-        
-        var account = session.sessionDescription
-        if account == nil { account = fileProviderData.sharedInstance.account }
-              
+                
         if error == nil {
             
-            if let metadata = NCManageDatabase.sharedInstance.getMetadata(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@ AND fileName == %@", account!, serverUrl, fileName)) {
+            guard let ocIdTemp = session.sessionDescription else { return }
+            let metadata = NCManageDatabase.sharedInstance.getMetadata(predicate: NSPredicate(format: "ocId == %@", ocIdTemp))
+            if let metadata = NCManageDatabase.sharedInstance.getMetadata(predicate: NSPredicate(format: "ocId == %@", ocIdTemp)) {
                       
                 guard let parentItemIdentifier = fileProviderUtility.sharedInstance.getParentItemIdentifier(metadata: metadata, homeServerUrl: fileProviderData.sharedInstance.homeServerUrl) else {
                     return
@@ -473,8 +472,6 @@ class FileProviderExtension: NSFileProviderExtension, NCNetworkingDelegate {
                 fileProviderData.sharedInstance.fileProviderSignalDeleteContainerItemIdentifier[item.itemIdentifier] = item.itemIdentifier
                 fileProviderData.sharedInstance.fileProviderSignalDeleteWorkingSetItemIdentifier[item.itemIdentifier] = item.itemIdentifier
                 fileProviderData.sharedInstance.signalEnumerator(for: [parentItemIdentifier, .workingSet])
-
-                let ocIdTemp = metadata.ocId
                       
                 if let etag = etag { metadata.etag = etag }
                 if let ocId = ocId { metadata.ocId = ocId }
