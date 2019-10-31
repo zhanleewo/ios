@@ -438,7 +438,7 @@ class FileProviderExtension: NSFileProviderExtension, NCNetworkingDelegate {
                 metadata.ocId = ocIdTemp
                 metadata.serverUrl = tableDirectory.serverUrl
                 metadata.size = size
-                metadata.status = Int(k_metadataStatusHide)
+                metadata.status = Int(k_metadataStatusInUpload)
                 CCUtility.insertTypeFileIconName(fileName, metadata: metadata)
                 
                 guard let metadataForUpload = NCManageDatabase.sharedInstance.addMetadata(metadata) else {
