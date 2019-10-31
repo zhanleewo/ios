@@ -475,6 +475,7 @@ class FileProviderExtension: NSFileProviderExtension, NCNetworkingDelegate {
                       
                 guard let metadataUpdated = NCManageDatabase.sharedInstance.addMetadata(metadata) else { return }
                 NCManageDatabase.sharedInstance.addLocalFile(metadata: metadataUpdated)
+                NCManageDatabase.sharedInstance.deleteMetadata(predicate: NSPredicate(format: "ocId == %@", ocIdTemp))
                 
                 item = FileProviderItem(metadata: metadataUpdated, parentItemIdentifier: parentItemIdentifier)
 
