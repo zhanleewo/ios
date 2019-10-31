@@ -482,12 +482,14 @@ class FileProviderExtension: NSFileProviderExtension, NCNetworkingDelegate {
                 metadata.status = Int(k_metadataStatusNormal)
                       
                 guard let metadataUpdated = NCManageDatabase.sharedInstance.addMetadata(metadata) else { return }
+                NCManageDatabase.sharedInstance.addLocalFile(metadata: metadataUpdated)
+                
                 item = FileProviderItem(metadata: metadataUpdated, parentItemIdentifier: parentItemIdentifier)
 
                 // File system
                 let atPath = CCUtility.getDirectoryProviderStorageOcId(ocIdTemp)
                 let toPath = CCUtility.getDirectoryProviderStorageOcId(ocId)
-                CCUtility.copyFile(atPath: atPath, toPath: toPath)
+                CCUtility.moveFile(atPath: atPath, toPath: toPath)
                 
                 // Signal
                 fileProviderData.sharedInstance.fileProviderSignalUpdateContainerItem[item.itemIdentifier] = item
