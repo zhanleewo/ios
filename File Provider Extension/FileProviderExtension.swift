@@ -467,10 +467,7 @@ class FileProviderExtension: NSFileProviderExtension, NCNetworkingDelegate {
                     return
                 }
                 var item = FileProviderItem(metadata: metadata, parentItemIdentifier: parentItemIdentifier)
-                fileProviderData.sharedInstance.fileProviderSignalDeleteContainerItemIdentifier[item.itemIdentifier] = item.itemIdentifier
-                fileProviderData.sharedInstance.fileProviderSignalDeleteWorkingSetItemIdentifier[item.itemIdentifier] = item.itemIdentifier
-                fileProviderData.sharedInstance.signalEnumerator(for: [parentItemIdentifier, .workingSet])
-                      
+                                      
                 if let etag = etag { metadata.etag = etag }
                 if let ocId = ocId { metadata.ocId = ocId }
                 if let date = date { metadata.date = date }
@@ -487,6 +484,8 @@ class FileProviderExtension: NSFileProviderExtension, NCNetworkingDelegate {
                 CCUtility.moveFile(atPath: atPath, toPath: toPath)
                 
                 // Signal
+                fileProviderData.sharedInstance.fileProviderSignalDeleteContainerItemIdentifier[item.itemIdentifier] = item.itemIdentifier
+                fileProviderData.sharedInstance.fileProviderSignalDeleteWorkingSetItemIdentifier[item.itemIdentifier] = item.itemIdentifier
                 fileProviderData.sharedInstance.fileProviderSignalUpdateContainerItem[item.itemIdentifier] = item
                 fileProviderData.sharedInstance.fileProviderSignalUpdateWorkingSetItem[item.itemIdentifier] = item
                 fileProviderData.sharedInstance.signalEnumerator(for: [parentItemIdentifier, .workingSet])
