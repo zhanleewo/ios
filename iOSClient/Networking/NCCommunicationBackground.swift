@@ -55,7 +55,7 @@ import Foundation
     
     //MARK: - Upload
     
-    @objc public func upload(serverUrlFileName: String, fileNamePathSource: String, sessionDescription: String?, session: URLSession) -> URLSessionUploadTask? {
+    @objc public func upload(serverUrlFileName: String, fileNamePathSource: String, session: URLSession) -> URLSessionUploadTask? {
         
         guard let url = NCCommunicationCommon.sharedInstance.encodeUrlString(serverUrlFileName) as? URL else {
             return nil
@@ -72,7 +72,6 @@ import Foundation
         request.setValue("Basic \(base64LoginString)", forHTTPHeaderField: "Authorization")
       
         // session
-        if sessionDescription != nil { session.sessionDescription = sessionDescription }
         let task = session.uploadTask(with: request, fromFile: URL.init(fileURLWithPath: fileNamePathSource))
         
         task.resume()
