@@ -53,6 +53,31 @@ import Foundation
         return session
     }()
     
+    //MARK: - Download
+    
+    @objc public func downlopad(serverUrlFileName: String, description: String?, session: URLSession) -> URLSessionDownloadTask? {
+        
+        guard let url = NCCommunicationCommon.sharedInstance.encodeUrlString(serverUrlFileName) as? URL else {
+            return nil
+        }
+        var request = URLRequest(url: url)
+        let loginString = "\(NCCommunicationCommon.sharedInstance.username):\(NCCommunicationCommon.sharedInstance.password)"
+        guard let loginData = loginString.data(using: String.Encoding.utf8) else {
+            return nil
+        }
+        let base64LoginString = loginData.base64EncodedString()
+        
+        request.setValue(NCCommunicationCommon.sharedInstance.userAgent, forHTTPHeaderField: "User-Agent")
+        request.setValue("Basic \(base64LoginString)", forHTTPHeaderField: "Authorization")
+        
+        // session
+        let task = session.downloadTask(with: request)
+        
+        task.taskDescription = description
+        task.resume()
+        return task
+    }
+    
     //MARK: - Upload
     
     @objc public func upload(serverUrlFileName: String, fileNamePathSource: String, description: String?, session: URLSession) -> URLSessionUploadTask? {
