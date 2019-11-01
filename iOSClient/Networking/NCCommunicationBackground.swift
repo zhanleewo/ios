@@ -136,7 +136,6 @@ import Foundation
                     let header = httpResponse.allHeaderFields
                     etag = header["OC-ETag"] as? String
                     if etag != nil { etag = etag!.replacingOccurrences(of: "\"", with: "") }
-                    ocId = header["OC-FileId"] as? String
                     if let dateString = header["Date"] as? String {
                         date = NCCommunicationCommon.sharedInstance.convertDate(dateString, format: "EEE, dd MMM y HH:mm:ss zzz")
                     }
@@ -145,6 +144,9 @@ import Foundation
                     }
                     let length = header["Content-Length"] as? Double ?? 0
                     
+                    NCCommunicationCommon.sharedInstance.downloadComplete(fileName: fileName, serverUrl: serverUrl, etag: etag, date: date, dateLastModified: dateLastModified, length: length, location: location, session: session, task: downloadTask, error: nil)
+                    
+                    /*
                     let destinationFilePath = CCUtility.getDirectoryProviderStorageOcId(ocId, fileNameView: fileName)!
                     let destinationUrl = NSURL.fileURL(withPath: destinationFilePath)
                     
@@ -154,6 +156,7 @@ import Foundation
                     } catch {
                         
                     }
+                    */
                 }
             }
         }
