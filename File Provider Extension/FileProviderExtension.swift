@@ -427,9 +427,7 @@ class FileProviderExtension: NSFileProviderExtension, NCNetworkingDelegate {
                 }
                 
                 fileURL.stopAccessingSecurityScopedResource()
-                
-                // ---------------------------------------------------------------------------------
-                
+                                
                 metadata.account = fileProviderData.sharedInstance.account
                 metadata.date = NSDate()
                 metadata.directory = false
