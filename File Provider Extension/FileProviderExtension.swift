@@ -509,6 +509,8 @@ class FileProviderExtension: NSFileProviderExtension, NCNetworkingDelegate {
             
         } else {
            
+            // Error
+            NCManageDatabase.sharedInstance.setMetadataSession("", sessionError: error?.localizedDescription, sessionSelector: "", sessionTaskIdentifier: 0, status: Int(k_metadataStatusUploadError), predicate: NSPredicate(format: "ocId == %@", ocIdTemp))
         }
     }
 }
