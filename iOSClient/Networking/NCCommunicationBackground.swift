@@ -123,7 +123,7 @@ import Foundation
     
     public func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
         
-        var fileName: String = "", serverUrl: String = "", etag: String?, ocId: String?, dateUpload: NSDate?
+        var fileName: String = "", serverUrl: String = "", etag: String?, ocId: String?, date: NSDate?
         let url = downloadTask.currentRequest?.url?.absoluteString.removingPercentEncoding
         if url != nil {
             fileName = (url! as NSString).lastPathComponent
@@ -131,7 +131,41 @@ import Foundation
         }
         
         DispatchQueue.main.async {
+            if let httpResponse = (downloadTask.response as? HTTPURLResponse) {
+                if httpResponse.statusCode >= 200 && httpResponse.statusCode < 300 {
+                    let header = httpResponse.allHeaderFields
+                    etag = header["OC-ETag"] as? String
+                    if etag != nil { etag = etag!.replacingOccurrences(of: "\"", with: "") }
+                    ocId = header["OC-FileId"] as? String
+                    if let dateString = header["Date"] as? String {
+                        date = NCCommunicationCommon.sharedInstance.convertDate(dateString, format: "EEE, dd MMM y HH:mm:ss zzz")
+                    }
+                    /*
+                     ▿ key : AnyHashable("Content-Length")
+                       - value : "Content-Length"
+                     - value : 37042
+                     
+                     ▿ key : AnyHashable("Last-Modified")
+                          - value : "Last-Modified"
+                        - value : Mon, 28 Oct 2019 15:38:29 GMT
+                     
+                     ▿ key : AnyHashable("Date")
+                          - value : "Date"
+                        - value : Fri, 01 Nov 2019 16:46:57 GMT
+                     */
+                }
+            }
         }
+        
+        /*
+        
+            NSString *destinationFilePath = [CCUtility getDirectoryProviderStorageOcId:metadata.ocId fileNameView:metadata.fileName];
+            NSURL *destinationURL = [NSURL fileURLWithPath:destinationFilePath];
+            
+            [[NSFileManager defaultManager] removeItemAtURL:destinationURL error:NULL];
+            [[NSFileManager defaultManager] copyItemAtURL:location toURL:destinationURL error:nil];
+       
+        */
     }
     
     public func urlSession(_ session: URLSession, task: URLSessionTask, didSendBodyData bytesSent: Int64, totalBytesSent: Int64, totalBytesExpectedToSend: Int64) {
@@ -149,7 +183,7 @@ import Foundation
     
     public func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
         
-        var fileName: String = "", serverUrl: String = "", etag: String?, ocId: String?, dateUpload: NSDate?
+        var fileName: String = "", serverUrl: String = "", etag: String?, ocId: String?, date: NSDate?
         let url = task.currentRequest?.url?.absoluteString.removingPercentEncoding
         if url != nil {
             fileName = (url! as NSString).lastPathComponent
@@ -163,11 +197,11 @@ import Foundation
                     if etag != nil { etag = etag!.replacingOccurrences(of: "\"", with: "") }
                     ocId = header["OC-FileId"] as? String
                     if let dateString = header["Date"] as? String {
-                        dateUpload = NCCommunicationCommon.sharedInstance.convertDate(dateString, format: "EEE, dd MMM y HH:mm:ss zzz")
+                        date = NCCommunicationCommon.sharedInstance.convertDate(dateString, format: "EEE, dd MMM y HH:mm:ss zzz")
                     }
                 }
                 
-                NCCommunicationCommon.sharedInstance.uploadComplete(fileName: fileName, serverUrl: serverUrl, ocId: ocId, etag: etag, date: dateUpload, session: session, task: task, error: error)
+                NCCommunicationCommon.sharedInstance.uploadComplete(fileName: fileName, serverUrl: serverUrl, ocId: ocId, etag: etag, date: date, session: session, task: task, error: error)
             }
         }
     }

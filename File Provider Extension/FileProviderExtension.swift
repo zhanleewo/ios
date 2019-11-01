@@ -192,8 +192,7 @@ class FileProviderExtension: NSFileProviderExtension, NCNetworkingDelegate {
             let placeholderURL = NSFileProviderManager.placeholderURL(for: url)
             try NSFileProviderManager.writePlaceholder(at: placeholderURL,withMetadata: fileProviderItem)
             completionHandler(nil)
-        } catch let error {
-            print("error: \(error)")
+        } catch {
             completionHandler(error)
         }
     }
