@@ -94,7 +94,7 @@ class FileProviderItem: NSObject, NSFileProviderItem {
             }
             
             // Upload
-            if (metadata.status == k_metadataStatusInUpload) {
+            if (metadata.status == Int(k_metadataStatusInUpload)) {
                 self.isDownloaded = true
                 self.isMostRecentVersionDownloaded = true
                 self.isUploading = true
@@ -105,6 +105,7 @@ class FileProviderItem: NSObject, NSFileProviderItem {
             if metadata.sessionError != "" {
                 uploadingError = NSError(domain: NSCocoaErrorDomain, code: NSFeatureUnsupportedError, userInfo:[:])
             }
+            
         } else {
             
             // Favorite directory
