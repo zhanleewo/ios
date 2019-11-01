@@ -458,7 +458,7 @@ class FileProviderExtension: NSFileProviderExtension, NCNetworkingDelegate {
                 let serverUrlFileName = tableDirectory.serverUrl + "/" + fileName
                 let fileNamePathSource = CCUtility.getDirectoryProviderStorageOcId(ocIdTemp, fileNameView: fileName)!
                 
-                if let task = NCCommunicationBackground.sharedInstance.upload(serverUrlFileName: serverUrlFileName, fileNamePathSource: fileNamePathSource, session: NCCommunicationBackground.sharedInstance.sessionManagerExtension) {
+                if let task = NCCommunicationBackground.sharedInstance.upload(serverUrlFileName: serverUrlFileName, fileNamePathSource: fileNamePathSource, description: ocIdTemp, session: NCCommunicationBackground.sharedInstance.sessionManagerExtension) {
                     self.outstandingSessionTasks[fileURL] = task
                     NSFileProviderManager.default.register(task, forItemWithIdentifier: NSFileProviderItemIdentifier(ocIdTemp)) { (error) in }
                 }
@@ -471,41 +471,44 @@ class FileProviderExtension: NSFileProviderExtension, NCNetworkingDelegate {
     
     func uploadComplete(fileName: String, serverUrl: String, ocId: String?, etag: String?, date: NSDate?, session: URLSession, task: URLSessionTask, error: Error?) {
                 
-        if error == nil {
-            if let metadata = NCManageDatabase.sharedInstance.getMetadata(predicate: NSPredicate(format: "serverUrl == %@ AND fileName == %@", serverUrl, fileName)) {
-                let ocIdTemp = metadata.ocId
-                guard let parentItemIdentifier = fileProviderUtility.sharedInstance.getParentItemIdentifier(metadata: metadata, homeServerUrl: fileProviderData.sharedInstance.homeServerUrl) else {
-                    return
-                }
-                var item = FileProviderItem(metadata: metadata, parentItemIdentifier: parentItemIdentifier)
-                
-                metadata.fileName = fileName
-                metadata.serverUrl = serverUrl
-                if let etag = etag { metadata.etag = etag }
-                if let ocId = ocId { metadata.ocId = ocId }
-                if let date = date { metadata.date = date }
-                metadata.status = Int(k_metadataStatusNormal)
-                      
-                guard let metadataUpdated = NCManageDatabase.sharedInstance.addMetadata(metadata) else { return }
-                NCManageDatabase.sharedInstance.addLocalFile(metadata: metadataUpdated)
-                NCManageDatabase.sharedInstance.deleteMetadata(predicate: NSPredicate(format: "ocId == %@", ocIdTemp))
-                
-                // Signal delete
-                fileProviderData.sharedInstance.fileProviderSignalDeleteContainerItemIdentifier[item.itemIdentifier] = item.itemIdentifier
-                fileProviderData.sharedInstance.fileProviderSignalDeleteWorkingSetItemIdentifier[item.itemIdentifier] = item.itemIdentifier
-
-                // File system
-                let atPath = CCUtility.getDirectoryProviderStorageOcId(ocIdTemp)
-                let toPath = CCUtility.getDirectoryProviderStorageOcId(ocId)
-                CCUtility.moveFile(atPath: atPath, toPath: toPath)
-                
-                // Signal update
-                item = FileProviderItem(metadata: metadataUpdated, parentItemIdentifier: parentItemIdentifier)
-                fileProviderData.sharedInstance.fileProviderSignalUpdateContainerItem[item.itemIdentifier] = item
-                fileProviderData.sharedInstance.fileProviderSignalUpdateWorkingSetItem[item.itemIdentifier] = item
-                
-                fileProviderData.sharedInstance.signalEnumerator(for: [parentItemIdentifier, .workingSet])
+        guard let ocIdTemp = task.taskDescription else { return }
+        guard let metadata = NCManageDatabase.sharedInstance.getMetadata(predicate: NSPredicate(format: "ocId == %@", ocIdTemp)) else { return }
+        
+        if error == nil  {
+            guard let parentItemIdentifier = fileProviderUtility.sharedInstance.getParentItemIdentifier(metadata: metadata, homeServerUrl: fileProviderData.sharedInstance.homeServerUrl) else {
+                return
             }
+            var item = FileProviderItem(metadata: metadata, parentItemIdentifier: parentItemIdentifier)
+            
+            metadata.fileName = fileName
+            metadata.serverUrl = serverUrl
+            if let etag = etag { metadata.etag = etag }
+            if let ocId = ocId { metadata.ocId = ocId }
+            if let date = date { metadata.date = date }
+            metadata.status = Int(k_metadataStatusNormal)
+                  
+            guard let metadataUpdated = NCManageDatabase.sharedInstance.addMetadata(metadata) else { return }
+            NCManageDatabase.sharedInstance.addLocalFile(metadata: metadataUpdated)
+            NCManageDatabase.sharedInstance.deleteMetadata(predicate: NSPredicate(format: "ocId == %@", ocIdTemp))
+            
+            // Signal delete
+            fileProviderData.sharedInstance.fileProviderSignalDeleteContainerItemIdentifier[item.itemIdentifier] = item.itemIdentifier
+            fileProviderData.sharedInstance.fileProviderSignalDeleteWorkingSetItemIdentifier[item.itemIdentifier] = item.itemIdentifier
+
+            // File system
+            let atPath = CCUtility.getDirectoryProviderStorageOcId(ocIdTemp)
+            let toPath = CCUtility.getDirectoryProviderStorageOcId(ocId)
+            CCUtility.moveFile(atPath: atPath, toPath: toPath)
+            
+            // Signal update
+            item = FileProviderItem(metadata: metadataUpdated, parentItemIdentifier: parentItemIdentifier)
+            fileProviderData.sharedInstance.fileProviderSignalUpdateContainerItem[item.itemIdentifier] = item
+            fileProviderData.sharedInstance.fileProviderSignalUpdateWorkingSetItem[item.itemIdentifier] = item
+            
+            fileProviderData.sharedInstance.signalEnumerator(for: [parentItemIdentifier, .workingSet])
+            
+        } else {
+           
         }
     }
 }

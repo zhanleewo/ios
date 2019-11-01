@@ -55,7 +55,7 @@ import Foundation
     
     //MARK: - Upload
     
-    @objc public func upload(serverUrlFileName: String, fileNamePathSource: String, session: URLSession) -> URLSessionUploadTask? {
+    @objc public func upload(serverUrlFileName: String, fileNamePathSource: String, description: String?, session: URLSession) -> URLSessionUploadTask? {
         
         guard let url = NCCommunicationCommon.sharedInstance.encodeUrlString(serverUrlFileName) as? URL else {
             return nil
@@ -74,6 +74,7 @@ import Foundation
         // session
         let task = session.uploadTask(with: request, fromFile: URL.init(fileURLWithPath: fileNamePathSource))
         
+        task.taskDescription = description
         task.resume()
         return task
     }
