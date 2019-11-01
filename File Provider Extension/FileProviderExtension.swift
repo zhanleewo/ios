@@ -52,13 +52,6 @@ class FileProviderExtension: NSFileProviderExtension, NCNetworkingDelegate {
     
     var outstandingSessionTasks = [URL: URLSessionTask]()
     
-    lazy var fileCoordinator: NSFileCoordinator = {
-        
-        let fileCoordinator = NSFileCoordinator()
-        fileCoordinator.purposeIdentifier = NSFileProviderManager.default.providerIdentifier
-        return fileCoordinator
-    }()
-    
     override init() {
         super.init()
         
@@ -429,10 +422,9 @@ class FileProviderExtension: NSFileProviderExtension, NCNetworkingDelegate {
                 let fileName = NCUtility.sharedInstance.createFileName(fileURL.lastPathComponent, serverUrl: tableDirectory.serverUrl, account: fileProviderData.sharedInstance.account)
                 let ocIdTemp = NSUUID().uuidString.lowercased()
                 
-                self.fileCoordinator.coordinate(readingItemAt: fileURL, options: .withoutChanges, error: &error) { (url) in
+                NSFileCoordinator().coordinate(readingItemAt: fileURL, options: .withoutChanges, error: &error) { (url) in
                     _ = fileProviderUtility.sharedInstance.moveFile(url.path, toPath: CCUtility.getDirectoryProviderStorageOcId(ocIdTemp, fileNameView: fileName))
                 }
-                
                 
                 fileURL.stopAccessingSecurityScopedResource()
                 
