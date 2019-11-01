@@ -203,9 +203,7 @@ class FileProviderExtension: NSFileProviderExtension, NCNetworkingDelegate {
         let pathComponents = url.pathComponents
         let identifier = NSFileProviderItemIdentifier(pathComponents[pathComponents.count - 2])
         
-        if let _ = outstandingSessionTasks[url] {
-            return
-        }
+        if let _ = outstandingSessionTasks[url] { return }
         
         guard let metadata = fileProviderUtility.sharedInstance.getTableMetadataFromItemIdentifier(identifier) else {
             completionHandler(NSFileProviderError(.noSuchItem))
@@ -217,6 +215,13 @@ class FileProviderExtension: NSFileProviderExtension, NCNetworkingDelegate {
             return
         }
         
+        let task = NCCommunicationBackground.sharedInstance.downlopad(serverUrlFileName: metadata.serverUrl + "/" + metadata.fileName, description: metadata.ocId, session: NCCommunicationBackground.sharedInstance.sessionManagerExtension)
+        
+        if task != nil {
+            outstandingSessionTasks[url] = task
+            NSFileProviderManager.default.register(task!, forItemWithIdentifier: NSFileProviderItemIdentifier(identifier.rawValue)) { (error) in }
+        }
+        /*
         let task = NCCommunication.sharedInstance.download(serverUrlFileName: metadata.serverUrl + "/" + metadata.fileName, fileNamePathLocalDestination: url.path, account: fileProviderData.sharedInstance.account, progressHandler: { (progress) in
             
         }) { (account, etag, date, lenght, error) in
@@ -255,6 +260,7 @@ class FileProviderExtension: NSFileProviderExtension, NCNetworkingDelegate {
             outstandingSessionTasks[url] = task
             NSFileProviderManager.default.register(task!, forItemWithIdentifier: NSFileProviderItemIdentifier(identifier.rawValue)) { (error) in }
         }
+        */
     }
     
     override func itemChanged(at url: URL) {

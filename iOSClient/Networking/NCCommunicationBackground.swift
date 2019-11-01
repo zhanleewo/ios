@@ -121,7 +121,18 @@ import Foundation
         }
     }
     
-    public func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) { }
+    public func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
+        
+        var fileName: String = "", serverUrl: String = "", etag: String?, ocId: String?, dateUpload: NSDate?
+        let url = downloadTask.currentRequest?.url?.absoluteString.removingPercentEncoding
+        if url != nil {
+            fileName = (url! as NSString).lastPathComponent
+            serverUrl = url!.replacingOccurrences(of: "/"+fileName, with: "")
+        }
+        
+        DispatchQueue.main.async {
+        }
+    }
     
     public func urlSession(_ session: URLSession, task: URLSessionTask, didSendBodyData bytesSent: Int64, totalBytesSent: Int64, totalBytesExpectedToSend: Int64) {
         
