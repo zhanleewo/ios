@@ -184,17 +184,24 @@ import Foundation
             serverUrl = url!.replacingOccurrences(of: "/"+fileName, with: "")
         }
         
-        DispatchQueue.main.async {
-            if task is URLSessionUploadTask {
-                if let header = (task.response as? HTTPURLResponse)?.allHeaderFields {
-                    etag = header["OC-ETag"] as? String
-                    if etag != nil { etag = etag!.replacingOccurrences(of: "\"", with: "") }
-                    ocId = header["OC-FileId"] as? String
-                    if let dateString = header["Date"] as? String {
-                        date = NCCommunicationCommon.sharedInstance.convertDate(dateString, format: "EEE, dd MMM y HH:mm:ss zzz")
-                    }
+        // Download
+        if task is URLSessionDownloadTask && error != nil {
+            DispatchQueue.main.async {
+                NCCommunicationCommon.sharedInstance.downloadComplete(fileName: fileName, serverUrl: serverUrl, etag: nil, date: nil, dateLastModified: nil, length: 0, location: nil, session: session, task: task, error: error)
+            }
+        }
+        
+        // Upload
+        if task is URLSessionUploadTask {
+            if let header = (task.response as? HTTPURLResponse)?.allHeaderFields {
+                etag = header["OC-ETag"] as? String
+                if etag != nil { etag = etag!.replacingOccurrences(of: "\"", with: "") }
+                ocId = header["OC-FileId"] as? String
+                if let dateString = header["Date"] as? String {
+                    date = NCCommunicationCommon.sharedInstance.convertDate(dateString, format: "EEE, dd MMM y HH:mm:ss zzz")
                 }
-                
+            }
+            DispatchQueue.main.async {
                 NCCommunicationCommon.sharedInstance.uploadComplete(fileName: fileName, serverUrl: serverUrl, ocId: ocId, etag: etag, date: date, session: session, task: task, error: error)
             }
         }

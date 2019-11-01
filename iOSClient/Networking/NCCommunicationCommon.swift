@@ -93,7 +93,7 @@ class NCCommunicationCommon: NSObject {
         delegate?.uploadComplete?(fileName: fileName, serverUrl: serverUrl, ocId: ocId, etag: etag, date: date, session: session, task: task, error: error)
     }
     
-    public func downloadComplete(fileName: String, serverUrl: String, etag: String?, date: NSDate?, dateLastModified: NSDate?, length: Double, location: URL, session: URLSession, task: URLSessionTask, error: Error?) {
+    public func downloadComplete(fileName: String, serverUrl: String, etag: String?, date: NSDate?, dateLastModified: NSDate?, length: Double, location: URL?, session: URLSession, task: URLSessionTask, error: Error?) {
     }
 
     //MARK: - Common
