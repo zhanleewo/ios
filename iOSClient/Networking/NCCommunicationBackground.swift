@@ -123,41 +123,41 @@ import Foundation
     
     public func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
         
-        var fileName: String = "", serverUrl: String = "", etag: String?, ocId: String?, date: NSDate?, dateLastModified: NSDate?, length: Double
+        var fileName: String = "", serverUrl: String = "", etag: String?, date: NSDate?, dateLastModified: NSDate?, length: Double
         let url = downloadTask.currentRequest?.url?.absoluteString.removingPercentEncoding
         if url != nil {
             fileName = (url! as NSString).lastPathComponent
             serverUrl = url!.replacingOccurrences(of: "/"+fileName, with: "")
         }
         
-        DispatchQueue.main.async {
-            if let httpResponse = (downloadTask.response as? HTTPURLResponse) {
-                if httpResponse.statusCode >= 200 && httpResponse.statusCode < 300 {
-                    let header = httpResponse.allHeaderFields
-                    etag = header["OC-ETag"] as? String
-                    if etag != nil { etag = etag!.replacingOccurrences(of: "\"", with: "") }
-                    if let dateString = header["Date"] as? String {
-                        date = NCCommunicationCommon.sharedInstance.convertDate(dateString, format: "EEE, dd MMM y HH:mm:ss zzz")
-                    }
-                    if let dateString = header["Last-Modified"] as? String {
-                        dateLastModified = NCCommunicationCommon.sharedInstance.convertDate(dateString, format: "EEE, dd MMM y HH:mm:ss zzz")
-                    }
-                    let length = header["Content-Length"] as? Double ?? 0
-                    
-                    NCCommunicationCommon.sharedInstance.downloadComplete(fileName: fileName, serverUrl: serverUrl, etag: etag, date: date, dateLastModified: dateLastModified, length: length, location: location, session: session, task: downloadTask, error: nil)
-                    
-                    /*
-                    let destinationFilePath = CCUtility.getDirectoryProviderStorageOcId(ocId, fileNameView: fileName)!
-                    let destinationUrl = NSURL.fileURL(withPath: destinationFilePath)
-                    
-                    do {
-                        try FileManager.default.removeItem(at: destinationUrl)
-                        try FileManager.default.copyItem(at: location, to: destinationUrl)
-                    } catch {
-                        
-                    }
-                    */
+        if let httpResponse = (downloadTask.response as? HTTPURLResponse) {
+            if httpResponse.statusCode >= 200 && httpResponse.statusCode < 300 {
+                let header = httpResponse.allHeaderFields
+                etag = header["OC-ETag"] as? String
+                if etag != nil { etag = etag!.replacingOccurrences(of: "\"", with: "") }
+                if let dateString = header["Date"] as? String {
+                    date = NCCommunicationCommon.sharedInstance.convertDate(dateString, format: "EEE, dd MMM y HH:mm:ss zzz")
                 }
+                if let dateString = header["Last-Modified"] as? String {
+                    dateLastModified = NCCommunicationCommon.sharedInstance.convertDate(dateString, format: "EEE, dd MMM y HH:mm:ss zzz")
+                }
+                length = header["Content-Length"] as? Double ?? 0
+                
+                DispatchQueue.main.async {
+                    NCCommunicationCommon.sharedInstance.downloadComplete(fileName: fileName, serverUrl: serverUrl, etag: etag, date: date, dateLastModified: dateLastModified, length: length, location: location, session: session, task: downloadTask, error: nil)
+                }
+                
+                /*
+                let destinationFilePath = CCUtility.getDirectoryProviderStorageOcId(ocId, fileNameView: fileName)!
+                let destinationUrl = NSURL.fileURL(withPath: destinationFilePath)
+                
+                do {
+                    try FileManager.default.removeItem(at: destinationUrl)
+                    try FileManager.default.copyItem(at: location, to: destinationUrl)
+                } catch {
+                    
+                }
+                */
             }
         }
     }
