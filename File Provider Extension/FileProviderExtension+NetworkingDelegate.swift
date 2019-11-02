@@ -12,14 +12,32 @@ extension FileProviderExtension: NCNetworkingDelegate {
 
     func downloadComplete(fileName: String, serverUrl: String, etag: String?, date: NSDate?, dateLastModified: NSDate?, length: Double, description: String?, error: Error?, statusCode: Int) {
         
-        guard let ocIdTemp = description else { return }
-        guard let metadata = NCManageDatabase.sharedInstance.getMetadata(predicate: NSPredicate(format: "ocId == %@", ocIdTemp)) else { return }
+        guard let ocId = description else { return }
+        guard let metadata = NCManageDatabase.sharedInstance.getMetadata(predicate: NSPredicate(format: "ocId == %@", ocId)) else { return }
         
         if error == nil && statusCode >= 200 && statusCode < 300 {
+            guard let parentItemIdentifier = fileProviderUtility.sharedInstance.getParentItemIdentifier(metadata: metadata, homeServerUrl: fileProviderData.sharedInstance.homeServerUrl) else {
+                return
+            }
+            var item = FileProviderItem(metadata: metadata, parentItemIdentifier: parentItemIdentifier)
+            
+            if let etag = etag { metadata.etag = etag }
+            metadata.status = Int(k_metadataStatusNormal)
+                  
+            guard let metadataUpdated = NCManageDatabase.sharedInstance.addMetadata(metadata) else { return }
+            NCManageDatabase.sharedInstance.addLocalFile(metadata: metadataUpdated)
+            
+            // Signal update
+            item = FileProviderItem(metadata: metadataUpdated, parentItemIdentifier: parentItemIdentifier)
+            fileProviderData.sharedInstance.fileProviderSignalUpdateContainerItem[item.itemIdentifier] = item
+            fileProviderData.sharedInstance.fileProviderSignalUpdateWorkingSetItem[item.itemIdentifier] = item
+            
+            fileProviderData.sharedInstance.signalEnumerator(for: [parentItemIdentifier, .workingSet])
+            
         } else {
             
             // Error
-            NCManageDatabase.sharedInstance.setMetadataSession("", sessionError: "", sessionSelector: "", sessionTaskIdentifier: 0, status: Int(k_metadataStatusDownloadError), predicate: NSPredicate(format: "ocId == %@", ocIdTemp))
+            NCManageDatabase.sharedInstance.setMetadataSession("", sessionError: "", sessionSelector: "", sessionTaskIdentifier: 0, status: Int(k_metadataStatusDownloadError), predicate: NSPredicate(format: "ocId == %@", ocId))
         }
     }
     
