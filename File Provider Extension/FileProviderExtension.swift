@@ -222,47 +222,10 @@ class FileProviderExtension: NSFileProviderExtension {
         if task != nil {
             outstandingSessionTasks[url] = task
             NSFileProviderManager.default.register(task!, forItemWithIdentifier: NSFileProviderItemIdentifier(identifier.rawValue)) { (error) in }
+            completionHandler(nil)
+        } else {
+            completionHandler(NSFileProviderError(.noSuchItem))
         }
-        /*
-        let task = NCCommunication.sharedInstance.download(serverUrlFileName: metadata.serverUrl + "/" + metadata.fileName, fileNamePathLocalDestination: url.path, account: fileProviderData.sharedInstance.account, progressHandler: { (progress) in
-            
-        }) { (account, etag, date, lenght, error) in
-            
-            // remove Task
-            self.outstandingSessionTasks.removeValue(forKey: url)
-            
-            if error == nil {
-                
-                guard let metadata = fileProviderUtility.sharedInstance.getTableMetadataFromItemIdentifier(identifier) else {
-                    completionHandler(NSFileProviderError(.noSuchItem))
-                    return
-                }
-                
-                metadata.date = date! as NSDate
-                metadata.etag = etag!
-                metadata.size = Double(lenght)
-                
-                guard let metadataUpdate = NCManageDatabase.sharedInstance.addMetadata(metadata) else { return }
-                NCManageDatabase.sharedInstance.addLocalFile(metadata: metadataUpdate)
-                
-                completionHandler(nil)
-                
-            } else {
-                
-//                if errorCode == Int(CFNetworkErrors.cfurlErrorCancelled.rawValue) {
-//                    completionHandler(NSFileProviderError(.noSuchItem))
-//                } else {
-                    completionHandler(NSFileProviderError(.serverUnreachable))
-//                }
-            }
-        }
-        
-        // Add and register task
-        if task != nil {
-            outstandingSessionTasks[url] = task
-            NSFileProviderManager.default.register(task!, forItemWithIdentifier: NSFileProviderItemIdentifier(identifier.rawValue)) { (error) in }
-        }
-        */
     }
     
     override func itemChanged(at url: URL) {
