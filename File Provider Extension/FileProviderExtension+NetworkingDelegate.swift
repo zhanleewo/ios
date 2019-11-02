@@ -24,11 +24,11 @@ extension FileProviderExtension: NCNetworkingDelegate {
             if let etag = etag { metadata.etag = etag }
             metadata.status = Int(k_metadataStatusNormal)
                   
-            guard let metadataUpdated = NCManageDatabase.sharedInstance.addMetadata(metadata) else { return }
-            NCManageDatabase.sharedInstance.addLocalFile(metadata: metadataUpdated)
+            guard let metadataDownloaded = NCManageDatabase.sharedInstance.addMetadata(metadata) else { return }
+            NCManageDatabase.sharedInstance.addLocalFile(metadata: metadataDownloaded)
             
             // Signal update
-            item = FileProviderItem(metadata: metadataUpdated, parentItemIdentifier: parentItemIdentifier)
+            item = FileProviderItem(metadata: metadataDownloaded, parentItemIdentifier: parentItemIdentifier)
             fileProviderData.sharedInstance.fileProviderSignalUpdateContainerItem[item.itemIdentifier] = item
             fileProviderData.sharedInstance.fileProviderSignalUpdateWorkingSetItem[item.itemIdentifier] = item
             
