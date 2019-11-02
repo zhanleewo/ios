@@ -35,10 +35,7 @@ extension FileProviderExtension {
             guard let metadata = fileProviderUtility.sharedInstance.getTableMetadataFromItemIdentifier(itemIdentifier) else {
                 
                 counterProgress += 1
-                if (counterProgress == progress.totalUnitCount) {
-                    completionHandler(nil)
-                }
-                
+                if (counterProgress == progress.totalUnitCount) { completionHandler(nil) }
                 continue
             }
             
@@ -59,17 +56,13 @@ extension FileProviderExtension {
                     }
                     
                     counterProgress += 1
-                    if (counterProgress == progress.totalUnitCount) {
-                        completionHandler(nil)
-                    }
+                    if (counterProgress == progress.totalUnitCount) { completionHandler(nil) }
                 }
                
             } else {
                 
                 counterProgress += 1
-                if (counterProgress == progress.totalUnitCount) {
-                    completionHandler(nil)
-                }
+                if (counterProgress == progress.totalUnitCount) { completionHandler(nil) }
             }
         }
         
