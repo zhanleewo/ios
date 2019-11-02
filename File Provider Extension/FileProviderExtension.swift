@@ -217,21 +217,21 @@ class FileProviderExtension: NSFileProviderExtension {
         let serverUrlFileName = metadata.serverUrl + "/" + metadata.fileName
         let fileNameLocalPath = CCUtility.getDirectoryProviderStorageOcId(metadata.ocId, fileNameView: metadata.fileName)!
         
-        
-        let task = NCCommunication.sharedInstance.download(serverUrlFileName: serverUrlFileName, fileNameLocalPath: fileNameLocalPath, account: fileProviderData.sharedInstance.account, progressHandler: { (progress) in
+        let task = NCCommunication.sharedInstance.download(serverUrlFileName: serverUrlFileName, fileNameLocalPath: fileNameLocalPath, account: fileProviderData.sharedInstance.account, progressHandler: { (progress) in }) { (account, etag, date, length, error) in
             
-        }) { (account, etag, date, length, error) in
-            
+            if error == nil  {
+               metadata.status = Int(k_metadataStatusNormal)
+               guard let metadataDownloaded = NCManageDatabase.sharedInstance.addMetadata(metadata) else { return }
+               NCManageDatabase.sharedInstance.addLocalFile(metadata: metadataDownloaded)
+                completionHandler(nil)
+            } else {
+                completionHandler(NSFileProviderError(.noSuchItem))
+            }
         }
-        
-        //let task = NCCommunicationBackground.sharedInstance.downlopad(serverUrlFileName: serverUrlFileName, fileNameLocalPath: fileNameLocalPath, description: metadata.ocId, session: NCCommunicationBackground.sharedInstance.sessionManagerExtension)
         
         if task != nil {
             outstandingSessionTasks[url] = task
             NSFileProviderManager.default.register(task!, forItemWithIdentifier: NSFileProviderItemIdentifier(identifier.rawValue)) { (error) in }
-            completionHandler(nil)
-        } else {
-            completionHandler(NSFileProviderError(.noSuchItem))
         }
     }
     

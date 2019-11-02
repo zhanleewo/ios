@@ -10,36 +10,6 @@ import FileProvider
 
 extension FileProviderExtension: NCNetworkingDelegate {
 
-    func downloadComplete(fileName: String, serverUrl: String, etag: String?, date: NSDate?, dateLastModified: NSDate?, length: Double, description: String?, error: Error?, statusCode: Int) {
-        
-        guard let ocId = description else { return }
-        guard let metadata = NCManageDatabase.sharedInstance.getMetadata(predicate: NSPredicate(format: "ocId == %@", ocId)) else { return }
-        
-        if error == nil && statusCode >= 200 && statusCode < 300 {
-            guard let parentItemIdentifier = fileProviderUtility.sharedInstance.getParentItemIdentifier(metadata: metadata, homeServerUrl: fileProviderData.sharedInstance.homeServerUrl) else {
-                return
-            }
-            
-            if let etag = etag { metadata.etag = etag }
-            metadata.status = Int(k_metadataStatusNormal)
-                  
-            guard let metadataDownloaded = NCManageDatabase.sharedInstance.addMetadata(metadata) else { return }
-            NCManageDatabase.sharedInstance.addLocalFile(metadata: metadataDownloaded)
-            
-            // Signal update
-            let item = FileProviderItem(metadata: metadataDownloaded, parentItemIdentifier: parentItemIdentifier)
-            fileProviderData.sharedInstance.fileProviderSignalUpdateContainerItem[item.itemIdentifier] = item
-            fileProviderData.sharedInstance.fileProviderSignalUpdateWorkingSetItem[item.itemIdentifier] = item
-            
-            fileProviderData.sharedInstance.signalEnumerator(for: [parentItemIdentifier, .workingSet])
-            
-        } else {
-            
-            // Error
-            NCManageDatabase.sharedInstance.setMetadataSession("", sessionError: "", sessionSelector: "", sessionTaskIdentifier: 0, status: Int(k_metadataStatusDownloadError), predicate: NSPredicate(format: "ocId == %@", ocId))
-        }
-    }
-    
     func uploadComplete(fileName: String, serverUrl: String, ocId: String?, etag: String?, date: NSDate?, description: String?, error: Error?, statusCode: Int) {
                 
         guard let ocIdTemp = description else { return }
