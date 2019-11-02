@@ -247,6 +247,8 @@ class FileProviderExtension: NSFileProviderExtension {
         let fileNameServerUrl = metadata.serverUrl + "/" + fileName
         let fileNameLocalPath = url.path
         
+        
+        
         /*
         _ = NCCommunication.sharedInstance.upload(serverUrlFileName: fileNameServerUrl, fileNamePathSource: fileNameLocalPath, account: fileProviderData.sharedInstance.account, progressHandler: { (progress) in
         }) { (account, ocId, etag, date, error) in
@@ -350,9 +352,9 @@ class FileProviderExtension: NSFileProviderExtension {
                 }
                 
                 let serverUrlFileName = tableDirectory.serverUrl + "/" + fileName
-                let fileNamePathSource = CCUtility.getDirectoryProviderStorageOcId(ocIdTemp, fileNameView: fileName)!
+                let fileNameLocalPath = CCUtility.getDirectoryProviderStorageOcId(ocIdTemp, fileNameView: fileName)!
                 
-                if let task = NCCommunicationBackground.sharedInstance.upload(serverUrlFileName: serverUrlFileName, fileNamePathSource: fileNamePathSource, description: ocIdTemp, session: NCCommunicationBackground.sharedInstance.sessionManagerTransferExtension) {
+                if let task = NCCommunicationBackground.sharedInstance.upload(serverUrlFileName: serverUrlFileName, fileNameLocalPath: fileNameLocalPath, description: ocIdTemp, session: NCCommunicationBackground.sharedInstance.sessionManagerTransferExtension) {
                     NSFileProviderManager.default.register(task, forItemWithIdentifier: NSFileProviderItemIdentifier(ocIdTemp)) { (error) in }
                 }
                 
