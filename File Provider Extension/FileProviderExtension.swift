@@ -48,7 +48,7 @@ import FileProvider
  
    -------------------------------------------------------------------------------------------------------------------------------------------- */
 
-class FileProviderExtension: NSFileProviderExtension, NCNetworkingDelegate {
+class FileProviderExtension: NSFileProviderExtension {
     
     var outstandingSessionTasks = [URL: URLSessionTask]()
     
@@ -214,7 +214,10 @@ class FileProviderExtension: NSFileProviderExtension, NCNetworkingDelegate {
             return
         }
         
-        let task = NCCommunicationBackground.sharedInstance.downlopad(serverUrlFileName: metadata.serverUrl + "/" + metadata.fileName, description: metadata.ocId, session: NCCommunicationBackground.sharedInstance.sessionManagerExtension)
+        let serverUrlFileName = metadata.serverUrl + "/" + metadata.fileName
+        let fileNameLocalPath = CCUtility.getDirectoryProviderStorageOcId(metadata.ocId, fileNameView: metadata.fileName)!
+        
+        let task = NCCommunicationBackground.sharedInstance.downlopad(serverUrlFileName: serverUrlFileName, fileNameLocalPath: fileNameLocalPath, session: NCCommunicationBackground.sharedInstance.sessionManagerExtension)
         
         if task != nil {
             outstandingSessionTasks[url] = task
@@ -460,51 +463,6 @@ class FileProviderExtension: NSFileProviderExtension, NCNetworkingDelegate {
                 let item = FileProviderItem(metadata: metadataForUpload, parentItemIdentifier: parentItemIdentifier)
                 completionHandler(item, nil)
             }
-        }
-    }
-    
-    func uploadComplete(fileName: String, serverUrl: String, ocId: String?, etag: String?, date: NSDate?, session: URLSession, task: URLSessionTask, error: Error?) {
-                
-        guard let ocIdTemp = task.taskDescription else { return }
-        guard let metadata = NCManageDatabase.sharedInstance.getMetadata(predicate: NSPredicate(format: "ocId == %@", ocIdTemp)) else { return }
-        
-        if error == nil  {
-            guard let parentItemIdentifier = fileProviderUtility.sharedInstance.getParentItemIdentifier(metadata: metadata, homeServerUrl: fileProviderData.sharedInstance.homeServerUrl) else {
-                return
-            }
-            var item = FileProviderItem(metadata: metadata, parentItemIdentifier: parentItemIdentifier)
-            
-            metadata.fileName = fileName
-            metadata.serverUrl = serverUrl
-            if let etag = etag { metadata.etag = etag }
-            if let ocId = ocId { metadata.ocId = ocId }
-            if let date = date { metadata.date = date }
-            metadata.status = Int(k_metadataStatusNormal)
-                  
-            guard let metadataUpdated = NCManageDatabase.sharedInstance.addMetadata(metadata) else { return }
-            NCManageDatabase.sharedInstance.addLocalFile(metadata: metadataUpdated)
-            NCManageDatabase.sharedInstance.deleteMetadata(predicate: NSPredicate(format: "ocId == %@", ocIdTemp))
-            
-            // Signal delete
-            fileProviderData.sharedInstance.fileProviderSignalDeleteContainerItemIdentifier[item.itemIdentifier] = item.itemIdentifier
-            fileProviderData.sharedInstance.fileProviderSignalDeleteWorkingSetItemIdentifier[item.itemIdentifier] = item.itemIdentifier
-
-            // File system
-            let atPath = CCUtility.getDirectoryProviderStorageOcId(ocIdTemp)
-            let toPath = CCUtility.getDirectoryProviderStorageOcId(ocId)
-            CCUtility.moveFile(atPath: atPath, toPath: toPath)
-            
-            // Signal update
-            item = FileProviderItem(metadata: metadataUpdated, parentItemIdentifier: parentItemIdentifier)
-            fileProviderData.sharedInstance.fileProviderSignalUpdateContainerItem[item.itemIdentifier] = item
-            fileProviderData.sharedInstance.fileProviderSignalUpdateWorkingSetItem[item.itemIdentifier] = item
-            
-            fileProviderData.sharedInstance.signalEnumerator(for: [parentItemIdentifier, .workingSet])
-            
-        } else {
-           
-            // Error
-            NCManageDatabase.sharedInstance.setMetadataSession("", sessionError: error?.localizedDescription, sessionSelector: "", sessionTaskIdentifier: 0, status: Int(k_metadataStatusUploadError), predicate: NSPredicate(format: "ocId == %@", ocIdTemp))
         }
     }
 }

@@ -55,7 +55,7 @@ import Foundation
     
     //MARK: - Download
     
-    @objc public func downlopad(serverUrlFileName: String, description: String?, session: URLSession) -> URLSessionDownloadTask? {
+    @objc public func downlopad(serverUrlFileName: String, fileNameLocalPath: String, session: URLSession) -> URLSessionDownloadTask? {
         
         guard let url = NCCommunicationCommon.sharedInstance.encodeUrlString(serverUrlFileName) as? URL else {
             return nil
@@ -73,7 +73,7 @@ import Foundation
         // session
         let task = session.downloadTask(with: request)
         
-        task.taskDescription = description
+        task.taskDescription = fileNameLocalPath
         task.resume()
         return task
     }
@@ -123,41 +123,15 @@ import Foundation
     
     public func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
         
-        var fileName: String = "", serverUrl: String = "", etag: String?, date: NSDate?, dateLastModified: NSDate?, length: Double
-        let url = downloadTask.currentRequest?.url?.absoluteString.removingPercentEncoding
-        if url != nil {
-            fileName = (url! as NSString).lastPathComponent
-            serverUrl = url!.replacingOccurrences(of: "/"+fileName, with: "")
-        }
-        
         if let httpResponse = (downloadTask.response as? HTTPURLResponse) {
             if httpResponse.statusCode >= 200 && httpResponse.statusCode < 300 {
-                let header = httpResponse.allHeaderFields
-                etag = header["OC-ETag"] as? String
-                if etag != nil { etag = etag!.replacingOccurrences(of: "\"", with: "") }
-                if let dateString = header["Date"] as? String {
-                    date = NCCommunicationCommon.sharedInstance.convertDate(dateString, format: "EEE, dd MMM y HH:mm:ss zzz")
+                if let destinationFilePath = downloadTask.taskDescription {
+                    let destinationUrl = NSURL.fileURL(withPath: destinationFilePath)
+                    do {
+                        try FileManager.default.removeItem(at: destinationUrl)
+                        try FileManager.default.copyItem(at: location, to: destinationUrl)
+                    } catch { }
                 }
-                if let dateString = header["Last-Modified"] as? String {
-                    dateLastModified = NCCommunicationCommon.sharedInstance.convertDate(dateString, format: "EEE, dd MMM y HH:mm:ss zzz")
-                }
-                length = header["Content-Length"] as? Double ?? 0
-                
-                DispatchQueue.main.async {
-                    NCCommunicationCommon.sharedInstance.downloadComplete(fileName: fileName, serverUrl: serverUrl, etag: etag, date: date, dateLastModified: dateLastModified, length: length, location: location, session: session, task: downloadTask, error: nil)
-                }
-                
-                /*
-                let destinationFilePath = CCUtility.getDirectoryProviderStorageOcId(ocId, fileNameView: fileName)!
-                let destinationUrl = NSURL.fileURL(withPath: destinationFilePath)
-                
-                do {
-                    try FileManager.default.removeItem(at: destinationUrl)
-                    try FileManager.default.copyItem(at: location, to: destinationUrl)
-                } catch {
-                    
-                }
-                */
             }
         }
     }
@@ -177,37 +151,40 @@ import Foundation
     
     public func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
         
-        var fileName: String = "", serverUrl: String = "", etag: String?, ocId: String?, date: NSDate?
+        var fileName: String = "", serverUrl: String = "", etag: String?, ocId: String?, date: NSDate?, dateLastModified: NSDate?, length: Double = 0
         let url = task.currentRequest?.url?.absoluteString.removingPercentEncoding
         if url != nil {
             fileName = (url! as NSString).lastPathComponent
             serverUrl = url!.replacingOccurrences(of: "/"+fileName, with: "")
         }
         
-        // Download
-        if task is URLSessionDownloadTask && error != nil {
-            DispatchQueue.main.async {
-                NCCommunicationCommon.sharedInstance.downloadComplete(fileName: fileName, serverUrl: serverUrl, etag: nil, date: nil, dateLastModified: nil, length: 0, location: nil, session: session, task: task, error: error)
+        let statusCode = (task.response as! HTTPURLResponse).statusCode
+
+        if let header = (task.response as? HTTPURLResponse)?.allHeaderFields {
+            etag = header["OC-ETag"] as? String
+            if etag != nil { etag = etag!.replacingOccurrences(of: "\"", with: "") }
+            ocId = header["OC-FileId"] as? String
+            if let dateString = header["Date"] as? String {
+                date = NCCommunicationCommon.sharedInstance.convertDate(dateString, format: "EEE, dd MMM y HH:mm:ss zzz")
             }
+            if let dateString = header["Last-Modified"] as? String {
+                dateLastModified = NCCommunicationCommon.sharedInstance.convertDate(dateString, format: "EEE, dd MMM y HH:mm:ss zzz")
+            }
+            length = header["Content-Length"] as? Double ?? 0
         }
         
-        // Upload
-        if task is URLSessionUploadTask {
-            if let header = (task.response as? HTTPURLResponse)?.allHeaderFields {
-                etag = header["OC-ETag"] as? String
-                if etag != nil { etag = etag!.replacingOccurrences(of: "\"", with: "") }
-                ocId = header["OC-FileId"] as? String
-                if let dateString = header["Date"] as? String {
-                    date = NCCommunicationCommon.sharedInstance.convertDate(dateString, format: "EEE, dd MMM y HH:mm:ss zzz")
-                }
+        DispatchQueue.main.async {
+            if task is URLSessionDownloadTask {
+                NCCommunicationCommon.sharedInstance.downloadComplete(fileName: fileName, serverUrl: serverUrl, etag: etag, date: date, dateLastModified: dateLastModified, length: length, session: session, task: task, error: error, statusCode: statusCode)
             }
-            DispatchQueue.main.async {
-                NCCommunicationCommon.sharedInstance.uploadComplete(fileName: fileName, serverUrl: serverUrl, ocId: ocId, etag: etag, date: date, session: session, task: task, error: error)
+            if task is URLSessionUploadTask {
+                NCCommunicationCommon.sharedInstance.uploadComplete(fileName: fileName, serverUrl: serverUrl, ocId: ocId, etag: etag, date: date, session: session, task: task, error: error, statusCode: statusCode)
             }
         }
     }
     
     public func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
+        
         NCCommunicationCommon.sharedInstance.authenticationChallenge(challenge, completionHandler: { (authChallengeDisposition, credential) in
             completionHandler(authChallengeDisposition, credential)
         })
