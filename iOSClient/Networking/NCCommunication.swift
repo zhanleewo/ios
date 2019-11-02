@@ -510,12 +510,11 @@ import SwiftyJSON
         
         // destination
         var destination: Alamofire.DownloadRequest.Destination?
-        if let fileNameLocalPath = URL(string: fileNameLocalPath) {
-            let destinationFile: DownloadRequest.Destination = { _, _ in
-                return (fileNameLocalPath, [.removePreviousFile, .createIntermediateDirectories])
-            }
-            destination = destinationFile
+        let fileNamePathLocalDestinationURL = NSURL.fileURL(withPath: fileNameLocalPath)
+        let destinationFile: DownloadRequest.Destination = { _, _ in
+            return (fileNamePathLocalDestinationURL, [.removePreviousFile, .createIntermediateDirectories])
         }
+        destination = destinationFile
         
         // headers
         var headers: HTTPHeaders = [.authorization(username: NCCommunicationCommon.sharedInstance.username, password: NCCommunicationCommon.sharedInstance.password)]
