@@ -41,7 +41,7 @@ import Foundation
         return session
     }()
     
-    @objc public lazy var sessionManagerExtension: URLSession = {
+    @objc public lazy var sessionManagerTransferExtension: URLSession = {
         let configuration = URLSessionConfiguration.background(withIdentifier: NCCommunicationCommon.sharedInstance.session_identifier_extension)
         configuration.allowsCellularAccess = true
         configuration.sessionSendsLaunchEvents = true
