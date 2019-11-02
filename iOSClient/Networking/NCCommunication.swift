@@ -368,7 +368,7 @@ import SwiftyJSON
     }
     
     //MARK: - API
-    @objc public func downloadPreview(serverUrl: String, fileNamePath: String, fileNamePathLocalDestination: String, width: CGFloat, height: CGFloat, account: String, completionHandler: @escaping (_ account: String, _ data: Data?, _ error: Error?) -> Void) {
+    @objc public func downloadPreview(serverUrl: String, fileNamePath: String, fileNameLocalPath: String, width: CGFloat, height: CGFloat, account: String, completionHandler: @escaping (_ account: String, _ data: Data?, _ error: Error?) -> Void) {
         
         // url
         var serverUrl = String(serverUrl)
@@ -393,7 +393,7 @@ import SwiftyJSON
             case .success( _):
                 if let data = response.data {
                     do {
-                        let url = URL.init(fileURLWithPath: fileNamePathLocalDestination)
+                        let url = URL.init(fileURLWithPath: fileNameLocalPath)
                         try  data.write(to: url, options: .atomic)
                         completionHandler(account, data, nil)
                     } catch let error {
@@ -500,7 +500,7 @@ import SwiftyJSON
     }
     //MARK: - File transfer
     
-    @objc public func download(serverUrlFileName: String, fileNamePathLocalDestination: String, account: String, progressHandler: @escaping (_ progress: Progress) -> Void , completionHandler: @escaping (_ account: String, _ etag: String?, _ date: NSDate?, _ lenght: Double, _ error: Error?) -> Void) -> URLSessionTask? {
+    @objc public func download(serverUrlFileName: String, fileNameLocalPath: String, account: String, progressHandler: @escaping (_ progress: Progress) -> Void , completionHandler: @escaping (_ account: String, _ etag: String?, _ date: NSDate?, _ lenght: Double, _ error: Error?) -> Void) -> URLSessionTask? {
         
         // url
         guard let url = NCCommunicationCommon.sharedInstance.encodeUrlString(serverUrlFileName) else {
@@ -510,9 +510,9 @@ import SwiftyJSON
         
         // destination
         var destination: Alamofire.DownloadRequest.Destination?
-        if let fileNamePathLocalDestinationURL = URL(string: fileNamePathLocalDestination) {
+        if let fileNameLocalPath = URL(string: fileNameLocalPath) {
             let destinationFile: DownloadRequest.Destination = { _, _ in
-                return (fileNamePathLocalDestinationURL, [.removePreviousFile, .createIntermediateDirectories])
+                return (fileNameLocalPath, [.removePreviousFile, .createIntermediateDirectories])
             }
             destination = destinationFile
         }

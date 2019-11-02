@@ -48,10 +48,10 @@ extension FileProviderExtension {
                 let height = NCUtility.sharedInstance.getScreenHeightForPreview()
                 
                 let fileNamePathSource = CCUtility.returnFileNamePath(fromFileName: metadata.fileName, serverUrl: metadata.serverUrl, activeUrl: fileProviderData.sharedInstance.accountUrl)!
-                let fileNamePathLocalDestination = CCUtility.getDirectoryProviderStorageIconOcId(metadata.ocId, fileNameView: metadata.fileNameView)!
+                let fileNameLocalPath = CCUtility.getDirectoryProviderStorageIconOcId(metadata.ocId, fileNameView: metadata.fileNameView)!
                 let serverUrl = fileProviderData.sharedInstance.accountUrl
                     
-                NCCommunication.sharedInstance.downloadPreview(serverUrl: serverUrl, fileNamePath: fileNamePathSource, fileNamePathLocalDestination: fileNamePathLocalDestination ,width: width, height: height, account: fileProviderData.sharedInstance.account) { (account, data, error) in
+                NCCommunication.sharedInstance.downloadPreview(serverUrl: serverUrl, fileNamePath: fileNamePathSource, fileNameLocalPath: fileNameLocalPath ,width: width, height: height, account: fileProviderData.sharedInstance.account) { (account, data, error) in
                     if error == nil && data != nil {
                         perThumbnailCompletionHandler(itemIdentifier, data, nil)
                     } else {
