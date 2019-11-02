@@ -181,17 +181,16 @@ import Foundation
         }
         
         DispatchQueue.main.async {
-            
-            var description = ""
-            var destinationFilePath = ""
-            
-            let parameter = task.taskDescription?.components(separatedBy: "|")
-           
             if task is URLSessionDownloadTask {
+                var description = task.taskDescription
+                let parameter = task.taskDescription?.components(separatedBy: "|")
+                if parameter?.count == 2 {
+                    description = parameter![1]
+                }
                 NCCommunicationCommon.sharedInstance.downloadComplete(fileName: fileName, serverUrl: serverUrl, etag: etag, date: date, dateLastModified: dateLastModified, length: length, description: description, error: error, statusCode: statusCode)
             }
             if task is URLSessionUploadTask {
-                NCCommunicationCommon.sharedInstance.uploadComplete(fileName: fileName, serverUrl: serverUrl, ocId: ocId, etag: etag, date: date, description: description, error: error, statusCode: statusCode)
+                NCCommunicationCommon.sharedInstance.uploadComplete(fileName: fileName, serverUrl: serverUrl, ocId: ocId, etag: etag, date: date, description: task.taskDescription, error: error, statusCode: statusCode)
             }
         }
     }
