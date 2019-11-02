@@ -12,7 +12,14 @@ extension FileProviderExtension: NCNetworkingDelegate {
 
     func downloadComplete(fileName: String, serverUrl: String, etag: String?, date: NSDate?, dateLastModified: NSDate?, length: Double, session: URLSession, task: URLSessionTask, error: Error?, statusCode: Int) {
         
+        guard let ocIdTemp = task.taskDescription else { return }
+        guard let metadata = NCManageDatabase.sharedInstance.getMetadata(predicate: NSPredicate(format: "ocId == %@", ocIdTemp)) else { return }
+        
         if error == nil && statusCode >= 200 && statusCode < 300 {
+        } else {
+            
+            // Error
+            NCManageDatabase.sharedInstance.setMetadataSession("", sessionError: "", sessionSelector: "", sessionTaskIdentifier: 0, status: Int(k_metadataStatusDownloadError), predicate: NSPredicate(format: "ocId == %@", ocIdTemp))
         }
     }
     
@@ -57,7 +64,7 @@ extension FileProviderExtension: NCNetworkingDelegate {
         } else {
            
             // Error
-            NCManageDatabase.sharedInstance.setMetadataSession("", sessionError: error?.localizedDescription, sessionSelector: "", sessionTaskIdentifier: 0, status: Int(k_metadataStatusUploadError), predicate: NSPredicate(format: "ocId == %@", ocIdTemp))
+            NCManageDatabase.sharedInstance.setMetadataSession("", sessionError: "", sessionSelector: "", sessionTaskIdentifier: 0, status: Int(k_metadataStatusUploadError), predicate: NSPredicate(format: "ocId == %@", ocIdTemp))
         }
     }
 }
