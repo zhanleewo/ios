@@ -10,9 +10,9 @@ import FileProvider
 
 extension FileProviderExtension: NCNetworkingDelegate {
 
-    func downloadComplete(fileName: String, serverUrl: String, etag: String?, date: NSDate?, dateLastModified: NSDate?, length: Double, session: URLSession, task: URLSessionTask, error: Error?, statusCode: Int) {
+    func downloadComplete(fileName: String, serverUrl: String, etag: String?, date: NSDate?, dateLastModified: NSDate?, length: Double, description: String?, error: Error?, statusCode: Int) {
         
-        guard let ocIdTemp = task.taskDescription else { return }
+        guard let ocIdTemp = description else { return }
         guard let metadata = NCManageDatabase.sharedInstance.getMetadata(predicate: NSPredicate(format: "ocId == %@", ocIdTemp)) else { return }
         
         if error == nil && statusCode >= 200 && statusCode < 300 {
@@ -23,9 +23,9 @@ extension FileProviderExtension: NCNetworkingDelegate {
         }
     }
     
-    func uploadComplete(fileName: String, serverUrl: String, ocId: String?, etag: String?, date: NSDate?, session: URLSession, task: URLSessionTask, error: Error?, statusCode: Int) {
+    func uploadComplete(fileName: String, serverUrl: String, ocId: String?, etag: String?, date: NSDate?, description: String?, error: Error?, statusCode: Int) {
                 
-        guard let ocIdTemp = task.taskDescription else { return }
+        guard let ocIdTemp = description else { return }
         guard let metadata = NCManageDatabase.sharedInstance.getMetadata(predicate: NSPredicate(format: "ocId == %@", ocIdTemp)) else { return }
         
         if error == nil && statusCode >= 200 && statusCode < 300 {

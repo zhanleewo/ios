@@ -55,7 +55,7 @@ import Foundation
     
     //MARK: - Download
     
-    @objc public func downlopad(serverUrlFileName: String, fileNameLocalPath: String, session: URLSession) -> URLSessionDownloadTask? {
+    @objc public func downlopad(serverUrlFileName: String, fileNameLocalPath: String, description: String?, session: URLSession) -> URLSessionDownloadTask? {
         
         guard let url = NCCommunicationCommon.sharedInstance.encodeUrlString(serverUrlFileName) as? URL else {
             return nil
@@ -73,7 +73,12 @@ import Foundation
         // session
         let task = session.downloadTask(with: request)
         
-        task.taskDescription = fileNameLocalPath
+        if description == nil {
+            task.taskDescription = fileNameLocalPath
+        } else {
+            task.taskDescription = fileNameLocalPath + "|" + description!
+        }
+        
         task.resume()
         return task
     }
@@ -125,7 +130,9 @@ import Foundation
         
         if let httpResponse = (downloadTask.response as? HTTPURLResponse) {
             if httpResponse.statusCode >= 200 && httpResponse.statusCode < 300 {
-                if let destinationFilePath = downloadTask.taskDescription {
+                let parameter = downloadTask.taskDescription?.components(separatedBy: "|")
+                if parameter?.count ?? 0 >= 1 {
+                    let destinationFilePath = parameter![0]
                     let destinationUrl = NSURL.fileURL(withPath: destinationFilePath)
                     do {
                         try FileManager.default.removeItem(at: destinationUrl)
@@ -174,11 +181,17 @@ import Foundation
         }
         
         DispatchQueue.main.async {
+            
+            var description = ""
+            var destinationFilePath = ""
+            
+            let parameter = task.taskDescription?.components(separatedBy: "|")
+           
             if task is URLSessionDownloadTask {
-                NCCommunicationCommon.sharedInstance.downloadComplete(fileName: fileName, serverUrl: serverUrl, etag: etag, date: date, dateLastModified: dateLastModified, length: length, session: session, task: task, error: error, statusCode: statusCode)
+                NCCommunicationCommon.sharedInstance.downloadComplete(fileName: fileName, serverUrl: serverUrl, etag: etag, date: date, dateLastModified: dateLastModified, length: length, description: description, error: error, statusCode: statusCode)
             }
             if task is URLSessionUploadTask {
-                NCCommunicationCommon.sharedInstance.uploadComplete(fileName: fileName, serverUrl: serverUrl, ocId: ocId, etag: etag, date: date, session: session, task: task, error: error, statusCode: statusCode)
+                NCCommunicationCommon.sharedInstance.uploadComplete(fileName: fileName, serverUrl: serverUrl, ocId: ocId, etag: etag, date: date, description: description, error: error, statusCode: statusCode)
             }
         }
     }

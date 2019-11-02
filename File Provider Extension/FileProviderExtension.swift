@@ -217,7 +217,7 @@ class FileProviderExtension: NSFileProviderExtension {
         let serverUrlFileName = metadata.serverUrl + "/" + metadata.fileName
         let fileNameLocalPath = CCUtility.getDirectoryProviderStorageOcId(metadata.ocId, fileNameView: metadata.fileName)!
         
-        let task = NCCommunicationBackground.sharedInstance.downlopad(serverUrlFileName: serverUrlFileName, fileNameLocalPath: fileNameLocalPath, session: NCCommunicationBackground.sharedInstance.sessionManagerExtension)
+        let task = NCCommunicationBackground.sharedInstance.downlopad(serverUrlFileName: serverUrlFileName, fileNameLocalPath: fileNameLocalPath, description: metadata.ocId, session: NCCommunicationBackground.sharedInstance.sessionManagerExtension)
         
         if task != nil {
             outstandingSessionTasks[url] = task
