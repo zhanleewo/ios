@@ -244,21 +244,12 @@ class FileProviderExtension: NSFileProviderExtension {
         guard let metadata = NCManageDatabase.sharedInstance.getMetadata(predicate: NSPredicate(format: "ocId == %@", itemIdentifier.rawValue)) else { return }
 
         let fileName = pathComponents[pathComponents.count - 1]
-        let fileNameServerUrl = metadata.serverUrl + "/" + fileName
+        let serverUrlFileName = metadata.serverUrl + "/" + fileName
         let fileNameLocalPath = url.path
         
-        
-        
-        /*
-        _ = NCCommunication.sharedInstance.upload(serverUrlFileName: fileNameServerUrl, fileNamePathSource: fileNameLocalPath, account: fileProviderData.sharedInstance.account, progressHandler: { (progress) in
-        }) { (account, ocId, etag, date, error) in
-            if error == nil {
-                NCManageDatabase.sharedInstance.setLocalFile(ocId: itemIdentifier.rawValue, date: date! as NSDate, exifDate: nil, exifLatitude: nil, exifLongitude: nil, fileName: nil, etag: etag!)
-                // remove preview ico
-                CCUtility.removeFile(atPath: CCUtility.getDirectoryProviderStorageIconOcId(itemIdentifier.rawValue, fileNameView: fileName))
-            }
+        if let task = NCCommunicationBackground.sharedInstance.upload(serverUrlFileName: serverUrlFileName, fileNameLocalPath: fileNameLocalPath, description: metadata.ocId, session: NCCommunicationBackground.sharedInstance.sessionManagerTransferExtension) {
+            NSFileProviderManager.default.register(task, forItemWithIdentifier: NSFileProviderItemIdentifier(metadata.fileId)) { (error) in }
         }
-        */
     }
     
     override func stopProvidingItem(at url: URL) {

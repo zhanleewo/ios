@@ -40,6 +40,8 @@ extension FileProviderExtension: NCNetworkingDelegate {
             let atPath = CCUtility.getDirectoryProviderStorageOcId(ocIdTemp)
             let toPath = CCUtility.getDirectoryProviderStorageOcId(ocId)
             CCUtility.moveFile(atPath: atPath, toPath: toPath)
+            let atPathIcon = CCUtility.getDirectoryProviderStorageIconOcId(ocId, fileNameView: fileName)
+            CCUtility.removeFile(atPath: atPathIcon)
             
             // Signal update
             item = FileProviderItem(metadata: metadataUpdated, parentItemIdentifier: parentItemIdentifier)
