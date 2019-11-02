@@ -93,6 +93,12 @@ class FileProviderItem: NSObject, NSFileProviderItem {
                 isDownloaded = true
             }
             
+            // Downloading
+            if (metadata.status == Int(k_metadataStatusInDownload)) {
+                isDownloaded = false
+                isDownloading = true
+            }
+            
             // Upload
             if (metadata.status == Int(k_metadataStatusInUpload)) {
                 self.isDownloaded = true
