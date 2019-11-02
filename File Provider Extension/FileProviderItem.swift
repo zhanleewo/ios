@@ -84,6 +84,7 @@ class FileProviderItem: NSObject, NSFileProviderItem {
             
             self.documentSize = NSNumber(value: metadata.size)
            
+            // Local file
             let tableLocalFile = NCManageDatabase.sharedInstance.getTableLocalFile(predicate: NSPredicate(format: "ocId == %@", metadata.ocId))
             if tableLocalFile == nil {
                 isMostRecentVersionDownloaded = false
