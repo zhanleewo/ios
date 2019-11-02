@@ -240,6 +240,7 @@ class FileProviderExtension: NSFileProviderExtension {
         let fileNameServerUrl = metadata.serverUrl + "/" + fileName
         let fileNameLocalPath = url.path
         
+        /*
         _ = NCCommunication.sharedInstance.upload(serverUrlFileName: fileNameServerUrl, fileNamePathSource: fileNameLocalPath, account: fileProviderData.sharedInstance.account, progressHandler: { (progress) in
         }) { (account, ocId, etag, date, error) in
             if error == nil {
@@ -248,83 +249,8 @@ class FileProviderExtension: NSFileProviderExtension {
                 CCUtility.removeFile(atPath: CCUtility.getDirectoryProviderStorageIconOcId(itemIdentifier.rawValue, fileNameView: fileName))
             }
         }
+        */
     }
-    
-    /*
-    override func itemChanged(at url: URL) {
-        
-        var size = 0 as Double
-        let pathComponents = url.pathComponents
-        assert(pathComponents.count > 2)
-        let itemIdentifier = NSFileProviderItemIdentifier(pathComponents[pathComponents.count - 2])
-        
-        guard let metadata = NCManageDatabase.sharedInstance.getMetadata(predicate: NSPredicate(format: "account == %@ AND ocId == %@", fileProviderData.sharedInstance.account, itemIdentifier.rawValue)) else { return }
-        guard let parentItemIdentifier = fileProviderUtility.sharedInstance.getParentItemIdentifier(metadata: metadata, homeServerUrl: fileProviderData.sharedInstance.homeServerUrl) else { return }
-        
-        // typefile directory ? (NOT PERMITTED)
-        do {
-            let attributes = try fileProviderUtility.sharedInstance.fileManager.attributesOfItem(atPath: url.path)
-            size = attributes[FileAttributeKey.size] as! Double
-            let typeFile = attributes[FileAttributeKey.type] as! FileAttributeType
-            if typeFile == FileAttributeType.typeDirectory {
-                return
-            }
-        } catch { return }
-        
-        let fileName = pathComponents[pathComponents.count - 1]
-        let fileNameServerUrl = metadata.serverUrl + "/" + fileName
-        let fileNameLocalPath = url.path
-        
-        let task = OCNetworking.sharedManager()?.upload(withAccount: fileProviderData.sharedInstance.account, fileNameServerUrl: fileNameServerUrl, fileNameLocalPath: fileNameLocalPath, encode: true, communication: OCNetworking.sharedManager()?.sharedOCCommunicationExtension(), progress: { (progress) in
-            
-        }, completion: { (account, ocId, etag, date, message, errorCode) in
-            
-            // remove Task
-            self.outstandingSessionTasks.removeValue(forKey: url)
-            
-            guard let metadata = NCManageDatabase.sharedInstance.getMetadata(predicate: NSPredicate(format: "account == %@ AND ocId == %@", fileProviderData.sharedInstance.account, itemIdentifier.rawValue)) else { return }
-            
-            if account == fileProviderData.sharedInstance.account && errorCode == 0 {
-                
-                metadata.sessionTaskIdentifier = Int(k_taskIdentifierDone)
-                metadata.status = Int(k_metadataStatusNormal)
-                metadata.session = ""
-                metadata.date = date! as NSDate
-                metadata.etag = etag!
-                metadata.size = size
-                
-                guard let metadataUpdate = NCManageDatabase.sharedInstance.addMetadata(metadata) else { return }
-                NCManageDatabase.sharedInstance.setLocalFile(ocId: metadataUpdate.ocId, date: metadataUpdate.date, exifDate: nil, exifLatitude: nil, exifLongitude: nil, fileName: nil, etag: metadataUpdate.etag)
-                
-                // Signal update/delete
-                _ = fileProviderData.sharedInstance.fileProviderSignal(metadata: metadataUpdate, parentItemIdentifier: parentItemIdentifier, delete: false, update: true)
-                
-            } else {
-                
-                metadata.sessionTaskIdentifier = Int(k_taskIdentifierDone)
-                metadata.status = Int(k_metadataStatusNormal)
-                metadata.session = ""
-                _ = NCManageDatabase.sharedInstance.addMetadata(metadata)
-            }
-        })
-        
-        // Add and register task
-        if task != nil {
-            
-            metadata.sessionTaskIdentifier = Int(task!.taskIdentifier)
-            metadata.status = Int(k_metadataStatusUploading)
-            metadata.session = k_upload_session_extension
-            
-            guard let metadataUpdate = NCManageDatabase.sharedInstance.addMetadata(metadata) else { return }
-            
-            // Signal update/delete
-            _ = fileProviderData.sharedInstance.fileProviderSignal(metadata: metadataUpdate, parentItemIdentifier: parentItemIdentifier, delete: false, update: true)
-            
-            self.outstandingSessionTasks[url] = task
-            NSFileProviderManager.default.register(task!, forItemWithIdentifier: NSFileProviderItemIdentifier(itemIdentifier.rawValue)) { (error) in }
-        }
-    }
-    */
     
     override func stopProvidingItem(at url: URL) {
         // Called after the last claim to the file has been released. At this point, it is safe for the file provider to remove the content file.
