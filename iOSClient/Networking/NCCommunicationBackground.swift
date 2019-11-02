@@ -31,18 +31,29 @@ import Foundation
     }()
         
     @objc public lazy var sessionManagerTransfer: URLSession = {
-        let configuration = URLSessionConfiguration.background(withIdentifier: NCCommunicationCommon.sharedInstance.session_identifier_background)
+        let configuration = URLSessionConfiguration.background(withIdentifier: NCCommunicationCommon.sharedInstance.sessionIdentifierBackground)
         configuration.allowsCellularAccess = true
         configuration.sessionSendsLaunchEvents = true
         configuration.isDiscretionary = false
-        configuration.httpMaximumConnectionsPerHost = 1
+        configuration.httpMaximumConnectionsPerHost = NCCommunicationCommon.sharedInstance.sessionMaximumConnectionsPerHost
+        configuration.requestCachePolicy = NSURLRequest.CachePolicy.reloadIgnoringLocalCacheData
+        let session = URLSession(configuration: configuration, delegate: self, delegateQueue: OperationQueue.main)
+        return session
+    }()
+    
+    @objc public lazy var sessionManagerTransferWiFi: URLSession = {
+        let configuration = URLSessionConfiguration.background(withIdentifier: NCCommunicationCommon.sharedInstance.sessionIdentifierBackgroundwifi)
+        configuration.allowsCellularAccess = false
+        configuration.sessionSendsLaunchEvents = true
+        configuration.isDiscretionary = false
+        configuration.httpMaximumConnectionsPerHost = NCCommunicationCommon.sharedInstance.sessionMaximumConnectionsPerHost
         configuration.requestCachePolicy = NSURLRequest.CachePolicy.reloadIgnoringLocalCacheData
         let session = URLSession(configuration: configuration, delegate: self, delegateQueue: OperationQueue.main)
         return session
     }()
     
     @objc public lazy var sessionManagerTransferExtension: URLSession = {
-        let configuration = URLSessionConfiguration.background(withIdentifier: NCCommunicationCommon.sharedInstance.session_identifier_extension)
+        let configuration = URLSessionConfiguration.background(withIdentifier: NCCommunicationCommon.sharedInstance.sessionIdentifierExtension)
         configuration.allowsCellularAccess = true
         configuration.sessionSendsLaunchEvents = true
         configuration.isDiscretionary = false
