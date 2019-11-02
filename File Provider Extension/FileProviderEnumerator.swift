@@ -125,37 +125,51 @@ class FileProviderEnumerator: NSObject, NSFileProviderEnumerator {
             // Update the WorkingSet -> Favorite
             fileProviderData.sharedInstance.updateFavoriteForWorkingSet()
             
-            NCCommunication.sharedInstance.readFileOrFolder(serverUrlFileName: serverUrl, depth: "1", account: fileProviderData.sharedInstance.account, completionHandler: { (account, files, error) in
+            NCCommunication.sharedInstance.readFileOrFolder(serverUrlFileName: serverUrl, depth: "0", account: fileProviderData.sharedInstance.account, completionHandler: { (account, files, error) in
                 
-                if error == nil && files.count >= 1 {
-                    
-                    let file = files[0]
+                var etag = ""
+                let etagServerUrl = fileProviderData.sharedInstance.listServerUrlEtag[serverUrl]
+                if error == nil && files.count == 1 { etag = files[0].etag }
+                
+                if etag != etagServerUrl {
+                                
+                    NCCommunication.sharedInstance.readFileOrFolder(serverUrlFileName: serverUrl, depth: "1", account: fileProviderData.sharedInstance.account, completionHandler: { (account, files, error) in
+                        
+                        if error == nil && files.count >= 1 {
+                            
+                            let file = files[0]
 
-                    // Update directory etag
-                    NCManageDatabase.sharedInstance.setDirectory(serverUrl: serverUrl, serverUrlTo: nil, etag: file.etag, ocId: file.ocId, encrypted: file.e2eEncrypted, account: account)
-                    // Save etag for this serverUrl
-                    fileProviderData.sharedInstance.listServerUrlEtag[serverUrl] = file.etag
-                    
-                    NCManageDatabase.sharedInstance.deleteMetadata(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@ AND (status == %d OR status == %d)", account, serverUrl, k_metadataStatusNormal, k_metadataStatusHide))
-                        
-                    NCManageDatabase.sharedInstance.setDateReadDirectory(serverUrl: serverUrl, account: account)
-                        
-                    let metadatasInDownload = NCManageDatabase.sharedInstance.getMetadatas(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@ AND (status == %d OR status == %d OR status == %d OR status == %d)", account, serverUrl, k_metadataStatusWaitDownload, k_metadataStatusInDownload, k_metadataStatusDownloading, k_metadataStatusDownloadError), sorted: nil, ascending: false)
-                     
-                    let metadatasInUpload = NCManageDatabase.sharedInstance.getMetadatas(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@ AND (status == %d OR status == %d OR status == %d OR status == %d)", account, serverUrl, k_metadataStatusWaitUpload, k_metadataStatusInUpload, k_metadataStatusUploading, k_metadataStatusUploadError), sorted: nil, ascending: false)
-                   
-                    NCManageDatabase.sharedInstance.addMetadata(files: files, account: account, serverUrl: serverUrl, removeFirst: true)
-                    
-                    if metadatasInDownload != nil {
-                        _ = NCManageDatabase.sharedInstance.addMetadatas(metadatasInDownload!)
-                    }
-                    if metadatasInUpload != nil {
-                        _ = NCManageDatabase.sharedInstance.addMetadatas(metadatasInUpload!)
-                    }
-                    
-                    metadatasFromDB = NCManageDatabase.sharedInstance.getMetadatas(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", account, serverUrl), sorted: "fileName", ascending: true)
-                    
-                    self.selectFirstPageItems(metadatasFromDB, observer: observer)
+                            // Update directory etag
+                            NCManageDatabase.sharedInstance.setDirectory(serverUrl: serverUrl, serverUrlTo: nil, etag: file.etag, ocId: file.ocId, encrypted: file.e2eEncrypted, account: account)
+                            // Save etag for this serverUrl
+                            fileProviderData.sharedInstance.listServerUrlEtag[serverUrl] = file.etag
+                            
+                            NCManageDatabase.sharedInstance.deleteMetadata(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@ AND (status == %d OR status == %d)", account, serverUrl, k_metadataStatusNormal, k_metadataStatusHide))
+                                
+                            NCManageDatabase.sharedInstance.setDateReadDirectory(serverUrl: serverUrl, account: account)
+                                
+                            let metadatasInDownload = NCManageDatabase.sharedInstance.getMetadatas(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@ AND (status == %d OR status == %d OR status == %d OR status == %d)", account, serverUrl, k_metadataStatusWaitDownload, k_metadataStatusInDownload, k_metadataStatusDownloading, k_metadataStatusDownloadError), sorted: nil, ascending: false)
+                             
+                            let metadatasInUpload = NCManageDatabase.sharedInstance.getMetadatas(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@ AND (status == %d OR status == %d OR status == %d OR status == %d)", account, serverUrl, k_metadataStatusWaitUpload, k_metadataStatusInUpload, k_metadataStatusUploading, k_metadataStatusUploadError), sorted: nil, ascending: false)
+                           
+                            NCManageDatabase.sharedInstance.addMetadata(files: files, account: account, serverUrl: serverUrl, removeFirst: true)
+                            
+                            if metadatasInDownload != nil {
+                                _ = NCManageDatabase.sharedInstance.addMetadatas(metadatasInDownload!)
+                            }
+                            if metadatasInUpload != nil {
+                                _ = NCManageDatabase.sharedInstance.addMetadatas(metadatasInUpload!)
+                            }
+                            
+                            metadatasFromDB = NCManageDatabase.sharedInstance.getMetadatas(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", account, serverUrl), sorted: "fileName", ascending: true)
+                            
+                            self.selectFirstPageItems(metadatasFromDB, observer: observer)
+                            
+                        } else {
+                            
+                            self.selectFirstPageItems(metadatasFromDB, observer: observer)
+                        }
+                    })
                     
                 } else {
                     
