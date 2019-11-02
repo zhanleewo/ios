@@ -40,13 +40,6 @@ import SwiftyJSON
         return Alamofire.Session(configuration: configuration, delegate: self, rootQueue:  DispatchQueue(label: "com.nextcloud.sessionManagerData.rootQueue"), startRequestsImmediately: true, requestQueue: nil, serializationQueue: nil, interceptor: nil, serverTrustManager: nil, redirectHandler: nil, cachedResponseHandler: nil, eventMonitors: self.makeEvents())
     }()
    
-    private lazy var sessionManagerTransfer: Alamofire.Session = {
-        let configuration = URLSessionConfiguration.af.default
-        configuration.allowsCellularAccess = true
-        configuration.httpMaximumConnectionsPerHost = NCCommunicationCommon.sharedInstance.session_maximumConnectionsPerHost
-        return Alamofire.Session(configuration: configuration, delegate: self, rootQueue:  DispatchQueue(label: "com.nextcloud.sessionManagerTransfer.rootQueue"), startRequestsImmediately: true, requestQueue: nil, serializationQueue: nil, interceptor: nil, serverTrustManager: nil, redirectHandler: nil, cachedResponseHandler: nil, eventMonitors: self.makeEvents())
-    }()
-    
     //MARK: - monitor
     
     private func makeEvents() -> [EventMonitor] {
@@ -521,8 +514,7 @@ import SwiftyJSON
         if let userAgent = NCCommunicationCommon.sharedInstance.userAgent { headers.update(.userAgent(userAgent)) }
         
         // session
-        sessionManagerTransfer.session.sessionDescription = NCCommunicationCommon.sharedInstance.session_description_download
-        let request = sessionManagerTransfer.download(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil, to: destination)
+        let request = sessionManagerData.download(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil, to: destination)
         .downloadProgress { progress in
             progressHandler(progress)
         }
@@ -560,8 +552,7 @@ import SwiftyJSON
         if let userAgent = NCCommunicationCommon.sharedInstance.userAgent { headers.update(.userAgent(userAgent)) }
         
         // session
-        sessionManagerTransfer.session.sessionDescription = NCCommunicationCommon.sharedInstance.session_description_upload
-        let request = sessionManagerTransfer.upload(fileNamePathSourceUrl, to: url, method: .put, headers: headers, interceptor: nil, fileManager: .default)
+        let request = sessionManagerData.upload(fileNamePathSourceUrl, to: url, method: .put, headers: headers, interceptor: nil, fileManager: .default)
         .uploadProgress { progress in
             progressHandler(progress)
         }
