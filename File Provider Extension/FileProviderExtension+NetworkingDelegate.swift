@@ -19,7 +19,6 @@ extension FileProviderExtension: NCNetworkingDelegate {
             guard let parentItemIdentifier = fileProviderUtility.sharedInstance.getParentItemIdentifier(metadata: metadata, homeServerUrl: fileProviderData.sharedInstance.homeServerUrl) else {
                 return
             }
-            var item = FileProviderItem(metadata: metadata, parentItemIdentifier: parentItemIdentifier)
             
             if let etag = etag { metadata.etag = etag }
             metadata.status = Int(k_metadataStatusNormal)
@@ -28,7 +27,7 @@ extension FileProviderExtension: NCNetworkingDelegate {
             NCManageDatabase.sharedInstance.addLocalFile(metadata: metadataDownloaded)
             
             // Signal update
-            item = FileProviderItem(metadata: metadataDownloaded, parentItemIdentifier: parentItemIdentifier)
+            let item = FileProviderItem(metadata: metadataDownloaded, parentItemIdentifier: parentItemIdentifier)
             fileProviderData.sharedInstance.fileProviderSignalUpdateContainerItem[item.itemIdentifier] = item
             fileProviderData.sharedInstance.fileProviderSignalUpdateWorkingSetItem[item.itemIdentifier] = item
             
