@@ -102,8 +102,11 @@ class FileProviderItem: NSObject, NSFileProviderItem {
             
             // Upload
             if (metadata.status == Int(k_metadataStatusInUpload)) {
-                self.isUploaded = false
-                self.isUploading = true
+                isUploaded = false
+                isUploading = true
+                
+                isMostRecentVersionDownloaded = true
+                isDownloaded = true
             }
             
             // Error ?
