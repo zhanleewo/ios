@@ -177,9 +177,7 @@ class FileProviderExtension: NSFileProviderExtension {
         let itemIdentifier = NSFileProviderItemIdentifier(pathComponents[pathComponents.count - 2])
         return itemIdentifier
     }
-    
-    // MARK: -
-    
+        
     override func providePlaceholder(at url: URL, completionHandler: @escaping (Error?) -> Void) {
         
         guard let identifier = persistentIdentifierForItem(at: url) else {
@@ -253,12 +251,7 @@ class FileProviderExtension: NSFileProviderExtension {
     }
     
     override func stopProvidingItem(at url: URL) {
-        // Called after the last claim to the file has been released. At this point, it is safe for the file provider to remove the content file.
-        // Care should be taken that the corresponding placeholder file stays behind after the content file has been deleted.
-        
-        // Called after the last claim to the file has been released. At this point, it is safe for the file provider to remove the content file.
-        
-        // look up whether the file has local changes
+      
         let fileHasLocalChanges = false
         
         if !fileHasLocalChanges {
