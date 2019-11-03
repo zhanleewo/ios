@@ -65,15 +65,7 @@ class FileProviderExtension: NSFileProviderExtension {
         
         var maybeEnumerator: NSFileProviderEnumerator? = nil
         
-        // Check account single
-        if (containerItemIdentifier != NSFileProviderItemIdentifier.workingSet) {
-            if fileProviderData.sharedInstance.setupActiveAccount(domain: nil, providerExtension: self) == false {
-                throw NSError(domain: NSFileProviderErrorDomain, code: NSFileProviderError.notAuthenticated.rawValue, userInfo:[:])
-            }
-        }
-        
         // Check account domain
-        /*
         if (containerItemIdentifier != NSFileProviderItemIdentifier.workingSet) {
             if containerItemIdentifier == NSFileProviderItemIdentifier.rootContainer && self.domain?.identifier.rawValue == nil {
                 throw NSError(domain: NSFileProviderErrorDomain, code: NSFileProviderError.notAuthenticated.rawValue, userInfo:[:])
@@ -87,7 +79,6 @@ class FileProviderExtension: NSFileProviderExtension {
                 }
             }
         }
-        */
         
         if (containerItemIdentifier == NSFileProviderItemIdentifier.rootContainer) {
             maybeEnumerator = FileProviderEnumerator(enumeratedItemIdentifier: containerItemIdentifier)
