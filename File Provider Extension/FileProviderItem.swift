@@ -45,11 +45,6 @@ class FileProviderItem: NSObject, NSFileProviderItem {
     var parentItemIdentifier: NSFileProviderItemIdentifier          // The persistent identifier of the item's parent folder
     var isTrashed: Bool = false                                     // A Boolean value that indicates whether an item is in the trash
    
-    // Tracking Usage
-    var contentModificationDate: Date?                              // The date the item was last modified
-    var creationDate: Date?                                         // The date the item was created
-    var lastUsedDate: Date? = Date()                                // The date the item was last used, default to the moment when the item is created 
-
     // Tracking Versions
     var versionIdentifier: Data?                                    // A data value used to determine when the item changes
     var isMostRecentVersionDownloaded: Bool = true                  // A Boolean value that indicates whether the item is the most recent version downloaded from the server
@@ -70,19 +65,16 @@ class FileProviderItem: NSObject, NSFileProviderItem {
     init(metadata: tableMetadata, parentItemIdentifier: NSFileProviderItemIdentifier) {
         
         self.parentItemIdentifier = parentItemIdentifier
-        self.itemIdentifier = fileProviderUtility.sharedInstance.getItemIdentifier(metadata: metadata)
-                
-        self.contentModificationDate = metadata.date as Date
-        self.creationDate = metadata.date as Date
-        self.documentSize = NSNumber(value: metadata.size)
-        self.filename = metadata.fileNameView
-        self.isDirectory = metadata.directory
-        self.typeIdentifier = CCUtility.insertTypeFileIconName(metadata.fileNameView, metadata: metadata)
-        self.versionIdentifier = metadata.etag.data(using: .utf8)
+        itemIdentifier = fileProviderUtility.sharedInstance.getItemIdentifier(metadata: metadata)
+        documentSize = NSNumber(value: metadata.size)
+        filename = metadata.fileNameView
+        isDirectory = metadata.directory
+        typeIdentifier = CCUtility.insertTypeFileIconName(metadata.fileNameView, metadata: metadata)
+        versionIdentifier = metadata.etag.data(using: .utf8)
         
         if (!metadata.directory) {
             
-            self.documentSize = NSNumber(value: metadata.size)
+            documentSize = NSNumber(value: metadata.size)
            
             // Local file
             let tableLocalFile = NCManageDatabase.sharedInstance.getTableLocalFile(predicate: NSPredicate(format: "ocId == %@", metadata.ocId))

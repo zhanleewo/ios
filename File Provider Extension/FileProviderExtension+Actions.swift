@@ -301,8 +301,6 @@ extension FileProviderExtension {
         }
         
         let item = FileProviderItem(metadata: metadata, parentItemIdentifier: parentItemIdentifier)
-        item.lastUsedDate = lastUsedDate
-
         completionHandler(item, nil)
     }
 }
