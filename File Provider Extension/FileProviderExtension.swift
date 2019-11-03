@@ -65,7 +65,6 @@ class FileProviderExtension: NSFileProviderExtension {
         
         var maybeEnumerator: NSFileProviderEnumerator? = nil
         
-        // Check account domain
         if (containerItemIdentifier != NSFileProviderItemIdentifier.workingSet) {
             if containerItemIdentifier == NSFileProviderItemIdentifier.rootContainer && self.domain?.identifier.rawValue == nil {
                 throw NSError(domain: NSFileProviderErrorDomain, code: NSFileProviderError.notAuthenticated.rawValue, userInfo:[:])
