@@ -45,8 +45,6 @@ class FileProviderItem: NSObject, NSFileProviderItem {
     var parentItemIdentifier: NSFileProviderItemIdentifier          // The persistent identifier of the item's parent folder
     var isTrashed: Bool = false                                     // A Boolean value that indicates whether an item is in the trash
    
-    // Tracking Versions
-    var versionIdentifier: Data?                                    // A data value used to determine when the item changes
     var isMostRecentVersionDownloaded: Bool = true                  // A Boolean value that indicates whether the item is the most recent version downloaded from the server
 
     // Monitoring File Transfers
@@ -70,7 +68,6 @@ class FileProviderItem: NSObject, NSFileProviderItem {
         filename = metadata.fileNameView
         isDirectory = metadata.directory
         typeIdentifier = CCUtility.insertTypeFileIconName(metadata.fileNameView, metadata: metadata)
-        versionIdentifier = metadata.etag.data(using: .utf8)
         
         if (!metadata.directory) {
             
