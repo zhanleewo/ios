@@ -20,8 +20,12 @@ extension FileProviderExtension: NCNetworkingDelegate {
             guard let parentItemIdentifier = fileProviderUtility.sharedInstance.getParentItemIdentifier(metadata: metadata, homeServerUrl: fileProviderData.sharedInstance.homeServerUrl) else {
                 return
             }
+            // Signal delete
             var item = FileProviderItem(metadata: metadata, parentItemIdentifier: parentItemIdentifier)
-            
+            fileProviderData.sharedInstance.fileProviderSignalDeleteContainerItemIdentifier[item.itemIdentifier] = item.itemIdentifier
+            fileProviderData.sharedInstance.fileProviderSignalDeleteWorkingSetItemIdentifier[item.itemIdentifier] = item.itemIdentifier
+            fileProviderData.sharedInstance.signalEnumerator(for: [parentItemIdentifier, .workingSet])
+
             metadata.fileName = fileName
             metadata.serverUrl = serverUrl
             if let etag = etag { metadata.etag = etag }
@@ -33,10 +37,6 @@ extension FileProviderExtension: NCNetworkingDelegate {
             NCManageDatabase.sharedInstance.addLocalFile(metadata: metadataUpdated)
             NCManageDatabase.sharedInstance.deleteMetadata(predicate: NSPredicate(format: "ocId == %@", ocIdTemp))
             
-            // Signal delete
-            fileProviderData.sharedInstance.fileProviderSignalDeleteContainerItemIdentifier[item.itemIdentifier] = item.itemIdentifier
-            fileProviderData.sharedInstance.fileProviderSignalDeleteWorkingSetItemIdentifier[item.itemIdentifier] = item.itemIdentifier
-
             // File system
             let atPath = CCUtility.getDirectoryProviderStorageOcId(ocIdTemp)
             let toPath = CCUtility.getDirectoryProviderStorageOcId(ocId)
@@ -48,7 +48,6 @@ extension FileProviderExtension: NCNetworkingDelegate {
             item = FileProviderItem(metadata: metadataUpdated, parentItemIdentifier: parentItemIdentifier)
             fileProviderData.sharedInstance.fileProviderSignalUpdateContainerItem[item.itemIdentifier] = item
             fileProviderData.sharedInstance.fileProviderSignalUpdateWorkingSetItem[item.itemIdentifier] = item
-            
             fileProviderData.sharedInstance.signalEnumerator(for: [parentItemIdentifier, .workingSet])
             
         } else {
