@@ -382,7 +382,6 @@
     
     // Registeration domain File Provider
     if (@available(iOS 11, *) ) {
-        [FileProviderDomain.sharedInstance removeAllDomain];
         [FileProviderDomain.sharedInstance registerDomain];
     }    
 }
