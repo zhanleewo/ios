@@ -69,4 +69,25 @@ class FileProviderDomain: NSObject {
             }
         }
     }
+    
+    @available(iOS 11.0, *) @objc func removeAllDomain() {
+        
+        NSFileProviderManager.getDomainsWithCompletionHandler { (fileProviderDomain, error) in
+            
+            var domains = [String]()
+            let pathRelativeToDocumentStorage = NSFileProviderManager.default.documentStorageURL.absoluteString
+
+            for domain in fileProviderDomain {
+                domains.append(domain.identifier.rawValue)
+            }
+            for domain in domains {
+                let domainRawValue = NSFileProviderDomain(identifier: NSFileProviderDomainIdentifier(rawValue: domain), displayName: domain, pathRelativeToDocumentStorage: pathRelativeToDocumentStorage)
+                NSFileProviderManager.remove(domainRawValue, completionHandler: { (error) in
+                    if error != nil {
+                        print("Error  domain: \(domainRawValue) error: \(String(describing: error))")
+                    }
+                })
+            }
+        }
+    }
 }

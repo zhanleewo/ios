@@ -65,15 +65,26 @@ class FileProviderExtension: NSFileProviderExtension {
         
         var maybeEnumerator: NSFileProviderEnumerator? = nil
         
-        if (containerItemIdentifier != NSFileProviderItemIdentifier.workingSet) {
-            if containerItemIdentifier == NSFileProviderItemIdentifier.rootContainer && self.domain?.identifier.rawValue == nil {
-                throw NSError(domain: NSFileProviderErrorDomain, code: NSFileProviderError.notAuthenticated.rawValue, userInfo:[:])
-            } else if self.domain?.identifier.rawValue != nil {
-                if fileProviderData.sharedInstance.setupActiveAccount(domain: self.domain?.identifier.rawValue, providerExtension: self) == false {
+        if Int(k_fileProvider_domain) == 1 {
+            
+            if (containerItemIdentifier != NSFileProviderItemIdentifier.workingSet) {
+                if containerItemIdentifier == NSFileProviderItemIdentifier.rootContainer && self.domain?.identifier.rawValue == nil {
                     throw NSError(domain: NSFileProviderErrorDomain, code: NSFileProviderError.notAuthenticated.rawValue, userInfo:[:])
+                } else if self.domain?.identifier.rawValue != nil {
+                    if fileProviderData.sharedInstance.setupActiveAccount(domain: self.domain?.identifier.rawValue, providerExtension: self) == false {
+                        throw NSError(domain: NSFileProviderErrorDomain, code: NSFileProviderError.notAuthenticated.rawValue, userInfo:[:])
+                    }
+                } else {
+                    if fileProviderData.sharedInstance.setupActiveAccount(itemIdentifier: containerItemIdentifier, providerExtension: self) == false {
+                        throw NSError(domain: NSFileProviderErrorDomain, code: NSFileProviderError.notAuthenticated.rawValue, userInfo:[:])
+                    }
                 }
-            } else {
-                if fileProviderData.sharedInstance.setupActiveAccount(itemIdentifier: containerItemIdentifier, providerExtension: self) == false {
+            }
+            
+        } else {
+            
+            if (containerItemIdentifier != NSFileProviderItemIdentifier.workingSet) {
+                if fileProviderData.sharedInstance.setupActiveAccount(domain: nil, providerExtension: self) == false {
                     throw NSError(domain: NSFileProviderErrorDomain, code: NSFileProviderError.notAuthenticated.rawValue, userInfo:[:])
                 }
             }
