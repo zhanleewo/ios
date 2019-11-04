@@ -57,7 +57,7 @@ import Foundation
         configuration.allowsCellularAccess = true
         configuration.sessionSendsLaunchEvents = true
         configuration.isDiscretionary = false
-        configuration.httpMaximumConnectionsPerHost = 1
+        configuration.httpMaximumConnectionsPerHost = NCCommunicationCommon.sharedInstance.sessionMaximumConnectionsPerHost
         configuration.requestCachePolicy = NSURLRequest.CachePolicy.reloadIgnoringLocalCacheData
         configuration.sharedContainerIdentifier = NCCommunicationCommon.sharedInstance.capabilitiesGroup
         let session = URLSession(configuration: configuration, delegate: self, delegateQueue: OperationQueue.main)
