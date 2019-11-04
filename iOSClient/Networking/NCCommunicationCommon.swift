@@ -47,6 +47,12 @@ class NCCommunicationCommon: NSObject {
     // Protocol
     var delegate: NCCommunicationCommonDelegate?
     
+    // Session
+    @objc let sessionMaximumConnectionsPerHost = 5
+    @objc let sessionIdentifierBackground: String = "com.nextcloud.session.background"
+    @objc let sessionIdentifierBackgroundwifi: String = "com.nextcloud.session.backgroundwifi"
+    @objc let sessionIdentifierExtension: String = "com.nextcloud.session.extension"
+
     //MARK: - Setup
     
     @objc public func setup(username: String, password: String, userAgent: String?, capabilitiesGroup: String?, delegate: NCCommunicationCommonDelegate?) {

@@ -125,8 +125,8 @@ class FileProviderExtension: NSFileProviderExtension {
             metadata.account = fileProviderData.sharedInstance.account
             metadata.directory = true
             metadata.ocId = NSFileProviderItemIdentifier.rootContainer.rawValue
-            metadata.fileName = "/"
-            metadata.fileNameView = "/"
+            metadata.fileName = "root"
+            metadata.fileNameView = "root"
             metadata.serverUrl = fileProviderData.sharedInstance.homeServerUrl
             metadata.typeFile = k_metadataTypeFile_directory
             
