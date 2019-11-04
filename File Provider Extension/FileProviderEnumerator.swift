@@ -255,7 +255,7 @@ class FileProviderEnumerator: NSObject, NSFileProviderEnumerator {
             
             for metadata in metadatas {
                 
-                if metadata.e2eEncrypted || metadata.status == Int(k_metadataStatusHide) || (metadata.session != "" && metadata.session != k_download_session_extension && metadata.session != k_upload_session_extension) { continue }
+                if metadata.e2eEncrypted || metadata.status == Int(k_metadataStatusHide) || (metadata.session != "" && metadata.session != k_upload_session_extension) { continue }
                 
                 counter += 1
                 if (counter >= start && counter <= stop) {

@@ -121,7 +121,6 @@
 #define k_upload_session_wwan                           @"it.twsweb.Crypto-Cloud.upload.sessionwwan"
 
 // Session Download Upload Extension
-#define k_download_session_extension                    @"com.nextcloud.download.session.extension"
 #define k_upload_session_extension                      @"com.nextcloud.upload.session.extension"
 
 // OperationQueue

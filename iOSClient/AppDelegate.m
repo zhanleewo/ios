@@ -1453,7 +1453,7 @@ PKPushRegistry *pushRegistry;
     
     // Verify internal error download (lost task)
     //
-    NSArray *matadatasInDownloading = [[NCManageDatabase sharedInstance] getMetadatasWithPredicate:[NSPredicate predicateWithFormat:@"session != %@ AND status == %d", k_download_session_extension, k_metadataStatusDownloading] sorted:nil ascending:true];
+    NSArray *matadatasInDownloading = [[NCManageDatabase sharedInstance] getMetadatasWithPredicate:[NSPredicate predicateWithFormat:@"status == %d", k_metadataStatusDownloading] sorted:nil ascending:true];
     for (tableMetadata *metadata in matadatasInDownloading) {
         
         NSURLSession *session = [[CCNetworking sharedNetworking] getSessionfromSessionDescription:metadata.session];
