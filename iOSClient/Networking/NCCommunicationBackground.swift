@@ -29,35 +29,42 @@ import Foundation
         let instance = NCCommunicationBackground()
         return instance
     }()
-        
+       
+    // Session
+    let sessionMaximumConnectionsPerHost = 5
+    let sessionMaximumConnectionsPerHostExtension = 1
+    let sessionIdentifierBackground: String = "com.nextcloud.session.background"
+    let sessionIdentifierBackgroundWifi: String = "com.nextcloud.session.backgroundwifi"
+    let sessionIdentifierBackgroundExtension: String = "com.nextcloud.session.backgroundextension"
+    
     @objc public lazy var sessionManagerTransfer: URLSession = {
-        let configuration = URLSessionConfiguration.background(withIdentifier: NCCommunicationCommon.sharedInstance.sessionIdentifierBackground)
+        let configuration = URLSessionConfiguration.background(withIdentifier: sessionIdentifierBackground)
         configuration.allowsCellularAccess = true
         configuration.sessionSendsLaunchEvents = true
         configuration.isDiscretionary = false
-        configuration.httpMaximumConnectionsPerHost = NCCommunicationCommon.sharedInstance.sessionMaximumConnectionsPerHost
+        configuration.httpMaximumConnectionsPerHost = sessionMaximumConnectionsPerHost
         configuration.requestCachePolicy = NSURLRequest.CachePolicy.reloadIgnoringLocalCacheData
         let session = URLSession(configuration: configuration, delegate: self, delegateQueue: OperationQueue.main)
         return session
     }()
     
     @objc public lazy var sessionManagerTransferWiFi: URLSession = {
-        let configuration = URLSessionConfiguration.background(withIdentifier: NCCommunicationCommon.sharedInstance.sessionIdentifierBackgroundwifi)
+        let configuration = URLSessionConfiguration.background(withIdentifier: sessionIdentifierBackgroundWifi)
         configuration.allowsCellularAccess = false
         configuration.sessionSendsLaunchEvents = true
         configuration.isDiscretionary = false
-        configuration.httpMaximumConnectionsPerHost = NCCommunicationCommon.sharedInstance.sessionMaximumConnectionsPerHost
+        configuration.httpMaximumConnectionsPerHost = sessionMaximumConnectionsPerHost
         configuration.requestCachePolicy = NSURLRequest.CachePolicy.reloadIgnoringLocalCacheData
         let session = URLSession(configuration: configuration, delegate: self, delegateQueue: OperationQueue.main)
         return session
     }()
     
     @objc public lazy var sessionManagerTransferExtension: URLSession = {
-        let configuration = URLSessionConfiguration.background(withIdentifier: NCCommunicationCommon.sharedInstance.sessionIdentifierExtension)
+        let configuration = URLSessionConfiguration.background(withIdentifier: sessionIdentifierBackgroundExtension)
         configuration.allowsCellularAccess = true
         configuration.sessionSendsLaunchEvents = true
         configuration.isDiscretionary = false
-        configuration.httpMaximumConnectionsPerHost = 1
+        configuration.httpMaximumConnectionsPerHost = sessionMaximumConnectionsPerHostExtension
         configuration.requestCachePolicy = NSURLRequest.CachePolicy.reloadIgnoringLocalCacheData
         configuration.sharedContainerIdentifier = NCCommunicationCommon.sharedInstance.capabilitiesGroup
         let session = URLSession(configuration: configuration, delegate: self, delegateQueue: OperationQueue.main)
