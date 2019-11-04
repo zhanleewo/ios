@@ -327,6 +327,7 @@ class FileProviderExtension: NSFileProviderExtension {
                 metadata.fileNameView = fileName
                 metadata.ocId = ocIdTemp
                 metadata.serverUrl = tableDirectory.serverUrl
+                metadata.session = k_upload_session_extension
                 metadata.size = size
                 metadata.status = Int(k_metadataStatusInUpload)
                 CCUtility.insertTypeFileIconName(fileName, metadata: metadata)

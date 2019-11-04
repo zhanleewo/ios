@@ -31,6 +31,7 @@ extension FileProviderExtension: NCNetworkingDelegate {
             if let etag = etag { metadata.etag = etag }
             if let ocId = ocId { metadata.ocId = ocId }
             if let date = date { metadata.date = date }
+            metadata.session = ""
             metadata.status = Int(k_metadataStatusNormal)
                   
             guard let metadataUpdated = NCManageDatabase.sharedInstance.addMetadata(metadata) else { return }
