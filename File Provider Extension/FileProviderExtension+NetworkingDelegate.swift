@@ -20,12 +20,16 @@ extension FileProviderExtension: NCNetworkingDelegate {
             guard let parentItemIdentifier = fileProviderUtility.sharedInstance.getParentItemIdentifier(metadata: metadata, homeServerUrl: fileProviderData.sharedInstance.homeServerUrl) else {
                 return
             }
-            // Signal delete
             var item = FileProviderItem(metadata: metadata, parentItemIdentifier: parentItemIdentifier)
-            fileProviderData.sharedInstance.fileProviderSignalDeleteContainerItemIdentifier[item.itemIdentifier] = item.itemIdentifier
-            fileProviderData.sharedInstance.fileProviderSignalDeleteWorkingSetItemIdentifier[item.itemIdentifier] = item.itemIdentifier
-            fileProviderData.sharedInstance.signalEnumerator(for: [parentItemIdentifier, .workingSet])
-
+            
+            // New file
+            if ocId != ocIdTemp {
+                
+                fileProviderData.sharedInstance.fileProviderSignalDeleteContainerItemIdentifier[item.itemIdentifier] = item.itemIdentifier
+                fileProviderData.sharedInstance.fileProviderSignalDeleteWorkingSetItemIdentifier[item.itemIdentifier] = item.itemIdentifier
+                fileProviderData.sharedInstance.signalEnumerator(for: [parentItemIdentifier, .workingSet])
+            }
+            
             metadata.fileName = fileName
             metadata.serverUrl = serverUrl
             if let etag = etag { metadata.etag = etag }
@@ -36,14 +40,19 @@ extension FileProviderExtension: NCNetworkingDelegate {
                   
             guard let metadataUpdated = NCManageDatabase.sharedInstance.addMetadata(metadata) else { return }
             NCManageDatabase.sharedInstance.addLocalFile(metadata: metadataUpdated)
-            NCManageDatabase.sharedInstance.deleteMetadata(predicate: NSPredicate(format: "ocId == %@", ocIdTemp))
             
-            // File system
-            let atPath = CCUtility.getDirectoryProviderStorageOcId(ocIdTemp)
-            let toPath = CCUtility.getDirectoryProviderStorageOcId(ocId)
-            CCUtility.moveFile(atPath: atPath, toPath: toPath)
-            let atPathIcon = CCUtility.getDirectoryProviderStorageIconOcId(ocId, fileNameView: fileName)
-            CCUtility.removeFile(atPath: atPathIcon)
+            // New file
+            if ocId != ocIdTemp {
+            
+                NCManageDatabase.sharedInstance.deleteMetadata(predicate: NSPredicate(format: "ocId == %@", ocIdTemp))
+                
+                // File system
+                let atPath = CCUtility.getDirectoryProviderStorageOcId(ocIdTemp)
+                let toPath = CCUtility.getDirectoryProviderStorageOcId(ocId)
+                CCUtility.moveFile(atPath: atPath, toPath: toPath)
+                let atPathIcon = CCUtility.getDirectoryProviderStorageIconOcId(ocId, fileNameView: fileName)
+                CCUtility.removeFile(atPath: atPathIcon)
+            }
             
             // Signal update
             item = FileProviderItem(metadata: metadataUpdated, parentItemIdentifier: parentItemIdentifier)
