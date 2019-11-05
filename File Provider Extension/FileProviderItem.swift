@@ -23,97 +23,145 @@
 
 import FileProvider
 
-class FileProviderItem: NSObject, NSFileProviderItem {
-
-    // Providing Required Properties
-    var itemIdentifier: NSFileProviderItemIdentifier                // The item's persistent identifier
-    var filename: String = ""                                       // The item's filename
-    var typeIdentifier: String = ""                                 // The item's uniform type identifiers
-    var capabilities: NSFileProviderItemCapabilities {              // The item's capabilities
-        if (self.isDirectory) {
-            return [ .allowsAddingSubItems, .allowsContentEnumerating, .allowsReading, .allowsDeleting, .allowsRenaming ]
-        } else {
-            return [ .allowsWriting, .allowsReading, .allowsDeleting, .allowsRenaming, .allowsReparenting ]
-        }
-    }
+final class FileProviderItem: NSObject {
     
-    // Managing Content
-    var childItemCount: NSNumber?                                   // The number of items contained by this item
-    var documentSize: NSNumber?                                     // The document's size, in bytes
+    let parentItemIdent: NSFileProviderItemIdentifier
 
-    // Specifying Content Location
-    var parentItemIdentifier: NSFileProviderItemIdentifier          // The persistent identifier of the item's parent folder
-    var isTrashed: Bool = false                                     // A Boolean value that indicates whether an item is in the trash
-   
-    var isMostRecentVersionDownloaded: Bool = true                  // A Boolean value that indicates whether the item is the most recent version downloaded from the server
-
-    // Monitoring File Transfers
-    var isUploading: Bool = false                                   // A Boolean value that indicates whether the item is currently uploading to your remote server
-    var isUploaded: Bool = true                                     // A Boolean value that indicates whether the item has been uploaded to your remote server
-    var uploadingError: Error?                                      // An error that occurred while uploading to your remote server
-    
-    var isDownloading: Bool = false                                 // A Boolean value that indicates whether the item is currently downloading from your remote server
-    var isDownloaded: Bool = true                                   // A Boolean value that indicates whether the item has been downloaded from your remote server
-    var downloadingError: Error?                                    // An error that occurred while downloading the item
-
-    var tagData: Data?                                              // Tag
-    var favoriteRank: NSNumber?                                     // Favorite
-    var isDirectory = false
+    let metadata: tableMetadata?
+    let tableLocalFile: tableLocalFile?
+    let tableTag: tableTag?
 
     init(metadata: tableMetadata, parentItemIdentifier: NSFileProviderItemIdentifier) {
         
-        self.parentItemIdentifier = parentItemIdentifier
-        itemIdentifier = fileProviderUtility.sharedInstance.getItemIdentifier(metadata: metadata)
-        documentSize = NSNumber(value: metadata.size)
-        filename = metadata.fileNameView
-        isDirectory = metadata.directory
-        typeIdentifier = CCUtility.insertTypeFileIconName(metadata.fileNameView, metadata: metadata)
-        
-        if (!metadata.directory) {
-            
-            documentSize = NSNumber(value: metadata.size)
-           
-            // Local file
-            let tableLocalFile = NCManageDatabase.sharedInstance.getTableLocalFile(predicate: NSPredicate(format: "ocId == %@", metadata.ocId))
-            if tableLocalFile == nil {
-                isMostRecentVersionDownloaded = false
-                isDownloaded = false
-            } else {
-                isMostRecentVersionDownloaded = true
-                isDownloaded = true
-            }
-            
-            // Downloading
-            if (metadata.status == Int(k_metadataStatusInDownload)) {
-                isDownloaded = false
-                isDownloading = true
-            }
-            
-            // Upload
-            if (metadata.status == Int(k_metadataStatusInUpload)) {
-                isUploaded = false
-                isUploading = true
-            }
-            
-            // Error ?
-            if metadata.sessionError != "" {
-                uploadingError = NSError(domain: NSCocoaErrorDomain, code: NSFeatureUnsupportedError, userInfo:[:])
-            }
-            
+        self.metadata = metadata
+        self.parentItemIdent = parentItemIdentifier
+        self.tableLocalFile = NCManageDatabase.sharedInstance.getTableLocalFile(predicate: NSPredicate(format: "ocId == %@", metadata.ocId))
+        self.tableTag = NCManageDatabase.sharedInstance.getTag(predicate: NSPredicate(format: "ocId == %@", metadata.ocId))
+
+        super.init()
+    }
+}
+
+extension FileProviderItem: NSFileProviderItem {
+    
+    var itemIdentifier: NSFileProviderItemIdentifier {
+        return self.parentItemIdent
+    }
+  
+    var parentItemIdentifier: NSFileProviderItemIdentifier {
+        return fileProviderUtility.sharedInstance.getItemIdentifier(metadata: self.metadata!)
+    }
+  
+    var filename: String {
+        return metadata!.fileNameView
+    }
+  
+    var typeIdentifier: String {
+        return CCUtility.insertTypeFileIconName(metadata!.fileNameView, metadata: metadata!)
+    }
+
+    var capabilities: NSFileProviderItemCapabilities {
+        if metadata!.directory {
+            return [.allowsAddingSubItems, .allowsContentEnumerating, .allowsReading, .allowsDeleting, .allowsRenaming]
         } else {
-            
-            // Favorite directory
-            let rank = fileProviderData.sharedInstance.listFavoriteIdentifierRank[metadata.ocId]
-            if (rank == nil) {
-                favoriteRank = nil
-            } else {
-                favoriteRank = fileProviderData.sharedInstance.listFavoriteIdentifierRank[metadata.ocId]
-            }
+            return [.allowsWriting, .allowsReading, .allowsDeleting, .allowsRenaming, .allowsReparenting]
         }
-        
-        // Tag
-        if let tableTag = NCManageDatabase.sharedInstance.getTag(predicate: NSPredicate(format: "ocId == %@", metadata.ocId)) {
-            tagData = tableTag.tagIOS
+    }
+
+    var childItemCount: NSNumber? {
+        return nil
+    }
+    
+    var documentSize: NSNumber? {
+        return NSNumber(value: metadata!.size)
+    }
+    
+    var isTrashed: Bool {
+        return false
+    }
+    
+    var contentModificationDate: Date? {
+        return metadata!.date as Date
+    }
+    
+    var creationDate: Date? {
+        return metadata!.date as Date
+    }
+    
+    var lastUsedDate: Date? {
+        return metadata!.date as Date
+    }
+    
+    var versionIdentifier: Data? {
+        return metadata!.etag.data(using: .utf8)
+    }
+    
+    var isMostRecentVersionDownloaded: Bool {
+        return true
+    }
+    
+    var isUploading: Bool {
+        if metadata!.status == Int(k_metadataStatusInUpload) {
+            return true
+        } else {
+            return false
+        }
+    }
+    
+    var isUploaded: Bool {
+        if metadata!.status == Int(k_metadataStatusInUpload) {
+            return false
+        } else {
+            return true
+        }
+    }
+    
+    var uploadingError: Error? {
+        if metadata!.status == Int(k_metadataStatusUploadError) {
+            return NSError(domain: NSCocoaErrorDomain, code: NSFeatureUnsupportedError, userInfo:[:])
+        } else {
+            return nil
+        }
+    }
+    
+    var isDownloading: Bool {
+        if metadata!.status == Int(k_metadataStatusInDownload) {
+            return true
+        } else {
+            return false
+        }
+    }
+    
+    var isDownloaded: Bool {
+        if tableLocalFile == nil {
+            return false
+        } else {
+            return true
+        }
+    }
+    
+    var downloadingError: Error? {
+        if metadata!.status == Int(k_metadataStatusDownloadError) {
+            return NSError(domain: NSCocoaErrorDomain, code: NSFeatureUnsupportedError, userInfo:[:])
+        } else {
+            return nil
+        }
+    }
+    
+    var tagData: Data? {
+        if tableTag != nil {
+            return tableTag!.tagIOS
+        } else {
+            return nil
+        }
+    }
+    
+    var favoriteRank: NSNumber? {
+        let rank = fileProviderData.sharedInstance.listFavoriteIdentifierRank[metadata!.ocId]
+        if (rank == nil) {
+            return nil
+        } else {
+            return rank
         }
     }
 }

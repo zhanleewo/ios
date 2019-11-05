@@ -225,17 +225,26 @@ class FileProviderExtension: NSFileProviderExtension {
             self.outstandingSessionTasks.removeValue(forKey: url)
             
             if error == nil  {
-               metadata.status = Int(k_metadataStatusNormal)
-               guard let metadataDownloaded = NCManageDatabase.sharedInstance.addMetadata(metadata) else { return }
-               NCManageDatabase.sharedInstance.addLocalFile(metadata: metadataDownloaded)
+                
+                metadata.status = Int(k_metadataStatusNormal)
+                guard let metadataDownloaded = NCManageDatabase.sharedInstance.addMetadata(metadata) else { return }
+                NCManageDatabase.sharedInstance.addLocalFile(metadata: metadataDownloaded)
+                
                 completionHandler(nil)
+                
             } else {
+                
+                // Error
+                NCManageDatabase.sharedInstance.setMetadataSession("", sessionError: "", sessionSelector: "", sessionTaskIdentifier: 0, status: Int(k_metadataStatusDownloadError), predicate: NSPredicate(format: "ocId == %@", metadata.ocId))
+                
                 completionHandler(NSFileProviderError(.noSuchItem))
             }
         }
         
         if task != nil {
+            
             outstandingSessionTasks[url] = task
+            
             NSFileProviderManager.default.register(task!, forItemWithIdentifier: NSFileProviderItemIdentifier(identifier.rawValue)) { (error) in }
         }
     }
@@ -261,6 +270,7 @@ class FileProviderExtension: NSFileProviderExtension {
         let fileNameLocalPath = url.path
         
         if let task = NCCommunicationBackground.sharedInstance.upload(serverUrlFileName: serverUrlFileName, fileNameLocalPath: fileNameLocalPath, description: metadata.ocId, session: NCCommunicationBackground.sharedInstance.sessionManagerTransferExtension) {
+            
             NSFileProviderManager.default.register(task, forItemWithIdentifier: NSFileProviderItemIdentifier(metadata.fileId)) { (error) in }
         }
     }
