@@ -201,7 +201,10 @@ class FileProviderExtension: NSFileProviderExtension {
         let pathComponents = url.pathComponents
         let identifier = NSFileProviderItemIdentifier(pathComponents[pathComponents.count - 2])
         
-        if let _ = outstandingSessionTasks[url] { return }
+        if let _ = outstandingSessionTasks[url] {
+            completionHandler(nil)
+            return
+        }
         
         guard let metadata = fileProviderUtility.sharedInstance.getTableMetadataFromItemIdentifier(identifier) else {
             completionHandler(NSFileProviderError(.noSuchItem))
@@ -341,6 +344,7 @@ class FileProviderExtension: NSFileProviderExtension {
                 let fileNameLocalPath = CCUtility.getDirectoryProviderStorageOcId(ocIdTemp, fileNameView: fileName)!
                 
                 if let task = NCCommunicationBackground.sharedInstance.upload(serverUrlFileName: serverUrlFileName, fileNameLocalPath: fileNameLocalPath, description: ocIdTemp, session: NCCommunicationBackground.sharedInstance.sessionManagerTransferExtension) {
+                    self.outstandingSessionTasks[URL(fileURLWithPath: fileNameLocalPath)] = task as URLSessionTask
                     NSFileProviderManager.default.register(task, forItemWithIdentifier: NSFileProviderItemIdentifier(ocIdTemp)) { (error) in }
                 }
                 
