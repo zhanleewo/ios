@@ -17,6 +17,7 @@ extension FileProviderExtension: NCNetworkingDelegate {
         
         let url = URL(fileURLWithPath: CCUtility.getDirectoryProviderStorageOcId(ocIdTemp, fileNameView: fileName))
         outstandingSessionTasks.removeValue(forKey: url)
+        outstandingOcIdTemp[ocIdTemp] = ocId
         
         if error == nil && statusCode >= 200 && statusCode < 300 {
             
@@ -52,9 +53,7 @@ extension FileProviderExtension: NCNetworkingDelegate {
                 // File system
                 let atPath = CCUtility.getDirectoryProviderStorageOcId(ocIdTemp)
                 let toPath = CCUtility.getDirectoryProviderStorageOcId(ocId)
-                CCUtility.moveFile(atPath: atPath, toPath: toPath)
-                let atPathIcon = CCUtility.getDirectoryProviderStorageIconOcId(ocId, fileNameView: fileName)
-                CCUtility.removeFile(atPath: atPathIcon)
+                CCUtility.copyFile(atPath: atPath, toPath: toPath)
             }
             
             // Signal update

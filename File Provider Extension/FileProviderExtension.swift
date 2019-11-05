@@ -51,6 +51,7 @@ import FileProvider
 class FileProviderExtension: NSFileProviderExtension {
     
     var outstandingSessionTasks = [URL: URLSessionTask]()
+    var outstandingOcIdTemp = [String:String]()
     
     override init() {
         super.init()
@@ -244,10 +245,18 @@ class FileProviderExtension: NSFileProviderExtension {
         let pathComponents = url.pathComponents
         assert(pathComponents.count > 2)
         let itemIdentifier = NSFileProviderItemIdentifier(pathComponents[pathComponents.count - 2])
-        
-        guard let metadata = NCManageDatabase.sharedInstance.getMetadata(predicate: NSPredicate(format: "ocId == %@", itemIdentifier.rawValue)) else { return }
-
         let fileName = pathComponents[pathComponents.count - 1]
+        var ocId = itemIdentifier.rawValue
+        
+        // Temp ocId ?
+        if outstandingOcIdTemp[ocId] != nil {
+            ocId = outstandingOcIdTemp[ocId]!
+            let atPath = CCUtility.getDirectoryProviderStorageOcId(itemIdentifier.rawValue, fileNameView: fileName)
+            let toPath = CCUtility.getDirectoryProviderStorageOcId(ocId, fileNameView: fileName)
+            CCUtility.copyFile(atPath: atPath, toPath: toPath)
+        }
+        guard let metadata = NCManageDatabase.sharedInstance.getMetadata(predicate: NSPredicate(format: "ocId == %@", ocId)) else { return }
+
         let serverUrlFileName = metadata.serverUrl + "/" + fileName
         let fileNameLocalPath = url.path
         
