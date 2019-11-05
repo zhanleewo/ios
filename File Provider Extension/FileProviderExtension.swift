@@ -221,6 +221,8 @@ class FileProviderExtension: NSFileProviderExtension {
         
         let task = NCCommunication.sharedInstance.download(serverUrlFileName: serverUrlFileName, fileNameLocalPath: fileNameLocalPath, account: fileProviderData.sharedInstance.account, progressHandler: { (progress) in }) { (account, etag, date, length, error) in
             
+            self.outstandingSessionTasks.removeValue(forKey: url)
+            
             if error == nil  {
                metadata.status = Int(k_metadataStatusNormal)
                guard let metadataDownloaded = NCManageDatabase.sharedInstance.addMetadata(metadata) else { return }

@@ -15,6 +15,9 @@ extension FileProviderExtension: NCNetworkingDelegate {
         guard let ocIdTemp = description else { return }
         guard let metadata = NCManageDatabase.sharedInstance.getMetadata(predicate: NSPredicate(format: "ocId == %@", ocIdTemp)) else { return }
         
+        let url = URL(fileURLWithPath: CCUtility.getDirectoryProviderStorageOcId(ocIdTemp, fileNameView: fileName))
+        outstandingSessionTasks.removeValue(forKey: url)
+        
         if error == nil && statusCode >= 200 && statusCode < 300 {
             
             guard let parentItemIdentifier = fileProviderUtility.sharedInstance.getParentItemIdentifier(metadata: metadata, homeServerUrl: fileProviderData.sharedInstance.homeServerUrl) else {
