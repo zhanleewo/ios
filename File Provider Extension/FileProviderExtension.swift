@@ -249,7 +249,7 @@ class FileProviderExtension: NSFileProviderExtension {
         var ocId = itemIdentifier.rawValue
         
         // Temp ocId ?
-        if outstandingOcIdTemp[ocId] != nil {
+        if outstandingOcIdTemp[ocId] != nil && outstandingOcIdTemp[ocId] != ocId {
             ocId = outstandingOcIdTemp[ocId]!
             let atPath = CCUtility.getDirectoryProviderStorageOcId(itemIdentifier.rawValue, fileNameView: fileName)
             let toPath = CCUtility.getDirectoryProviderStorageOcId(ocId, fileNameView: fileName)
