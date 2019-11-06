@@ -23,145 +23,113 @@
 
 import FileProvider
 
-final class FileProviderItem: NSObject {
-    
-    let parentItemIdent: NSFileProviderItemIdentifier
+class FileProviderItem: NSObject, NSFileProviderItem {
 
-    let metadata: tableMetadata?
-    let tableLocalFile: tableLocalFile?
-    let tableTag: tableTag?
+    var metadata = tableMetadata()
+
+    var itemIdentifier: NSFileProviderItemIdentifier {
+        return fileProviderUtility.sharedInstance.getItemIdentifier(metadata: metadata)
+    }
+    
+    var filename: String {
+        return metadata.fileNameView
+    }
+    
+    var contentModificationDate: Date? {
+        return metadata.date as Date
+    }
+    
+    var creationDate: Date? {
+        return metadata.date as Date
+    }
+    
+    var lastUsedDate: Date? {
+        return metadata.date as Date
+    }
+
+    
+    var typeIdentifier: String = ""
+    var capabilities: NSFileProviderItemCapabilities {
+        if (metadata.directory) {
+            return [ .allowsAddingSubItems, .allowsContentEnumerating, .allowsReading, .allowsDeleting, .allowsRenaming ]
+        } else {
+            return [ .allowsWriting, .allowsReading, .allowsDeleting, .allowsRenaming, .allowsReparenting ]
+        }
+    }
+    
+    var childItemCount: NSNumber?
+    var documentSize: NSNumber?
+
+    var parentItemIdentifier: NSFileProviderItemIdentifier
+    var isTrashed: Bool = false
+   
+    var isMostRecentVersionDownloaded: Bool = true
+
+    var isUploading: Bool = false
+    var isUploaded: Bool = true
+    var uploadingError: Error?
+    
+    var isDownloading: Bool = false
+    var isDownloaded: Bool = true
+    var downloadingError: Error?
+
+    var tagData: Data?
+    var favoriteRank: NSNumber? 
 
     init(metadata: tableMetadata, parentItemIdentifier: NSFileProviderItemIdentifier) {
         
         self.metadata = metadata
-        self.parentItemIdent = parentItemIdentifier
-        self.tableLocalFile = NCManageDatabase.sharedInstance.getTableLocalFile(predicate: NSPredicate(format: "ocId == %@", metadata.ocId))
-        self.tableTag = NCManageDatabase.sharedInstance.getTag(predicate: NSPredicate(format: "ocId == %@", metadata.ocId))
-
-        super.init()
-    }
-}
-
-extension FileProviderItem: NSFileProviderItem {
+        self.parentItemIdentifier = parentItemIdentifier
     
-    var itemIdentifier: NSFileProviderItemIdentifier {
-        return self.parentItemIdent
-    }
-  
-    var parentItemIdentifier: NSFileProviderItemIdentifier {
-        return fileProviderUtility.sharedInstance.getItemIdentifier(metadata: self.metadata!)
-    }
-  
-    var filename: String {
-        return metadata!.fileNameView
-    }
-  
-    var typeIdentifier: String {
-        return CCUtility.insertTypeFileIconName(metadata!.fileNameView, metadata: metadata!)
-    }
-
-    var capabilities: NSFileProviderItemCapabilities {
-        if metadata!.directory {
-            return [.allowsAddingSubItems, .allowsContentEnumerating, .allowsReading, .allowsDeleting, .allowsRenaming]
+        documentSize = NSNumber(value: metadata.size)
+        
+        typeIdentifier = CCUtility.insertTypeFileIconName(metadata.fileNameView, metadata: metadata)
+        
+        if (!metadata.directory) {
+            
+            documentSize = NSNumber(value: metadata.size)
+           
+            // Local file
+            let tableLocalFile = NCManageDatabase.sharedInstance.getTableLocalFile(predicate: NSPredicate(format: "ocId == %@", metadata.ocId))
+            if tableLocalFile == nil {
+                isMostRecentVersionDownloaded = false
+                isDownloaded = false
+            } else {
+                isMostRecentVersionDownloaded = true
+                isDownloaded = true
+            }
+            
+            // Downloading
+            if (metadata.status == Int(k_metadataStatusInDownload)) {
+                isDownloaded = false
+                isDownloading = true
+            }
+            
+            // Upload
+            if (metadata.status == Int(k_metadataStatusInUpload)) {
+                isUploaded = false
+                isUploading = true
+            }
+            
+            // Error ?
+            if metadata.sessionError != "" {
+                uploadingError = NSError(domain: NSCocoaErrorDomain, code: NSFeatureUnsupportedError, userInfo:[:])
+            }
+            
         } else {
-            return [.allowsWriting, .allowsReading, .allowsDeleting, .allowsRenaming, .allowsReparenting]
+            
+            // Favorite directory
+            let rank = fileProviderData.sharedInstance.listFavoriteIdentifierRank[metadata.ocId]
+            if (rank == nil) {
+                favoriteRank = nil
+            } else {
+                favoriteRank = fileProviderData.sharedInstance.listFavoriteIdentifierRank[metadata.ocId]
+            }
         }
-    }
-
-    var childItemCount: NSNumber? {
-        return nil
-    }
-    
-    var documentSize: NSNumber? {
-        return NSNumber(value: metadata!.size)
-    }
-    
-    var isTrashed: Bool {
-        return false
-    }
-    
-    var contentModificationDate: Date? {
-        return metadata!.date as Date
-    }
-    
-    var creationDate: Date? {
-        return metadata!.date as Date
-    }
-    
-    var lastUsedDate: Date? {
-        return metadata!.date as Date
-    }
-    
-    var versionIdentifier: Data? {
-        return metadata!.etag.data(using: .utf8)
-    }
-    
-    var isMostRecentVersionDownloaded: Bool {
-        return true
-    }
-    
-    var isUploading: Bool {
-        if metadata!.status == Int(k_metadataStatusInUpload) {
-            return true
-        } else {
-            return false
-        }
-    }
-    
-    var isUploaded: Bool {
-        if metadata!.status == Int(k_metadataStatusInUpload) {
-            return false
-        } else {
-            return true
-        }
-    }
-    
-    var uploadingError: Error? {
-        if metadata!.status == Int(k_metadataStatusUploadError) {
-            return NSError(domain: NSCocoaErrorDomain, code: NSFeatureUnsupportedError, userInfo:[:])
-        } else {
-            return nil
-        }
-    }
-    
-    var isDownloading: Bool {
-        if metadata!.status == Int(k_metadataStatusInDownload) {
-            return true
-        } else {
-            return false
-        }
-    }
-    
-    var isDownloaded: Bool {
-        if tableLocalFile == nil {
-            return false
-        } else {
-            return true
-        }
-    }
-    
-    var downloadingError: Error? {
-        if metadata!.status == Int(k_metadataStatusDownloadError) {
-            return NSError(domain: NSCocoaErrorDomain, code: NSFeatureUnsupportedError, userInfo:[:])
-        } else {
-            return nil
-        }
-    }
-    
-    var tagData: Data? {
-        if tableTag != nil {
-            return tableTag!.tagIOS
-        } else {
-            return nil
-        }
-    }
-    
-    var favoriteRank: NSNumber? {
-        let rank = fileProviderData.sharedInstance.listFavoriteIdentifierRank[metadata!.ocId]
-        if (rank == nil) {
-            return nil
-        } else {
-            return rank
+        
+        // Tag
+        if let tableTag = NCManageDatabase.sharedInstance.getTag(predicate: NSPredicate(format: "ocId == %@", metadata.ocId)) {
+            tagData = tableTag.tagIOS
         }
     }
 }
