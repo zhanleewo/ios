@@ -25,7 +25,7 @@ import FileProvider
 
 class FileProviderItem: NSObject, NSFileProviderItem {
 
-    var metadata = tableMetadata()
+    var metadata: tableMetadata
     var parentItemIdentifier: NSFileProviderItemIdentifier
 
     var itemIdentifier: NSFileProviderItemIdentifier {
@@ -92,57 +92,41 @@ class FileProviderItem: NSObject, NSFileProviderItem {
         }
     }
 
-
-   
-    var isMostRecentVersionDownloaded: Bool = true
+    var isMostRecentVersionDownloaded: Bool {
+        return true
+    }
+    
+    var isDownloaded: Bool {
+        if NCManageDatabase.sharedInstance.getTableLocalFile(predicate: NSPredicate(format: "ocId == %@", metadata.ocId)) != nil {
+            return true
+        } else {
+            return false
+        }
+    }
+    
+    var isDownloading: Bool {
+        if metadata.status == Int(k_metadataStatusInDownload) {
+            return true
+        } else {
+            return false
+        }
+    }
+    
+    var downloadingError: Error? {
+        if metadata.status == Int(k_metadataStatusDownloadError) {
+            return NSError(domain: NSCocoaErrorDomain, code: NSFeatureUnsupportedError, userInfo:[:])
+        } else {
+            return nil
+        }
+    }
 
     var isUploading: Bool = false
     var isUploaded: Bool = true
     var uploadingError: Error?
     
-    var isDownloading: Bool = false
-    var isDownloaded: Bool = true
-    var downloadingError: Error?
-
-   
 
     init(metadata: tableMetadata, parentItemIdentifier: NSFileProviderItemIdentifier) {
-        
         self.metadata = metadata
         self.parentItemIdentifier = parentItemIdentifier
-    
-        
-        if (!metadata.directory) {
-            
-           
-            // Local file
-            let tableLocalFile = NCManageDatabase.sharedInstance.getTableLocalFile(predicate: NSPredicate(format: "ocId == %@", metadata.ocId))
-            if tableLocalFile == nil {
-                isMostRecentVersionDownloaded = false
-                isDownloaded = false
-            } else {
-                isMostRecentVersionDownloaded = true
-                isDownloaded = true
-            }
-            
-            // Downloading
-            if (metadata.status == Int(k_metadataStatusInDownload)) {
-                isDownloaded = false
-                isDownloading = true
-            }
-            
-            // Upload
-            if (metadata.status == Int(k_metadataStatusInUpload)) {
-                isUploaded = false
-                isUploading = true
-            }
-            
-            // Error ?
-            if metadata.sessionError != "" {
-                uploadingError = NSError(domain: NSCocoaErrorDomain, code: NSFeatureUnsupportedError, userInfo:[:])
-            }
-            
-        }
-        
     }
 }
