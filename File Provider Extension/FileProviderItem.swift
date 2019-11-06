@@ -120,10 +120,29 @@ class FileProviderItem: NSObject, NSFileProviderItem {
         }
     }
 
-    var isUploading: Bool = false
-    var isUploaded: Bool = true
-    var uploadingError: Error?
+    var isUploaded: Bool {
+        if metadata.status == Int(k_metadataStatusInUpload) {
+            return false
+        } else {
+            return true
+        }
+    }
     
+    var isUploading: Bool {
+        if metadata.status == Int(k_metadataStatusInUpload) {
+            return true
+        } else {
+            return false
+        }
+    }
+    
+    var uploadingError: Error? {
+        if metadata.status == Int(k_metadataStatusUploadError) {
+            return NSError(domain: NSCocoaErrorDomain, code: NSFeatureUnsupportedError, userInfo:[:])
+        } else {
+            return nil
+        }
+    }
 
     init(metadata: tableMetadata, parentItemIdentifier: NSFileProviderItemIdentifier) {
         self.metadata = metadata
