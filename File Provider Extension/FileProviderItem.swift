@@ -114,7 +114,7 @@ class FileProviderItem: NSObject, NSFileProviderItem {
     
     var downloadingError: Error? {
         if metadata.status == Int(k_metadataStatusDownloadError) {
-            return NSError(domain: NSCocoaErrorDomain, code: NSFeatureUnsupportedError, userInfo:[:])
+            return fileProviderData.FileProviderError.downloadError
         } else {
             return nil
         }
@@ -138,7 +138,7 @@ class FileProviderItem: NSObject, NSFileProviderItem {
     
     var uploadingError: Error? {
         if metadata.status == Int(k_metadataStatusUploadError) {
-            return NSError(domain: NSCocoaErrorDomain, code: NSFeatureUnsupportedError, userInfo:[:])
+            return fileProviderData.FileProviderError.uploadError
         } else {
             return nil
         }

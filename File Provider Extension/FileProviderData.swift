@@ -55,6 +55,12 @@ class fileProviderData: NSObject {
     // UserDefaults
     var ncUserDefaults = UserDefaults(suiteName: NCBrandOptions.sharedInstance.capabilitiesGroups)
     
+    // Error
+    enum FileProviderError: Error {
+        case downloadError
+        case uploadError
+    }
+    
     // MARK: - 
     
     func setupActiveAccount(domain: String?, providerExtension: NSFileProviderExtension) -> Bool {
