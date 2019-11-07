@@ -154,15 +154,12 @@ class fileProviderData: NSObject {
         // (ADD)
         for (identifier, _) in listFavoriteIdentifierRank {
             
-            if !oldListFavoriteIdentifierRank.keys.contains(identifier) {
-            
-                guard let metadata = NCManageDatabase.sharedInstance.getMetadata(predicate: NSPredicate(format: "ocId == %@", identifier)) else { continue }
-                guard let parentItemIdentifier = fileProviderUtility.sharedInstance.getParentItemIdentifier(metadata: metadata, homeServerUrl: homeServerUrl) else { continue }
-                let item = FileProviderItem(metadata: metadata, parentItemIdentifier: parentItemIdentifier)
+            guard let metadata = NCManageDatabase.sharedInstance.getMetadata(predicate: NSPredicate(format: "ocId == %@", identifier)) else { continue }
+            guard let parentItemIdentifier = fileProviderUtility.sharedInstance.getParentItemIdentifier(metadata: metadata, homeServerUrl: homeServerUrl) else { continue }
+            let item = FileProviderItem(metadata: metadata, parentItemIdentifier: parentItemIdentifier)
                 
-                fileProviderSignalUpdateWorkingSetItem[item.itemIdentifier] = item
-                updateWorkingSet = true
-            }
+            fileProviderSignalUpdateWorkingSetItem[item.itemIdentifier] = item
+            updateWorkingSet = true
         }
         
         // (REMOVE)
