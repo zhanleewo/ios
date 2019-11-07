@@ -1893,9 +1893,9 @@
 {
     NSString *fileNameServerUrl = [CCUtility returnFileNamePathFromFileName:metadata.fileName serverUrl:self.serverUrl activeUrl:appDelegate.activeUrl];
     
-    [[OCNetworking sharedManager] settingFavoriteWithAccount:appDelegate.activeAccount fileName:fileNameServerUrl favorite:favorite completion:^(NSString *account, NSString *message, NSInteger errorCode) {
+    [[NCCommunication sharedInstance] setFavoriteWithUrlString:appDelegate.activeUrl fileName:fileNameServerUrl favorite:favorite account:appDelegate.activeAccount completionHandler:^(NSString *account, NSError *error) {
         
-        if (errorCode == 0 && [appDelegate.activeAccount isEqualToString:account]) {
+        if (error == nil && [appDelegate.activeAccount isEqualToString:account]) {
             
             [[NCManageDatabase sharedInstance] setMetadataFavoriteWithOcId:metadata.ocId favorite:favorite];
 
@@ -1914,7 +1914,7 @@
                 else
                     selector = selectorReadFolder;
                 
-                [[CCSynchronize sharedSynchronize] readFolder:[CCUtility stringAppendServerUrl:self.serverUrl addFileName:metadata.fileName] selector:selector account:appDelegate.activeAccount];                
+                [[CCSynchronize sharedSynchronize] readFolder:[CCUtility stringAppendServerUrl:self.serverUrl addFileName:metadata.fileName] selector:selector account:appDelegate.activeAccount];
             }
             
             if (!metadata.directory && favorite && [CCUtility getFavoriteOffline]) {
@@ -1932,11 +1932,12 @@
                 [appDelegate startLoadAutoDownloadUpload];
             }
             
-        } else if (errorCode != 0) {
-            [appDelegate messageNotification:@"_error_" description:message visible:YES delay:k_dismissAfterSecond type:TWMessageBarMessageTypeError errorCode:errorCode];
+        } else if (error != nil) {
+            [appDelegate messageNotification:@"_error_" description:error.description visible:YES delay:k_dismissAfterSecond type:TWMessageBarMessageTypeError errorCode:error.code];
         } else {
             NSLog(@"[LOG] It has been changed user during networking process, error.");
         }
+        
     }];
 }
 

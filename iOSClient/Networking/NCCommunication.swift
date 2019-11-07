@@ -313,8 +313,8 @@ import SwiftyJSON
         
         let dataFile =
         """
-        <?xml version=\"1.0\" encoding=\"UTF-8\"?>
-        <d:propfind xmlns:d=\"DAV:\" xmlns:oc=\"http://owncloud.org/ns\" xmlns:nc=\"http://nextcloud.org/ns\">
+        <?xml version=\"1.0\"?>
+        <d:propertyupdate xmlns:d=\"DAV:\" xmlns:oc=\"http://owncloud.org/ns\">
         <d:set>
         <d:prop>
         <oc:favorite>%i</oc:favorite>
@@ -322,6 +322,7 @@ import SwiftyJSON
         </d:set>
         </d:propertyupdate>
         """
+        
         let body = NSString.init(format: dataFile as NSString, (favorite ? 1 : 0)) as String
         
         // url
@@ -350,7 +351,7 @@ import SwiftyJSON
             return
         }
         
-        sessionManager.request(urlRequest).validate(statusCode: 200..<300).responseData { (response) in
+        sessionManager.request(urlRequest).validate(statusCode: 200..<300).response { (response) in
             switch response.result {
             case.failure(let error):
                 completionHandler(account, error)
