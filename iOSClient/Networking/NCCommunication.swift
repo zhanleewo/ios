@@ -87,7 +87,7 @@ import SwiftyJSON
         sessionManager.request(url, method: method, parameters:nil, encoding: URLEncoding.default, headers: getStandardHeaders(), interceptor: nil).validate(statusCode: 200..<300).response { (response) in
             switch response.result {
             case.failure(let error):
-                let error = NCCommunicationCommon.sharedInstance.getError(error: error, httResponse: response.response)
+                let error = NCCommunicationError().getError(error: error, httResponse: response.response)
                 completionHandler(account, nil, nil, error.errorCode, error.description)
             case .success( _):
                 let ocId = response.response?.allHeaderFields["OC-FileId"] as? String
@@ -114,7 +114,7 @@ import SwiftyJSON
         sessionManager.request(url, method: method, parameters:nil, encoding: URLEncoding.default, headers: getStandardHeaders(), interceptor: nil).validate(statusCode: 200..<300).response { (response) in
             switch response.result {
             case.failure(let error):
-                let error = NCCommunicationCommon.sharedInstance.getError(error: error, httResponse: response.response)
+                let error = NCCommunicationError().getError(error: error, httResponse: response.response)
                 completionHandler(account, error.errorCode, error.description)
             case .success( _):
                 completionHandler(account, 0, nil)
@@ -141,7 +141,7 @@ import SwiftyJSON
         sessionManager.request(url, method: method, parameters:nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).response { (response) in
             switch response.result {
             case.failure(let error):
-                let error = NCCommunicationCommon.sharedInstance.getError(error: error, httResponse: response.response)
+                let error = NCCommunicationError().getError(error: error, httResponse: response.response)
                 completionHandler(account, error.errorCode, error.description)
             case .success( _):
                 completionHandler(account, 0, nil)
@@ -181,7 +181,7 @@ import SwiftyJSON
         sessionManager.request(urlRequest).validate(statusCode: 200..<300).responseData { (response) in
             switch response.result {
             case.failure(let error):
-                let error = NCCommunicationCommon.sharedInstance.getError(error: error, httResponse: response.response)
+                let error = NCCommunicationError().getError(error: error, httResponse: response.response)
                 completionHandler(account, nil, error.errorCode, error.description)
             case .success( _):
                 if let data = response.data {
@@ -220,7 +220,7 @@ import SwiftyJSON
         sessionManager.request(urlRequest).validate(statusCode: 200..<300).response { (response) in
             switch response.result {
             case.failure(let error):
-                let error = NCCommunicationCommon.sharedInstance.getError(error: error, httResponse: response.response)
+                let error = NCCommunicationError().getError(error: error, httResponse: response.response)
                 completionHandler(account, error.errorCode, error.description)
             case .success( _):
                 completionHandler(account, 0, nil)
@@ -252,7 +252,7 @@ import SwiftyJSON
         sessionManager.request(urlRequest).validate(statusCode: 200..<300).responseData { (response) in
             switch response.result {
             case.failure(let error):
-                let error = NCCommunicationCommon.sharedInstance.getError(error: error, httResponse: response.response)
+                let error = NCCommunicationError().getError(error: error, httResponse: response.response)
                 completionHandler(account, nil, error.errorCode, error.description)
             case .success( _):
                 if let data = response.data {
@@ -284,7 +284,7 @@ import SwiftyJSON
         sessionManager.request(url, method: method, parameters:nil, encoding: URLEncoding.default, headers: getStandardHeaders(), interceptor: nil).validate(statusCode: 200..<300).response { (response) in
             switch response.result {
             case.failure(let error):
-                let error = NCCommunicationCommon.sharedInstance.getError(error: error, httResponse: response.response)
+                let error = NCCommunicationError().getError(error: error, httResponse: response.response)
                 completionHandler(account, nil, error.errorCode, error.description)
             case .success( _):
                 if let data = response.data {
@@ -322,7 +322,7 @@ import SwiftyJSON
             debugPrint(response)
             switch response.result {
             case.failure(let error):
-                let error = NCCommunicationCommon.sharedInstance.getError(error: error, httResponse: response.response)
+                let error = NCCommunicationError().getError(error: error, httResponse: response.response)
                 completionHandler(account, externalFiles, error.errorCode, error.description)
             case .success(let json):
                 let json = JSON(json)
@@ -359,7 +359,7 @@ import SwiftyJSON
         sessionManager.request(url, method: method, parameters:nil, encoding: URLEncoding.default, headers: getStandardHeaders(), interceptor: nil).validate(statusCode: 200..<300).responseJSON { (response) in
             switch response.result {
             case.failure(let error):
-                let error = NCCommunicationCommon.sharedInstance.getError(error: error, httResponse: response.response)
+                let error = NCCommunicationError().getError(error: error, httResponse: response.response)
                 completionHandler(nil, nil, 0, 0, 0, false, error.errorCode, error.description)
             case .success(let json):
                 let json = JSON(json)
@@ -413,7 +413,7 @@ import SwiftyJSON
         .response { response in
             switch response.result {
             case.failure(let error):
-                let error = NCCommunicationCommon.sharedInstance.getError(error: error, httResponse: response.response)
+                let error = NCCommunicationError().getError(error: error, httResponse: response.response)
                 completionHandler(account, nil, nil, 0, error.errorCode, error.description)
             case .success( _):
                 let lenght = response.response?.allHeaderFields["lenght"] as? Double ?? 0
@@ -448,7 +448,7 @@ import SwiftyJSON
         .response { response in
             switch response.result {
             case.failure(let error):
-                let error = NCCommunicationCommon.sharedInstance.getError(error: error, httResponse: response.response)
+                let error = NCCommunicationError().getError(error: error, httResponse: response.response)
                 completionHandler(account, nil, nil, nil, error.errorCode, error.description)
             case .success( _):
                 let ocId = response.response?.allHeaderFields["OC-FileId"] as? String

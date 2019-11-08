@@ -102,6 +102,9 @@
 		F72E0B9D21AD60BC00898D7B /* WeScan.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F72E0B9C21AD60BC00898D7B /* WeScan.framework */; };
 		F732BA061D76CE1500E9878B /* CCNetworking.m in Sources */ = {isa = PBXBuildFile; fileRef = F732BA041D76CE1500E9878B /* CCNetworking.m */; };
 		F732BA0B1D76DBA500E9878B /* CCNetworking.m in Sources */ = {isa = PBXBuildFile; fileRef = F732BA041D76CE1500E9878B /* CCNetworking.m */; };
+		F733AE8C2375492A00AE4A75 /* NCCommunicationError.swift in Sources */ = {isa = PBXBuildFile; fileRef = F733AE8B2375492A00AE4A75 /* NCCommunicationError.swift */; };
+		F733AE8D2375492A00AE4A75 /* NCCommunicationError.swift in Sources */ = {isa = PBXBuildFile; fileRef = F733AE8B2375492A00AE4A75 /* NCCommunicationError.swift */; };
+		F733AE8E2375492A00AE4A75 /* NCCommunicationError.swift in Sources */ = {isa = PBXBuildFile; fileRef = F733AE8B2375492A00AE4A75 /* NCCommunicationError.swift */; };
 		F733B65221997CC2001C1FFA /* TLPhotoPicker.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F733B65121997CC1001C1FFA /* TLPhotoPicker.framework */; };
 		F736267923604A8A0083CF36 /* NCNetworking.swift in Sources */ = {isa = PBXBuildFile; fileRef = F736267823604A8A0083CF36 /* NCNetworking.swift */; };
 		F736267A23604A8A0083CF36 /* NCNetworking.swift in Sources */ = {isa = PBXBuildFile; fileRef = F736267823604A8A0083CF36 /* NCNetworking.swift */; };
@@ -802,6 +805,7 @@
 		F732093B201B81E4008A0888 /* es-419 */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "es-419"; path = "es-419.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		F732BA031D76CE1500E9878B /* CCNetworking.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CCNetworking.h; sourceTree = "<group>"; };
 		F732BA041D76CE1500E9878B /* CCNetworking.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CCNetworking.m; sourceTree = "<group>"; };
+		F733AE8B2375492A00AE4A75 /* NCCommunicationError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCCommunicationError.swift; sourceTree = "<group>"; };
 		F733B65121997CC1001C1FFA /* TLPhotoPicker.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = TLPhotoPicker.framework; path = Carthage/Build/iOS/TLPhotoPicker.framework; sourceTree = "<group>"; };
 		F736267823604A8A0083CF36 /* NCNetworking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCNetworking.swift; sourceTree = "<group>"; };
 		F7362A1E220C853A005101B5 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -1922,6 +1926,7 @@
 				F7AE0F362368A50700997EE0 /* NCCommunicationBackground.swift */,
 				F724B1CB2351BFBD00A5753B /* NCCommunicationModel.swift */,
 				F7E8561A235202DF009A3330 /* NCCommunicationCommon.swift */,
+				F733AE8B2375492A00AE4A75 /* NCCommunicationError.swift */,
 				F732BA031D76CE1500E9878B /* CCNetworking.h */,
 				F732BA041D76CE1500E9878B /* CCNetworking.m */,
 				F74D3DBD1BAC1941000BAE4B /* OCNetworking.h */,
@@ -3412,6 +3417,7 @@
 				F7F878AF1FB9E3B900599E4F /* NCEndToEndMetadata.swift in Sources */,
 				F71459C91D12E3B700CAFEEC /* OCNetworking.m in Sources */,
 				F7DBC38023325E2E001A85BA /* NCXMLGetAppPasswordParser.m in Sources */,
+				F733AE8D2375492A00AE4A75 /* NCCommunicationError.swift in Sources */,
 				F71459CD1D12E3B700CAFEEC /* AFViewShaker.m in Sources */,
 				F7D2D128230804E000FD3ED7 /* NCXMLListParser.m in Sources */,
 				F74E432720B5547700C2E54C /* NCNetworkingEndToEnd.m in Sources */,
@@ -3482,6 +3488,7 @@
 				F772A1D1236DA88F00130807 /* FileProviderExtension+NetworkingDelegate.swift in Sources */,
 				F7434B6320E249FB00417916 /* NSString+TruncateToWidth.m in Sources */,
 				F7434B5620E2412900417916 /* CCError.m in Sources */,
+				F733AE8E2375492A00AE4A75 /* NCCommunicationError.swift in Sources */,
 				F7434B5C20E241D500417916 /* NCEndToEndEncryption.m in Sources */,
 				F7434B3E20E2404700417916 /* OCFileDto.m in Sources */,
 				F7434B3D20E2404300417916 /* OCExternalSites.m in Sources */,
@@ -3689,6 +3696,7 @@
 				F7DBC37F23325E2E001A85BA /* NCXMLGetAppPasswordParser.m in Sources */,
 				F750374D1DBFA91A008FB480 /* ALView+PureLayout.m in Sources */,
 				F7381EE1218218C9000B1560 /* NCOffline.swift in Sources */,
+				F733AE8C2375492A00AE4A75 /* NCCommunicationError.swift in Sources */,
 				F7E8561B235202DF009A3330 /* NCCommunicationCommon.swift in Sources */,
 				F7D423861F0596C6009C9782 /* ReaderThumbRequest.m in Sources */,
 				F73B4EF51F470D9100BBEE4B /* JpCntx.cpp in Sources */,
