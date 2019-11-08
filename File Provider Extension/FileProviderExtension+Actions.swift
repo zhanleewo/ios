@@ -34,9 +34,9 @@ extension FileProviderExtension {
         
         let serverUrlFileName = tableDirectory.serverUrl + "/" + directoryName
         
-        NCCommunication.sharedInstance.createFolder(serverUrlFileName, account: fileProviderData.sharedInstance.account) { (account, ocId, date, error) in
+        NCCommunication.sharedInstance.createFolder(serverUrlFileName, account: fileProviderData.sharedInstance.account) { (account, ocId, date, errorCode, errorDescription) in
             
-            if error == nil {
+            if errorCode == 0 {
                 
                 let metadata = tableMetadata()
                 
@@ -81,9 +81,9 @@ extension FileProviderExtension {
         
         let serverUrlFileName = metadata.serverUrl + "/" + metadata.fileName
         
-        NCCommunication.sharedInstance.deleteFileOrFolder(serverUrlFileName, account: fileProviderData.sharedInstance.account) { (account, error) in
+        NCCommunication.sharedInstance.deleteFileOrFolder(serverUrlFileName, account: fileProviderData.sharedInstance.account) { (account, errorCode, errorDescription) in
             
-            if error == nil { //|| error == kOCErrorServerPathNotFound {
+            if errorCode == 0 { //|| error == kOCErrorServerPathNotFound {
             
                 let fileNamePath = CCUtility.getDirectoryProviderStorageOcId(itemIdentifier.rawValue)!
                 do {
@@ -131,9 +131,9 @@ extension FileProviderExtension {
         let serverUrlTo = tableDirectoryTo.serverUrl
         let fileNameTo = serverUrlTo + "/" + itemFrom.filename
         
-        NCCommunication.sharedInstance.moveFileOrFolder(serverUrlFileNameSource: fileNameFrom, serverUrlFileNameDestination: fileNameTo, account: fileProviderData.sharedInstance.account) { (account, error) in
+        NCCommunication.sharedInstance.moveFileOrFolder(serverUrlFileNameSource: fileNameFrom, serverUrlFileNameDestination: fileNameTo, account: fileProviderData.sharedInstance.account) { (account, errorCode, errorDescription) in
        
-            if error == nil {
+            if errorCode == 0 {
                 
                 if metadataFrom.directory {
                     NCManageDatabase.sharedInstance.deleteDirectoryAndSubDirectory(serverUrl: serverUrlFrom, account: account)
@@ -172,9 +172,9 @@ extension FileProviderExtension {
         let fileNamePathFrom = metadata.serverUrl + "/" + fileNameFrom
         let fileNamePathTo = metadata.serverUrl + "/" + itemName
         
-        NCCommunication.sharedInstance.moveFileOrFolder(serverUrlFileNameSource: fileNamePathFrom, serverUrlFileNameDestination: fileNamePathTo, account: fileProviderData.sharedInstance.account) { (account, error) in
+        NCCommunication.sharedInstance.moveFileOrFolder(serverUrlFileNameSource: fileNamePathFrom, serverUrlFileNameDestination: fileNamePathTo, account: fileProviderData.sharedInstance.account) { (account, errorCode, errorDescription) in
        
-            if error == nil {
+            if errorCode == 0 {
                 
                 // Rename metadata
                 guard let metadata = NCManageDatabase.sharedInstance.renameMetadata(fileNameTo: itemName, ocId: metadata.ocId) else {
@@ -237,8 +237,8 @@ extension FileProviderExtension {
         if (favorite == true && metadata.favorite == false) || (favorite == false && metadata.favorite == true) {
             let fileNamePath = CCUtility.returnFileNamePath(fromFileName: metadata.fileName, serverUrl: metadata.serverUrl, activeUrl: fileProviderData.sharedInstance.accountUrl)!
             
-            NCCommunication.sharedInstance.setFavorite(urlString: fileProviderData.sharedInstance.accountUrl, fileName: fileNamePath, favorite: favorite, account: fileProviderData.sharedInstance.account) { (account, error) in
-                if error == nil {
+            NCCommunication.sharedInstance.setFavorite(urlString: fileProviderData.sharedInstance.accountUrl, fileName: fileNamePath, favorite: favorite, account: fileProviderData.sharedInstance.account) { (account, errorCode, errorDescription) in
+                if errorCode == 0 {
                     // Change DB
                     metadata.favorite = favorite
                     guard let metadataUpdate = NCManageDatabase.sharedInstance.addMetadata(metadata) else {

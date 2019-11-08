@@ -1893,9 +1893,9 @@
 {
     NSString *fileNameServerUrl = [CCUtility returnFileNamePathFromFileName:metadata.fileName serverUrl:self.serverUrl activeUrl:appDelegate.activeUrl];
     
-    [[NCCommunication sharedInstance] setFavoriteWithUrlString:appDelegate.activeUrl fileName:fileNameServerUrl favorite:favorite account:appDelegate.activeAccount completionHandler:^(NSString *account, NSError *error) {
+    [[NCCommunication sharedInstance] setFavoriteWithUrlString:appDelegate.activeUrl fileName:fileNameServerUrl favorite:favorite account:appDelegate.activeAccount completionHandler:^(NSString *account, NSInteger errorCode, NSString *errorDecription) {
         
-        if (error == nil && [appDelegate.activeAccount isEqualToString:account]) {
+        if (errorCode == 0 && [appDelegate.activeAccount isEqualToString:account]) {
             
             [[NCManageDatabase sharedInstance] setMetadataFavoriteWithOcId:metadata.ocId favorite:favorite];
 
@@ -1932,8 +1932,8 @@
                 [appDelegate startLoadAutoDownloadUpload];
             }
             
-        } else if (error != nil) {
-            [appDelegate messageNotification:@"_error_" description:error.description visible:YES delay:k_dismissAfterSecond type:TWMessageBarMessageTypeError errorCode:error.code];
+        } else if (errorCode != 0) {
+            [appDelegate messageNotification:@"_error_" description:errorDecription visible:YES delay:k_dismissAfterSecond type:TWMessageBarMessageTypeError errorCode:errorCode];
         } else {
             NSLog(@"[LOG] It has been changed user during networking process, error.");
         }

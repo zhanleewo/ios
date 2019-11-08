@@ -23,6 +23,7 @@
 
 import Foundation
 import Alamofire
+import CFNetwork
 
 @objc public protocol NCCommunicationCommonDelegate {
     @objc optional func authenticationChallenge(_ challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void)
@@ -33,7 +34,6 @@ import Alamofire
 }
 
 class NCCommunicationCommon: NSObject {
-   
     @objc static let sharedInstance: NCCommunicationCommon = {
         let instance = NCCommunicationCommon()
         return instance
@@ -56,6 +56,7 @@ class NCCommunicationCommon: NSObject {
     //MARK: - Setup
     
     @objc public func setup(username: String, password: String, userAgent: String?, capabilitiesGroup: String?, delegate: NCCommunicationCommonDelegate?) {
+        
         self.username = username
         self.password = password
         self.userAgent = userAgent
@@ -64,6 +65,7 @@ class NCCommunicationCommon: NSObject {
     }
     
     @objc public func setup(userAgent: String?, capabilitiesGroup: String?, delegate: NCCommunicationCommonDelegate?) {
+        
         self.userAgent = userAgent
         self.capabilitiesGroup = capabilitiesGroup
         self.delegate = delegate
@@ -100,6 +102,7 @@ class NCCommunicationCommon: NSObject {
     //MARK: - Common
     
     func convertDate(_ dateString: String, format: String) -> NSDate? {
+        
         let dateFormatter = DateFormatter()
         dateFormatter.locale = Locale.init(identifier: "en_US_POSIX")
         dateFormatter.dateFormat = format
@@ -111,6 +114,7 @@ class NCCommunicationCommon: NSObject {
     }
     
     func encodeUrlString(_ string: String) -> URLConvertible? {
+        
         let allowedCharacterSet = (CharacterSet(charactersIn: " ").inverted)
         if let escapedString = string.addingPercentEncoding(withAllowedCharacters: allowedCharacterSet) {            
             var url: URLConvertible
@@ -125,13 +129,55 @@ class NCCommunicationCommon: NSObject {
     }
     
     func getError(code: Int, description: String) -> Error {
+        
         return NSError(domain: "Nextcloud", code: code, userInfo: [NSLocalizedDescriptionKey : description])
     }
     
     func getError(error: AFError?, httResponse: HTTPURLResponse?) -> (errorCode: Int, description: String?) {
+        
         if let errorCode = httResponse?.statusCode  {
-            return(errorCode, httResponse?.description)
+            switch errorCode {
+            case -999:
+                return(errorCode, "\(errorCode):" + NSLocalizedString("_internal_server_", comment: ""))
+            case -1001:
+                return(errorCode, "\(errorCode):" + NSLocalizedString("_time_out_", comment: ""))
+            case -1004:
+                return(errorCode, "\(errorCode):" + NSLocalizedString("_server_down_", comment: ""))
+            case -1005:
+                return(errorCode, "\(errorCode):" + NSLocalizedString("_not_possible_connect_to_server_", comment: ""))
+            case -1009:
+                return(errorCode, "\(errorCode):" + NSLocalizedString("_not_connected_internet_", comment: ""))
+            case -1011:
+                return(errorCode, "\(errorCode):" + NSLocalizedString("_error_", comment: ""))
+            case -1012:
+                return(errorCode, "\(errorCode):" + NSLocalizedString("_not_possible_connect_to_server_", comment: ""))
+            case -1013:
+                return(errorCode, "\(errorCode):" + NSLocalizedString("_user_authentication_required_", comment: ""))
+            case -1200:
+                return(errorCode, "\(errorCode):" + NSLocalizedString("_ssl_connection_error_", comment: ""))
+            case -1202:
+                return(errorCode, "\(errorCode):" + NSLocalizedString("_ssl_certificate_untrusted_", comment: ""))
+            case 101:
+                return(errorCode, "\(errorCode):" + NSLocalizedString("_forbidden_characters_from_server_", comment: ""))
+            case 400:
+                return(errorCode, "\(errorCode):" + NSLocalizedString("_bad_request_", comment: ""))
+            case 403:
+                return(errorCode, "\(errorCode):" + NSLocalizedString("_error_not_permission_", comment: ""))
+            case 404:
+                return(errorCode, "\(errorCode):" + NSLocalizedString("_error_path_", comment: ""))
+            case 423:
+                return(errorCode, "\(errorCode):" + NSLocalizedString("_webdav_locked_", comment: ""))
+            case 500:
+                return(errorCode, "\(errorCode):" + NSLocalizedString("_internal_server_", comment: ""))
+            case 503:
+                return(errorCode, "\(errorCode):" + NSLocalizedString("_server_error_retry_", comment: ""))
+            case 507:
+                return(errorCode, "\(errorCode):" + NSLocalizedString("_user_over_quota_", comment: ""))
+            default:
+                return(errorCode, httResponse?.description)
+            }
         }
+        
         if let error = error {
             switch error {
             case .createUploadableFailed(let error as NSError):

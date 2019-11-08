@@ -48,8 +48,8 @@ extension FileProviderExtension {
                 let fileNameLocalPath = CCUtility.getDirectoryProviderStorageIconOcId(metadata.ocId, fileNameView: metadata.fileNameView)!
                 let serverUrl = fileProviderData.sharedInstance.accountUrl
                     
-                NCCommunication.sharedInstance.downloadPreview(serverUrl: serverUrl, fileNamePath: fileNamePath, fileNameLocalPath: fileNameLocalPath ,width: width, height: height, account: fileProviderData.sharedInstance.account) { (account, data, error) in
-                    if error == nil && data != nil {
+                NCCommunication.sharedInstance.downloadPreview(serverUrl: serverUrl, fileNamePath: fileNamePath, fileNameLocalPath: fileNameLocalPath ,width: width, height: height, account: fileProviderData.sharedInstance.account) { (account, data, errorCode, errorDescription) in
+                    if errorCode == 0 && data != nil {
                         perThumbnailCompletionHandler(itemIdentifier, data, nil)
                     } else {
                         perThumbnailCompletionHandler(itemIdentifier, nil, NSFileProviderError(.serverUnreachable))

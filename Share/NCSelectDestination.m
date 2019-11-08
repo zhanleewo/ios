@@ -266,9 +266,9 @@
 
 - (void)readFolder
 {
-    [[NCCommunication sharedInstance] readFileOrFolderWithServerUrlFileName:_serverUrl depth:@"1" account:activeAccount completionHandler:^(NSString *account, NSArray<NCFile *> *files, NSError *error) {
+    [[NCCommunication sharedInstance] readFileOrFolderWithServerUrlFileName:_serverUrl depth:@"1" account:activeAccount completionHandler:^(NSString *account, NSArray<NCFile *> *files, NSInteger errorCode, NSString *errorDecription) {
         
-        if (error == nil && files.count >= 1) {
+        if (errorCode == 0 && files.count >= 1) {
 
             NCFile *fileDirectory = files[0];
         
@@ -293,7 +293,7 @@
             
             self.move.enabled = NO;
             
-            UIAlertController *alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"_error_",nil) message:error.description preferredStyle:UIAlertControllerStyleAlert];
+            UIAlertController *alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"_error_",nil) message:errorDecription preferredStyle:UIAlertControllerStyleAlert];
             
             [alertController addAction: [UIAlertAction actionWithTitle:NSLocalizedString(@"_ok_", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
             }]];
@@ -315,11 +315,11 @@
 {
     NSString *serverUrlFileName = [NSString stringWithFormat:@"%@/%@", _serverUrl, fileNameFolder];
      
-    [[NCCommunication sharedInstance] createFolder:serverUrlFileName account:activeAccount completionHandler:^(NSString *account, NSString *ocID, NSDate *date, NSError *error) {
-        if (error == nil) {
+    [[NCCommunication sharedInstance] createFolder:serverUrlFileName account:activeAccount completionHandler:^(NSString *account, NSString *ocID, NSDate *date, NSInteger errorCode, NSString *errorDecription) {
+        if (errorCode == 0) {
            [self readFolder];
         } else {
-            UIAlertController *alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"_error_",nil) message:error.description preferredStyle:UIAlertControllerStyleAlert];
+            UIAlertController *alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"_error_",nil) message:errorDecription preferredStyle:UIAlertControllerStyleAlert];
             [alertController addAction: [UIAlertAction actionWithTitle:NSLocalizedString(@"_ok_", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) { }]];
             [self presentViewController:alertController animated:YES completion:nil];
         }

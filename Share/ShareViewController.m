@@ -213,11 +213,11 @@
         
         (void)[[NCCommunication sharedInstance] uploadWithServerUrlFileName:fileNameServer fileNameLocalPath:fileNameLocal account:self.activeAccount progressHandler:^(NSProgress * progress) {
             [self.hud progress:progress.fractionCompleted];
-        } completionHandler:^(NSString *account, NSString *ocId, NSString *etag, NSDate *date, NSError *error) {
+        } completionHandler:^(NSString *account, NSString *ocId, NSString *etag, NSDate *date, NSInteger errorCode, NSString *errorDescription) {
             [self.hud hideHud];
             [self.filesName removeObject:fileName];
            
-            if (error == nil) {
+            if (errorCode == 0) {
                
                 [CCUtility copyFileAtPath:fileNameLocal toPath:[CCUtility getDirectoryProviderStorageOcId:ocId fileNameView:fileNameForUpload]];
                
@@ -240,7 +240,7 @@
                
             } else {
                
-                UIAlertController * alert= [UIAlertController alertControllerWithTitle:NSLocalizedString(@"_error_", nil) message:error.description preferredStyle:UIAlertControllerStyleAlert];
+                UIAlertController * alert= [UIAlertController alertControllerWithTitle:NSLocalizedString(@"_error_", nil) message: errorDescription preferredStyle:UIAlertControllerStyleAlert];
                 UIAlertAction* ok = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault
                                                           handler:^(UIAlertAction * action) {
                    [alert dismissViewControllerAnimated:YES completion:nil];
