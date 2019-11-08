@@ -404,7 +404,6 @@ import SwiftyJSON
         }
         destination = destinationFile
         
-        // session
         let request = sessionManager.download(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: getStandardHeaders(), interceptor: nil, to: destination)
         .downloadProgress { progress in
             progressHandler(progress)
@@ -439,7 +438,6 @@ import SwiftyJSON
         }
         let fileNameLocalPathUrl = URL.init(fileURLWithPath: fileNameLocalPath)
         
-        // session
         let request = sessionManager.upload(fileNameLocalPathUrl, to: url, method: .put, headers: getStandardHeaders(), interceptor: nil, fileManager: .default)
         .uploadProgress { progress in
             progressHandler(progress)
