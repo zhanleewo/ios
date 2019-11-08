@@ -22,6 +22,7 @@
 //
 
 import RealmSwift
+import NCCommunication
 
 class NCManageDatabase: NSObject {
         

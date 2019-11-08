@@ -23,6 +23,7 @@
 
 import Foundation
 import SVGKit
+import NCCommunication
 
 class NCService: NSObject {
     @objc static let sharedInstance: NCService = {

@@ -22,6 +22,7 @@
 //
 
 import FileProvider
+import NCCommunication
 
 class FileProviderEnumerator: NSObject, NSFileProviderEnumerator {
     

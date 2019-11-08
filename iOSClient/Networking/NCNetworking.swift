@@ -23,6 +23,7 @@
 
 import Foundation
 import OpenSSL
+import NCCommunication
 
 @objc public protocol NCNetworkingDelegate {
     @objc optional func downloadProgress(_ progress: Double, fileName: String, ServerUrl: String, session: URLSession, task: URLSessionTask)
