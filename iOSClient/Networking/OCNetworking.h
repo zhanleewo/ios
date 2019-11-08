@@ -67,7 +67,7 @@
 #pragma mark ===== Favorite =====
 
 - (void)listingFavoritesWithAccount:(NSString *)account completion:(void(^)(NSString *account, NSArray *metadatas, NSString *message, NSInteger errorCode))completion;
-- (void)settingFavoriteWithAccount:(NSString *)account fileName:(NSString *)fileName favorite:(BOOL)favorite completion:(void (^)(NSString *account, NSString *message, NSInteger errorCode))completion;
+
 
 #pragma mark ===== Share =====
 
