@@ -72,30 +72,28 @@ class NCDataFileXML: NSObject {
     """
     <?xml version=\"1.0\" encoding=\"UTF-8\"?>
     <d:propfind xmlns:d=\"DAV:\" xmlns:oc=\"http://owncloud.org/ns\" xmlns:nc=\"http://nextcloud.org/ns\">
-    <d:prop>
+        <d:prop>
+            <d:getlastmodified />
+            <d:getetag />
+            <d:getcontenttype />
+            <d:resourcetype />
+            <d:quota-available-bytes />
+            <d:quota-used-bytes />
 
-    <d:getlastmodified />
-    <d:getetag />
-    <d:getcontenttype />
-    <d:resourcetype />
-    <d:quota-available-bytes />
-    <d:quota-used-bytes />
+            <permissions xmlns=\"http://owncloud.org/ns\"/>
+            <id xmlns=\"http://owncloud.org/ns\"/>
+            <fileid xmlns=\"http://owncloud.org/ns\"/>
+            <size xmlns=\"http://owncloud.org/ns\"/>
+            <favorite xmlns=\"http://owncloud.org/ns\"/>
+            <share-types xmlns=\"http://owncloud.org/ns\"/>
+            <owner-id xmlns=\"http://owncloud.org/ns\"/>
+            <owner-display-name xmlns=\"http://owncloud.org/ns\"/>
+            <comments-unread xmlns=\"http://owncloud.org/ns\"/>
 
-    <permissions xmlns=\"http://owncloud.org/ns\"/>
-    <id xmlns=\"http://owncloud.org/ns\"/>
-    <fileid xmlns=\"http://owncloud.org/ns\"/>
-    <size xmlns=\"http://owncloud.org/ns\"/>
-    <favorite xmlns=\"http://owncloud.org/ns\"/>
-    <share-types xmlns=\"http://owncloud.org/ns\"/>
-    <owner-id xmlns=\"http://owncloud.org/ns\"/>
-    <owner-display-name xmlns=\"http://owncloud.org/ns\"/>
-    <comments-unread xmlns=\"http://owncloud.org/ns\"/>
-
-    <is-encrypted xmlns=\"http://nextcloud.org/ns\"/>
-    <has-preview xmlns=\"http://nextcloud.org/ns\"/>
-    <mount-type xmlns=\"http://nextcloud.org/ns\"/>
-
-    </d:prop>
+            <is-encrypted xmlns=\"http://nextcloud.org/ns\"/>
+            <has-preview xmlns=\"http://nextcloud.org/ns\"/>
+            <mount-type xmlns=\"http://nextcloud.org/ns\"/>
+        </d:prop>
     </d:propfind>
     """
     
@@ -103,21 +101,24 @@ class NCDataFileXML: NSObject {
     """
     <?xml version=\"1.0\"?>
     <d:propertyupdate xmlns:d=\"DAV:\" xmlns:oc=\"http://owncloud.org/ns\">
-    <d:set>
-    <d:prop>
-    <oc:favorite>%i</oc:favorite>
-    </d:prop>
-    </d:set>
+        <d:set>
+            <d:prop>
+                <oc:favorite>%i</oc:favorite>
+            </d:prop>
+        </d:set>
     </d:propertyupdate>
     """
     
-    let requestBodyFileSetFavoriteListingFavorites =
+    let requestBodyFileListingFavorites =
     """
     <?xml version=\"1.0\"?>
-    <oc:filter-files  xmlns:d=\"DAV:\" xmlns:oc=\"http://owncloud.org/ns\" xmlns:nc=\"http://nextcloud.org/ns\">
-    <oc:filter-rules>
-    <oc:favorite>1</oc:favorite>
-    </oc:filter-rules>
+    <oc:filter-files xmlns:d=\"DAV:\" xmlns:oc=\"http://owncloud.org/ns\" xmlns:nc=\"http://nextcloud.org/ns\">
+        <d:prop>
+            <fileid xmlns=\"http://owncloud.org/ns\"/>
+        </d:prop>
+        <oc:filter-rules>
+            <oc:favorite>1</oc:favorite>
+        </oc:filter-rules>
     </oc:filter-files>
     """
     
