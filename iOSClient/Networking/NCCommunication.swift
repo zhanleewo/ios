@@ -228,7 +228,7 @@ import SwiftyJSON
         }
     }
     
-    @objc public func listingFavorites(urlString: String, account: String, completionHandler: @escaping (_ account: String, _ ocIds: [String]?, _ errorCode: Int, _ errorDescription: String?) -> Void) {
+    @objc public func listingFavorites(urlString: String, account: String, completionHandler: @escaping (_ account: String, _ files: [NCFile]?, _ errorCode: Int, _ errorDescription: String?) -> Void) {
         
         let serverUrlFileName = urlString + "/remote.php/dav/files/" + NCCommunicationCommon.sharedInstance.username
         guard let url = NCCommunicationCommon.sharedInstance.encodeUrlString(serverUrlFileName) else {
@@ -256,8 +256,8 @@ import SwiftyJSON
                 completionHandler(account, nil, error.errorCode, error.description)
             case .success( _):
                 if let data = response.data {
-                    
-                    completionHandler(account, nil, 0, nil)
+                    let files = NCDataFileXML().convertDataFile(data: data)
+                    completionHandler(account, files, 0, nil)
                 } else {
                     completionHandler(account, nil, NSURLErrorBadServerResponse, "Response error decode XML")
                 }

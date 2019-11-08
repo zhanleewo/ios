@@ -114,7 +114,26 @@ class NCDataFileXML: NSObject {
     <?xml version=\"1.0\"?>
     <oc:filter-files xmlns:d=\"DAV:\" xmlns:oc=\"http://owncloud.org/ns\" xmlns:nc=\"http://nextcloud.org/ns\">
         <d:prop>
+            <d:getlastmodified />
+            <d:getetag />
+            <d:getcontenttype />
+            <d:resourcetype />
+            <d:quota-available-bytes />
+            <d:quota-used-bytes />
+
+            <permissions xmlns=\"http://owncloud.org/ns\"/>
+            <id xmlns=\"http://owncloud.org/ns\"/>
             <fileid xmlns=\"http://owncloud.org/ns\"/>
+            <size xmlns=\"http://owncloud.org/ns\"/>
+            <favorite xmlns=\"http://owncloud.org/ns\"/>
+            <share-types xmlns=\"http://owncloud.org/ns\"/>
+            <owner-id xmlns=\"http://owncloud.org/ns\"/>
+            <owner-display-name xmlns=\"http://owncloud.org/ns\"/>
+            <comments-unread xmlns=\"http://owncloud.org/ns\"/>
+
+            <is-encrypted xmlns=\"http://nextcloud.org/ns\"/>
+            <has-preview xmlns=\"http://nextcloud.org/ns\"/>
+            <mount-type xmlns=\"http://nextcloud.org/ns\"/>
         </d:prop>
         <oc:filter-rules>
             <oc:favorite>1</oc:favorite>
