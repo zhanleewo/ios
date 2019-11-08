@@ -1768,7 +1768,7 @@ class NCManageDatabase: NSObject {
         return Array(metadatas.map { tableMetadata.init(value:$0) })
     }
 
-    @objc func addMetadata(files: [NCFile], account: String, serverUrl: String, removeFirst: Bool) {
+    @objc func addMetadatas(files: [NCFile], account: String, serverUrl: String, removeFirst: Bool) {
     
         var isNotFirstFileOfList: Bool = false
         let realm = try! Realm()
@@ -1779,6 +1779,10 @@ class NCManageDatabase: NSObject {
                     
                     if removeFirst == true && isNotFirstFileOfList == false {
                         isNotFirstFileOfList = true
+                        continue
+                    }
+                    
+                    if !CCUtility.getShowHiddenFiles() && file.fileName.first == "." {
                         continue
                     }
                     

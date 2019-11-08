@@ -282,7 +282,7 @@
             NSArray *metadatasInDownload = [[NCManageDatabase sharedInstance] getMetadatasWithPredicate:[NSPredicate predicateWithFormat:@"account == %@ AND serverUrl == %@ AND (status == %d OR status == %d OR status == %d OR status == %d)", account, _serverUrl, k_metadataStatusWaitDownload, k_metadataStatusInDownload, k_metadataStatusDownloading, k_metadataStatusDownloadError] sorted:nil ascending:NO];
             
             // Insert in Database
-            [[NCManageDatabase sharedInstance] addMetadataWithFiles:files account:account serverUrl:_serverUrl removeFirst:true];
+            [[NCManageDatabase sharedInstance] addMetadatasWithFiles:files account:account serverUrl:_serverUrl removeFirst:true];
             
             // reinsert metadatas in Download
             if (metadatasInDownload) {
