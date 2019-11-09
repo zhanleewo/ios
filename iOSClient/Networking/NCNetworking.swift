@@ -154,7 +154,7 @@ import NCCommunication
         return result
     }
     
-    @objc func convertFiles(_ files: [NCFile], user: String, urlString: String) -> [tableMetadata] {
+    @objc func convertFiles(_ files: [NCFile], urlString: String, serverUrl : String?, user: String) -> [tableMetadata] {
         
         var metadatas = [tableMetadata]()
         
@@ -185,7 +185,11 @@ import NCCommunication
             metadata.quotaUsedBytes = file.quotaUsedBytes
             metadata.quotaAvailableBytes = file.quotaAvailableBytes
             metadata.resourceType = file.resourceType
-            metadata.serverUrl = urlString + file.path.replacingOccurrences(of: "/remote.php/dav/files/"+user, with: "").dropLast()
+            if serverUrl == nil {
+                metadata.serverUrl = urlString + file.path.replacingOccurrences(of: "/remote.php/dav/files/"+user, with: "").dropLast()
+            } else {
+                metadata.serverUrl = serverUrl!
+            }
             metadata.size = file.size
                         
             CCUtility.insertTypeFileIconName(file.fileName, metadata: metadata)
