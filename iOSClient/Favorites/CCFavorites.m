@@ -188,7 +188,7 @@
             NSString *father = @"";
             NSMutableArray *filesOcId = [NSMutableArray new];
             
-            NSArray *metadatas = [[NCNetworking sharedInstance] convertFiles:files user:appDelegate.activeUserID urlString:[CCUtility getHomeServerUrlActiveUrl:appDelegate.activeUrl]];
+            NSArray *metadatas = [[NCNetworking sharedInstance] convertFiles:files urlString:[CCUtility getHomeServerUrlActiveUrl:appDelegate.activeUrl] serverUrl:nil user:appDelegate.activeUserID];
             
             for (tableMetadata *metadata in metadatas) {
                 
