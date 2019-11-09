@@ -401,7 +401,8 @@ PKPushRegistry *pushRegistry;
     // Setting Account to Networking
     [CCNetworking sharedNetworking].delegate = [NCNetworkingMain sharedInstance];
     
-    [[NCCommunicationCommon sharedInstance] setupWithUsername:activeUserID password:activePassword userAgent:[CCUtility getUserAgent] capabilitiesGroup:[NCBrandOptions sharedInstance].capabilitiesGroups delegate:[NCNetworking sharedInstance]];    
+    [[NCNetworking sharedInstance] setupWithAccount:activeAccount delegate:nil];
+    [[NCCommunicationCommon sharedInstance] setupWithUsername:activeUserID password:activePassword userAgent:[CCUtility getUserAgent] capabilitiesGroup:[NCBrandOptions sharedInstance].capabilitiesGroups delegate:[NCNetworking sharedInstance]];
 }
 
 - (void)deleteAccount:(NSString *)account wipe:(BOOL)wipe
