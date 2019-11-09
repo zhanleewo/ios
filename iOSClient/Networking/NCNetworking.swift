@@ -153,4 +153,50 @@ import NCCommunication
         
         return result
     }
+    
+    @objc func convertFiles(_ files: [NCFile], urlString: String, serverUrl : String?, user: String) -> [tableMetadata] {
+        
+        var metadatas = [tableMetadata]()
+        
+        for file in files {
+            
+            if !CCUtility.getShowHiddenFiles() && file.fileName.first == "." { continue }
+            if file.fileName.count == 0 { continue }
+            
+            let metadata = tableMetadata()
+            
+            metadata.account = account
+            metadata.commentsUnread = file.commentsUnread
+            metadata.contentType = file.contentType
+            metadata.date = file.date
+            metadata.directory = file.directory
+            metadata.e2eEncrypted = file.e2eEncrypted
+            metadata.etag = file.etag
+            metadata.favorite = file.favorite
+            metadata.fileId = file.fileId
+            metadata.fileName = file.fileName
+            metadata.fileNameView = file.fileName
+            metadata.hasPreview = file.hasPreview
+            metadata.mountType = file.mountType
+            metadata.ocId = file.ocId
+            metadata.ownerId = file.ownerId
+            metadata.ownerDisplayName = file.ownerDisplayName
+            metadata.permissions = file.permissions
+            metadata.quotaUsedBytes = file.quotaUsedBytes
+            metadata.quotaAvailableBytes = file.quotaAvailableBytes
+            metadata.resourceType = file.resourceType
+            if serverUrl == nil {
+                metadata.serverUrl = urlString + file.path.replacingOccurrences(of: "/remote.php/dav/files/"+user, with: "").dropLast()
+            } else {
+                metadata.serverUrl = serverUrl!
+            }
+            metadata.size = file.size
+                        
+            CCUtility.insertTypeFileIconName(file.fileName, metadata: metadata)
+            
+            metadatas.append(metadata)
+        }
+        
+        return metadatas
+    }
 }
